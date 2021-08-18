@@ -205,29 +205,46 @@ class EditTextWidgetState extends State<EditTextWidget>
 
   @override
   Widget build(BuildContext context) {
+    // Get the screen height, keyboard height, widget height and position
+    //
+    // This is used to add padding to the text editing widget so that the keyboard
+    // doesn't block it
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final keyboardHeight = mediaQuery.viewInsets.bottom;
+    final renderBox = widget.controller.painterKey.currentContext
+        ?.findRenderObject() as RenderBox?;
+    final y = renderBox?.localToGlobal(Offset.zero).dy ?? 0;
+    final height = renderBox?.size.height ?? screenHeight;
+
     return GestureDetector(
       // If the border is tapped, un-focus the text field
       onTap: () => textFieldNode.unfocus(),
       child: Container(
         color: Colors.black38,
-        child: Center(
-          child: TextField(
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-              isDense: true,
+        child: Padding(
+          padding: EdgeInsets.only(
+              bottom: (keyboardHeight - (screenHeight - height - y))
+                  .clamp(0, screenHeight)),
+          child: Center(
+            child: TextField(
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+                isDense: true,
+              ),
+              cursorColor: Colors.white,
+              buildCounter: buildEmptyCounter,
+              maxLength: 1000,
+              minLines: 1,
+              maxLines: 10,
+              controller: textEditingController,
+              focusNode: textFieldNode,
+              style: settings.textStyle,
+              textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.center,
+              onEditingComplete: onEditingComplete,
             ),
-            cursorColor: Colors.white,
-            buildCounter: buildEmptyCounter,
-            maxLength: 1000,
-            minLines: 1,
-            maxLines: 10,
-            controller: textEditingController,
-            focusNode: textFieldNode,
-            style: settings.textStyle,
-            textAlign: TextAlign.center,
-            textAlignVertical: TextAlignVertical.center,
-            onEditingComplete: onEditingComplete,
           ),
         ),
       ),
