@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 /// Represents the possible haptic feedback settings.
-enum HapticFeedbackSettings{
+enum HapticFeedbackSettings {
   /// No haptic feedback.
   none,
 
@@ -16,11 +16,10 @@ enum HapticFeedbackSettings{
 }
 
 /// An extension to add a method that performs the haptic feedback impact.
-extension HapticFeedbackSettingsImpact on HapticFeedbackSettings{
-
+extension HapticFeedbackSettingsImpact on HapticFeedbackSettings {
   /// Performs the haptic feedback impact of the [HapticFeedbackSettings].
   Future<void> impact() async {
-    switch(this){
+    switch (this) {
       case HapticFeedbackSettings.none:
         break;
       case HapticFeedbackSettings.light:
@@ -34,5 +33,4 @@ extension HapticFeedbackSettingsImpact on HapticFeedbackSettings{
         break;
     }
   }
-
 }

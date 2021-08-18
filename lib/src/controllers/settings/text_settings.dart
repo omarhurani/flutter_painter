@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Represents settings used to create and draw text.
 @immutable
-class TextSettings{
-
+class TextSettings {
   /// The text style to be used.
   final TextStyle textStyle;
 
@@ -24,13 +23,9 @@ class TextSettings{
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
-  TextSettings copyWith({
-    TextStyle? textStyle,
-    FocusNode? focusNode
-  }){
+  TextSettings copyWith({TextStyle? textStyle, FocusNode? focusNode}) {
     return TextSettings(
-      textStyle: textStyle ?? this.textStyle,
-      focusNode: focusNode ?? this.focusNode
-    );
+        textStyle: textStyle ?? this.textStyle,
+        focusNode: focusNode ?? this.focusNode);
   }
 }

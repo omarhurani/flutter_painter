@@ -2,7 +2,6 @@ part of 'flutter_painter.dart';
 
 /// Flutter widget to detect user input and request drawing [FreeStyleDrawable]s.
 class FreeStyleWidget extends StatefulWidget {
-
   /// The controller for the current [FlutterPainter].
   final PainterController controller;
 
@@ -22,14 +21,12 @@ class FreeStyleWidget extends StatefulWidget {
 
 /// State class
 class FreeStyleWidgetState extends State<FreeStyleWidget> {
-
   /// The current drawable being drawn.
   FreeStyleDrawable? drawable;
 
   @override
   Widget build(BuildContext context) {
-    if(!settings.enabled)
-      return widget.child;
+    if (!settings.enabled) return widget.child;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -41,19 +38,16 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
   }
 
   /// Getter for [FreeStyleSettings] from `widget.controller.value` to make code more readable.
-  FreeStyleSettings get settings =>
-      widget.controller.value.settings.freeStyle;
+  FreeStyleSettings get settings => widget.controller.value.settings.freeStyle;
 
   /// Callback when the user holds their pointer(s) down onto the widget.
-  void onScaleStart(ScaleStartDetails event){
+  void onScaleStart(ScaleStartDetails event) {
     // If the user is already drawing, don't create a new drawing
-    if(this.drawable != null)
-      return;
+    if (this.drawable != null) return;
 
     // If the user is trying to draw with multiple pointers, ignore user input
     // Drawing with two pointers causes an issue, so this is to avoid it
-    if(event.pointerCount > 1)
-      return;
+    if (event.pointerCount > 1) return;
 
     // Create a new free-style drawable representing the current drawing
     final drawable = FreeStyleDrawable(
@@ -68,16 +62,14 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
   }
 
   /// Callback when the user moves, rotates or scales the pointer(s).
-  void onScaleUpdate(ScaleUpdateDetails event){
+  void onScaleUpdate(ScaleUpdateDetails event) {
     final drawable = this.drawable;
     // If there is no current drawable, ignore user input
-    if(drawable == null)
-      return;
+    if (drawable == null) return;
 
     // If the user is trying to draw with multiple pointers, ignore user input
     // Drawing with two pointers causes an issue, so this is to avoid it
-    if(event.pointerCount > 1)
-      this.drawable = null;
+    if (event.pointerCount > 1) this.drawable = null;
 
     // Add the new point to a copy of the current drawable
     final newDrawable = drawable.copyWith(
@@ -90,7 +82,7 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
   }
 
   /// Callback when the user removes all pointers from the widget.
-  void onScaleEnd(ScaleEndDetails event){
+  void onScaleEnd(ScaleEndDetails event) {
     /// Reset the current drawable for the user to draw a new one next time
     drawable = null;
   }

@@ -8,7 +8,6 @@ import 'package:collection/collection.dart';
 
 /// Free-style Drawable (hand scribble).
 class FreeStyleDrawable extends Drawable {
-
   /// List of points representing the path to draw.
   final List<Offset> path;
 
@@ -26,14 +25,14 @@ class FreeStyleDrawable extends Drawable {
     this.color = Colors.black,
     this.strokeWidth = 1,
     bool hidden = false,
-  }) :
-  // An empty path cannot be drawn, so it is an invalid argument.
-  assert(path.isNotEmpty, 'The path cannot be an empty list'),
+  })  :
+        // An empty path cannot be drawn, so it is an invalid argument.
+        assert(path.isNotEmpty, 'The path cannot be an empty list'),
 
-  // The line cannot have a non-positive stroke width.
-  assert(strokeWidth > 0, 'The stroke width cannot be less than or equal to 0'),
-
-  super(hidden: hidden);
+        // The line cannot have a non-positive stroke width.
+        assert(strokeWidth > 0,
+            'The stroke width cannot be less than or equal to 0'),
+        super(hidden: hidden);
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   FreeStyleDrawable copyWith({
@@ -41,7 +40,7 @@ class FreeStyleDrawable extends Drawable {
     List<Offset>? path,
     Color? color,
     double? strokeWidth,
-  }){
+  }) {
     return FreeStyleDrawable(
       path: path ?? this.path,
       color: color ?? this.color,
@@ -52,8 +51,7 @@ class FreeStyleDrawable extends Drawable {
 
   /// Draws the free-style [path] on the provided [canvas] of size [size].
   @override
-  void draw(Canvas canvas, Size size){
-    
+  void draw(Canvas canvas, Size size) {
     // Create a UI path to draw
     final path = Path();
 
@@ -89,5 +87,4 @@ class FreeStyleDrawable extends Drawable {
 
   @override
   int get hashCode => hashValues(hidden, hashList(path), color, strokeWidth);
-
 }

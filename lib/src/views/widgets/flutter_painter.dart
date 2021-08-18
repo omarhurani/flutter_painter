@@ -17,7 +17,6 @@ part 'object_widget.dart';
 
 /// Widget that allows user to draw on it
 class FlutterPainter extends StatelessWidget {
-
   /// The controller for this painter.
   final PainterController controller;
 
@@ -29,37 +28,32 @@ class FlutterPainter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Navigator(
         onGenerateRoute: (settings) => PageRouteBuilder(
-          settings: settings,
-          opaque: false,
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              // Listen to the [controller]
-              ValueListenableBuilder<PainterControllerValue>(
-                key: controller.painterKey,
-                valueListenable: controller,
-                builder: (context, value, child) =>
-                  ClipRect(
-                    child: FreeStyleWidget(
-                        controller: controller,
-                        child: TextWidget(
-                          controller: controller,
-                          child: ObjectWidget(
-                            controller: controller,
-                            interactionEnabled: true,
-                            child: CustomPaint(
-                              painter: Painter(
-                                drawables: value.drawables,
-                                background: value.background,
-                              ),
-                            ),
-                          ),
-                        )
-                    ),
-                  )
-        ),
-      )
-    );
+              settings: settings,
+              opaque: false,
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  // Listen to the [controller]
+                  ValueListenableBuilder<PainterControllerValue>(
+                      key: controller.painterKey,
+                      valueListenable: controller,
+                      builder: (context, value, child) => ClipRect(
+                            child: FreeStyleWidget(
+                                controller: controller,
+                                child: TextWidget(
+                                  controller: controller,
+                                  child: ObjectWidget(
+                                    controller: controller,
+                                    interactionEnabled: true,
+                                    child: CustomPaint(
+                                      painter: Painter(
+                                        drawables: value.drawables,
+                                        background: value.background,
+                                      ),
+                                    ),
+                                  ),
+                                )),
+                          )),
+            ));
   }
 }

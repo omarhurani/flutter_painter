@@ -8,7 +8,6 @@ import 'dart:math';
 
 /// An abstract drawable that can be moved and rotated and scaled.
 abstract class ObjectDrawable<T> extends Drawable {
-
   /// Default paint used for horizontal and vertical assist lines.
   static final Paint defaultAssistPaint = Paint()
     ..strokeWidth = 1.5
@@ -59,24 +58,27 @@ abstract class ObjectDrawable<T> extends Drawable {
   }) : super(hidden: hidden);
 
   /// Draws any assist lines that the object has on [canvas] with [size].
-  void drawAssists(Canvas canvas, Size size){
+  void drawAssists(Canvas canvas, Size size) {
     // Draw the rotation assist line
     //
     // This assist line passes through the center point of the object
     // and extends according to the object's rotation angle
-    if(assists.contains(ObjectDrawableAssist.rotation)){
+    if (assists.contains(ObjectDrawableAssist.rotation)) {
       // Calculate the tangent of the angle
       final angleTan = tan(rotationAngle);
       // Calculate the points at which a line passing through the object's center
       // with an angle tangent crosses the borders of the drawing size
-      final intersections = _calculateBoxIntersections(position, angleTan, size);
+      final intersections =
+          _calculateBoxIntersections(position, angleTan, size);
 
-      if(intersections.length == 2){ // Should be redundant, added for safety
+      if (intersections.length == 2) {
+        // Should be redundant, added for safety
         // Draw the line between the two points on the size border
         canvas.drawLine(
-            intersections[0],
-            intersections[1],
-            assistPaints[ObjectDrawableAssist.rotation] ?? defaultRotationAssistPaint,
+          intersections[0],
+          intersections[1],
+          assistPaints[ObjectDrawableAssist.rotation] ??
+              defaultRotationAssistPaint,
         );
       }
     }
@@ -85,30 +87,22 @@ abstract class ObjectDrawable<T> extends Drawable {
     //
     // This assist line passes through the center point of the object
     // and extends horizontally (with a constant dy value)
-    if(assists.contains(ObjectDrawableAssist.horizontal))
-      canvas.drawLine(
-          Offset(0, position.dy),
-          Offset(size.width, position.dy),
-          assistPaints[ObjectDrawableAssist.horizontal] ?? defaultAssistPaint
-      );
-
+    if (assists.contains(ObjectDrawableAssist.horizontal))
+      canvas.drawLine(Offset(0, position.dy), Offset(size.width, position.dy),
+          assistPaints[ObjectDrawableAssist.horizontal] ?? defaultAssistPaint);
 
     // Draw the vertical assist line
     //
     // This assist line passes through the center point of the object
     // and extends vertically (with a constant dx value)
-    if(assists.contains(ObjectDrawableAssist.vertical))
-      canvas.drawLine(
-          Offset(position.dx, 0),
-          Offset(position.dx, size.height),
-          assistPaints[ObjectDrawableAssist.horizontal] ?? defaultAssistPaint
-      );
+    if (assists.contains(ObjectDrawableAssist.vertical))
+      canvas.drawLine(Offset(position.dx, 0), Offset(position.dx, size.height),
+          assistPaints[ObjectDrawableAssist.horizontal] ?? defaultAssistPaint);
   }
 
   /// Draws the object on the provided [canvas] of size [size].
   @override
-  void draw(Canvas canvas, Size size){
-
+  void draw(Canvas canvas, Size size) {
     // Draw the assist lines
     drawAssists(canvas, size);
 
@@ -136,7 +130,7 @@ abstract class ObjectDrawable<T> extends Drawable {
   ///
   /// Implementing/extending classes must implement its behavior to provide the correct size
   /// This size is used by the UI to detect movement, pinching and rotating actions.
-  Size getSize({ double minWidth = 0.0, double maxWidth = double.infinity});
+  Size getSize({double minWidth = 0.0, double maxWidth = double.infinity});
 
   /// Compares two [ObjectDrawable]s for equality.
   @override
@@ -162,49 +156,42 @@ abstract class ObjectDrawable<T> extends Drawable {
   });
 
   @override
-  int get hashCode => hashValues(
-    hidden,
-    hashList(assists),
-    hashList(assistPaints.entries),
-    object,
-    position,
-    rotationAngle
-  );
+  int get hashCode => hashValues(hidden, hashList(assists),
+      hashList(assistPaints.entries), object, position, rotationAngle);
 
   /// Calculates the intersection points between a line passing through point [point]
   /// with an angle tangent [angleTan] with the rectangular box of size [size].
-  List<Offset> _calculateBoxIntersections(Offset point, double angleTan, Size size){
-
+  List<Offset> _calculateBoxIntersections(
+      Offset point, double angleTan, Size size) {
     final intersections = <Offset>[];
 
     // Calculate if there is an intersection with the top edge
-    double coordinate = point.dx - (point.dy/angleTan);
-    if(coordinate >= 0 && coordinate <= size.width)
+    double coordinate = point.dx - (point.dy / angleTan);
+    if (coordinate >= 0 && coordinate <= size.width)
       intersections.add(Offset(coordinate, 0));
 
     // Calculate if there is an intersection with the bottom edge
-    coordinate = (size.height - point.dy)/angleTan + point.dx;
-    if(coordinate >= 0 && coordinate <= size.width)
+    coordinate = (size.height - point.dy) / angleTan + point.dx;
+    if (coordinate >= 0 && coordinate <= size.width)
       intersections.add(Offset(coordinate, size.height));
 
     // Calculate if there is an intersection with the right edge
     coordinate = point.dy - angleTan * point.dx;
-    if(coordinate >= 0 && coordinate <= size.height)
+    if (coordinate >= 0 && coordinate <= size.height)
       intersections.add(Offset(0, coordinate));
 
     // Calculate if there is an intersection with the left edge
     coordinate = angleTan * (size.width - point.dx) + point.dy;
-    if(coordinate >= 0 && coordinate <= size.height)
+    if (coordinate >= 0 && coordinate <= size.height)
       intersections.add(Offset(size.width, coordinate));
 
     // Interactions should always have 2 results
     return intersections;
   }
-
 }
 
 /// Defines the different types of assist lines objects might have.
-enum ObjectDrawableAssist{
+enum ObjectDrawableAssist {
   // Horizontal assist line.
   //
   // This assist line passes through the center point of the object

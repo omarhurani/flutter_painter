@@ -2,7 +2,6 @@ part of 'flutter_painter.dart';
 
 /// Flutter widget to move, scale and rotate [ObjectDrawable]s.
 class ObjectWidget extends StatefulWidget {
-
   /// The controller for the current [FlutterPainter].
   final PainterController controller;
 
@@ -26,9 +25,18 @@ class ObjectWidget extends StatefulWidget {
   ObjectWidgetState createState() => ObjectWidgetState();
 }
 
-class ObjectWidgetState extends State<ObjectWidget>{
-
-  static Set<double> assistAngles = <double>{0, pi/4, pi/2, 3*pi/4, pi, 5*pi/4, 3*pi/2, 7*pi/4, 2*pi};
+class ObjectWidgetState extends State<ObjectWidget> {
+  static Set<double> assistAngles = <double>{
+    0,
+    pi / 4,
+    pi / 2,
+    3 * pi / 4,
+    pi,
+    5 * pi / 4,
+    3 * pi / 2,
+    7 * pi / 4,
+    2 * pi
+  };
 
   static double get objectPadding => 25;
 
@@ -49,67 +57,65 @@ class ObjectWidgetState extends State<ObjectWidget>{
   Map<ObjectDrawableAssist, Set<int>> assistDrawables = Map.fromIterable(
       ObjectDrawableAssist.values,
       key: (e) => e,
-      value: (e) => <int>{}
-  );
+      value: (e) => <int>{});
 
   /// Getter for the list of [ObjectDrawable]s in the controller
   /// to make code more readable.
-  List<ObjectDrawable> get drawables => widget.controller.value
-      .drawables.whereType<ObjectDrawable>().toList();
+  List<ObjectDrawable> get drawables =>
+      widget.controller.value.drawables.whereType<ObjectDrawable>().toList();
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: widget.child
+    return LayoutBuilder(builder: (context, constraints) {
+      return Stack(
+        children: [
+          Positioned.fill(child: widget.child),
+          ...drawables.asMap().entries.map((entry) {
+            final drawable = entry.value;
+            final size = drawable.getSize(
+                maxWidth: constraints.maxWidth * drawable.scale);
+            final widget = Padding(
+              padding: EdgeInsets.all(objectPadding),
+              child: SizedBox(
+                width: size.width,
+                height: size.height,
               ),
-
-              ...drawables.asMap().entries.map((entry) {
-                final drawable = entry.value;
-                final size = drawable.getSize(maxWidth: constraints.maxWidth * drawable.scale);
-                final widget = Padding(
-                  padding: EdgeInsets.all(objectPadding),
-                  child: SizedBox(
-                    width: size.width,
-                    height: size.height,
-                  ),
-                );
-                return Positioned(
-                  // Offset the position by half the size of the drawable so that
-                  // the object is in the center point
-                  top: drawable.position.dy - objectPadding - size.height/2,
-                  left: drawable.position.dx - objectPadding - size.width/2,
-                  child: Transform.rotate(
-                    angle: drawable.rotationAngle,
-                    transformHitTests: true,
-                    child: Container(
-                      child: freeStyleSettings.enabled ? widget : MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () => tapDrawable(drawable),
-                          onScaleStart: (details) => onDrawableScaleStart(entry, details),
-                          onScaleUpdate: (details) => onDrawableScaleUpdate(entry, details),
-                          onScaleEnd: (_) => onDrawableScaleEnd(entry),
-                          child: widget,
+            );
+            return Positioned(
+              // Offset the position by half the size of the drawable so that
+              // the object is in the center point
+              top: drawable.position.dy - objectPadding - size.height / 2,
+              left: drawable.position.dx - objectPadding - size.width / 2,
+              child: Transform.rotate(
+                angle: drawable.rotationAngle,
+                transformHitTests: true,
+                child: Container(
+                  child: freeStyleSettings.enabled
+                      ? widget
+                      : MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => tapDrawable(drawable),
+                            onScaleStart: (details) =>
+                                onDrawableScaleStart(entry, details),
+                            onScaleUpdate: (details) =>
+                                onDrawableScaleUpdate(entry, details),
+                            onScaleEnd: (_) => onDrawableScaleEnd(entry),
+                            child: widget,
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ],
-          );
-        }
-    );
+                ),
+              ),
+            );
+          }),
+        ],
+      );
+    });
   }
 
   /// Getter for the [ObjectSettings] from the controller to make code more readable.
-  ObjectSettings get settings =>
-      widget.controller.value.settings.object;
+  ObjectSettings get settings => widget.controller.value.settings.object;
 
   /// Getter for the [FreeStyleSettings] from the controller to make code more readable.
   ///
@@ -121,26 +127,22 @@ class ObjectWidgetState extends State<ObjectWidget>{
   /// Callback when an object is tapped.
   ///
   /// Dispatches an [ObjectDrawableNotification] that the object was tapped.
-  void tapDrawable(ObjectDrawable drawable){
-    ObjectDrawableNotification(
-      drawable,
-      ObjectDrawableNotificationType.tapped
-    ).dispatch(context);
+  void tapDrawable(ObjectDrawable drawable) {
+    ObjectDrawableNotification(drawable, ObjectDrawableNotificationType.tapped)
+        .dispatch(context);
   }
 
   /// Callback when the object drawable starts being moved, scaled and/or rotated.
   ///
   /// Saves the initial point of interaction and drawable to be used on update events.
-  void onDrawableScaleStart(MapEntry<int, ObjectDrawable> entry, ScaleStartDetails details){
-
-    if(!widget.interactionEnabled)
-      return;
+  void onDrawableScaleStart(
+      MapEntry<int, ObjectDrawable> entry, ScaleStartDetails details) {
+    if (!widget.interactionEnabled) return;
 
     final index = entry.key;
     final drawable = entry.value;
 
-    if(index < 0)
-      return;
+    if (index < 0) return;
 
     initialScaleDrawables[index] = drawable;
 
@@ -149,17 +151,17 @@ class ObjectWidgetState extends State<ObjectWidget>{
     // So, a [Matrix4] is used to transform the needed event details to be consistent with
     // the current rotation of the object
     final rotateOffset = Matrix4.rotationZ(drawable.rotationAngle)
-      ..translate(details.localFocalPoint.dx,details.localFocalPoint.dy)
+      ..translate(details.localFocalPoint.dx, details.localFocalPoint.dy)
       ..rotateZ(-drawable.rotationAngle);
-    drawableInitialLocalFocalPoints[index] = Offset(rotateOffset[12], rotateOffset[13]);
+    drawableInitialLocalFocalPoints[index] =
+        Offset(rotateOffset[12], rotateOffset[13]);
   }
 
   /// Callback when the object drawable finishes movement, scaling and rotation.
   ///
   /// Cleans up the object information.
-  void onDrawableScaleEnd(MapEntry<int, ObjectDrawable> entry){
-    if(!widget.interactionEnabled)
-      return;
+  void onDrawableScaleEnd(MapEntry<int, ObjectDrawable> entry) {
+    if (!widget.interactionEnabled) return;
 
     final index = entry.key;
 
@@ -174,13 +176,10 @@ class ObjectWidgetState extends State<ObjectWidget>{
     // Clean up
     drawableInitialLocalFocalPoints.remove(index);
     initialScaleDrawables.remove(index);
-    for (final assistSet in assistDrawables.values)
-      assistSet.remove(index);
+    for (final assistSet in assistDrawables.values) assistSet.remove(index);
 
     // Remove any assist lines the object has
-    final newDrawable = drawable.copyWith(
-      assists: {}
-    );
+    final newDrawable = drawable.copyWith(assists: {});
 
     updateDrawable(drawable, newDrawable);
   }
@@ -188,24 +187,23 @@ class ObjectWidgetState extends State<ObjectWidget>{
   /// Callback when the object drawable is moved, scaled and/or rotated.
   ///
   /// Calculates the next position, scale and rotation of the object depending on the event details.
-  void onDrawableScaleUpdate(MapEntry<int, ObjectDrawable> entry, ScaleUpdateDetails details){
-    if(!widget.interactionEnabled)
-      return;
+  void onDrawableScaleUpdate(
+      MapEntry<int, ObjectDrawable> entry, ScaleUpdateDetails details) {
+    if (!widget.interactionEnabled) return;
 
     final index = entry.key;
     final drawable = entry.value;
-    if(index < 0)
-      return;
+    if (index < 0) return;
 
     final initialDrawable = initialScaleDrawables[index];
     // When the gesture detector is rotated, the hit test details are not transformed with it
     // This causes events from rotated objects to behave incorrectly
     // So, a [Matrix4] is used to transform the needed event details to be consistent with
     // the current rotation of the object
-    final initialLocalFocalPoint = drawableInitialLocalFocalPoints[index] ?? Offset.zero;
+    final initialLocalFocalPoint =
+        drawableInitialLocalFocalPoints[index] ?? Offset.zero;
 
-    if(initialDrawable == null)
-      return;
+    if (initialDrawable == null) return;
 
     final initialPosition = initialDrawable.position - initialLocalFocalPoint;
     final initialRotation = initialDrawable.rotationAngle;
@@ -218,16 +216,16 @@ class ObjectWidgetState extends State<ObjectWidget>{
       ..rotateZ(initialRotation)
       ..translate(details.localFocalPoint.dx, details.localFocalPoint.dy)
       ..rotateZ(-initialRotation);
-    final position = initialPosition + Offset(rotateOffset[12], rotateOffset[13]);
+    final position =
+        initialPosition + Offset(rotateOffset[12], rotateOffset[13]);
 
     // Calculate scale of object reference to the initial object scale
     final scale = initialDrawable.scale * details.scale;
 
     // Calculate the rotation of the object reference to the initial object rotation
     // and normalize it so that its between 0 and 2*pi
-    var rotation = (initialRotation + details.rotation).remainder(pi*2);
-    if(rotation < 0)
-      rotation += pi*2;
+    var rotation = (initialRotation + details.rotation).remainder(pi * 2);
+    if (rotation < 0) rotation += pi * 2;
 
     // The center point of the widget
     final center = this.center;
@@ -236,41 +234,50 @@ class ObjectWidgetState extends State<ObjectWidget>{
     final double? closestAssistAngle;
 
     // If layout assist is enabled, calculate the positional and rotational assists
-    if(settings.layoutAssist.enabled){
-      calculatePositionalAssists(settings.layoutAssist, index, position, center,);
-      closestAssistAngle = calculateRotationalAssist(settings.layoutAssist, index, rotation,);
-    }
-    else{
+    if (settings.layoutAssist.enabled) {
+      calculatePositionalAssists(
+        settings.layoutAssist,
+        index,
+        position,
+        center,
+      );
+      closestAssistAngle = calculateRotationalAssist(
+        settings.layoutAssist,
+        index,
+        rotation,
+      );
+    } else {
       closestAssistAngle = null;
     }
 
     // The set of assists for the object
     // If layout assist is disabled, it is empty
-    final assists = settings.layoutAssist.enabled ?
-    assistDrawables.entries
-        .where((element) => element.value.contains(index))
-        .map((e) => e.key)
-        .toSet() :
-    <ObjectDrawableAssist>{};
+    final assists = settings.layoutAssist.enabled
+        ? assistDrawables.entries
+            .where((element) => element.value.contains(index))
+            .map((e) => e.key)
+            .toSet()
+        : <ObjectDrawableAssist>{};
 
     // Do not display the rotational assist if the user is using less that 2 pointers
     // So, rotational assist lines won't show if the user is only moving the object
-    if(details.pointerCount < 2)
-      assists.remove(ObjectDrawableAssist.rotation);
+    if (details.pointerCount < 2) assists.remove(ObjectDrawableAssist.rotation);
 
     // Snap the object to the horizontal/vertical center if its is near it
     // and layout assist is enabled
     final assistedPosition = Offset(
       assists.contains(ObjectDrawableAssist.vertical) ? center.dx : position.dx,
-      assists.contains(ObjectDrawableAssist.horizontal) ? center.dy : position.dy,
+      assists.contains(ObjectDrawableAssist.horizontal)
+          ? center.dy
+          : position.dy,
     );
 
     // Snap the object rotation to the nearest angle from [assistAngles] if its near it
     // and layout assist is enabled
-    final assistedRotation =
-      assists.contains(ObjectDrawableAssist.rotation) && closestAssistAngle != null ?
-      closestAssistAngle.remainder(pi*2) :
-      rotation;
+    final assistedRotation = assists.contains(ObjectDrawableAssist.rotation) &&
+            closestAssistAngle != null
+        ? closestAssistAngle.remainder(pi * 2)
+        : rotation;
 
     final newDrawable = drawable.copyWith(
       position: assistedPosition,
@@ -283,20 +290,24 @@ class ObjectWidgetState extends State<ObjectWidget>{
   }
 
   /// Calculates whether the object entered or exited the horizontal and vertical assist areas.
-  void calculatePositionalAssists(ObjectLayoutAssistSettings settings, int index, Offset position, Offset center){
+  void calculatePositionalAssists(ObjectLayoutAssistSettings settings,
+      int index, Offset position, Offset center) {
     // Horizontal
     //
     // If the object is within the enter distance from the center dy and isn't marked
     // as a drawable with a horizontal assist, mark it
-    if((position.dy - center.dy).abs() < settings.positionalEnterDistance &&
-        !(assistDrawables[ObjectDrawableAssist.horizontal]?.contains(index) ?? false)){
+    if ((position.dy - center.dy).abs() < settings.positionalEnterDistance &&
+        !(assistDrawables[ObjectDrawableAssist.horizontal]?.contains(index) ??
+            false)) {
       assistDrawables[ObjectDrawableAssist.horizontal]?.add(index);
       settings.hapticFeedback.impact();
     }
     // Otherwise, if the object is outside the exit distance from the center dy and is marked as
     // as a drawable with a horizontal assist, un-mark it
-    else if ((position.dy - center.dy).abs() > settings.positionalExitDistance &&
-        (assistDrawables[ObjectDrawableAssist.horizontal]?.contains(index) ?? false)){
+    else if ((position.dy - center.dy).abs() >
+            settings.positionalExitDistance &&
+        (assistDrawables[ObjectDrawableAssist.horizontal]?.contains(index) ??
+            false)) {
       assistDrawables[ObjectDrawableAssist.horizontal]?.remove(index);
     }
 
@@ -304,33 +315,41 @@ class ObjectWidgetState extends State<ObjectWidget>{
     //
     // If the object is within the enter distance from the center dx and isn't marked
     // as a drawable with a vertical assist, mark it
-    if((position.dx - center.dx).abs() < settings.positionalEnterDistance &&
-      !(assistDrawables[ObjectDrawableAssist.vertical]?.contains(index) ?? false)){
+    if ((position.dx - center.dx).abs() < settings.positionalEnterDistance &&
+        !(assistDrawables[ObjectDrawableAssist.vertical]?.contains(index) ??
+            false)) {
       assistDrawables[ObjectDrawableAssist.vertical]?.add(index);
       settings.hapticFeedback.impact();
     }
     // Otherwise, if the object is outside the exit distance from the center dx and is marked as
     // as a drawable with a vertical assist, un-mark it
-    else if ((position.dx - center.dx).abs() > settings.positionalExitDistance &&
-        (assistDrawables[ObjectDrawableAssist.vertical]?.contains(index) ?? false)){
-        assistDrawables[ObjectDrawableAssist.vertical]?.remove(index);
+    else if ((position.dx - center.dx).abs() >
+            settings.positionalExitDistance &&
+        (assistDrawables[ObjectDrawableAssist.vertical]?.contains(index) ??
+            false)) {
+      assistDrawables[ObjectDrawableAssist.vertical]?.remove(index);
     }
   }
+
   /// Calculates whether the object entered or exited the rotational assist range.
   ///
   /// Returns the angle the object is closest to if it is inside the assist range.
-  double? calculateRotationalAssist(ObjectLayoutAssistSettings settings, int index, double rotation){
+  double? calculateRotationalAssist(
+      ObjectLayoutAssistSettings settings, int index, double rotation) {
     // Calculates all angles from [assistAngles] in the exit range of rotational assist
     final closeAngles = assistAngles
-        .where((angle) => (rotation - angle).abs() < settings.rotationalExitAngle)
+        .where(
+            (angle) => (rotation - angle).abs() < settings.rotationalExitAngle)
         .toList();
 
     // If the object is close to at least one assist angle
-    if(closeAngles.isNotEmpty){
+    if (closeAngles.isNotEmpty) {
       // If the object is also in the enter range of rotational assist and isn't marked
       // as a drawable with a rotational assist, mark it
-      if(closeAngles.any((angle) => (rotation - angle).abs() < settings.rotationalEnterAngle) &&
-          !(assistDrawables[ObjectDrawableAssist.rotation]?.contains(index) ?? false)){
+      if (closeAngles.any((angle) =>
+              (rotation - angle).abs() < settings.rotationalEnterAngle) &&
+          !(assistDrawables[ObjectDrawableAssist.rotation]?.contains(index) ??
+              false)) {
         assistDrawables[ObjectDrawableAssist.rotation]?.add(index);
         settings.hapticFeedback.impact();
       }
@@ -338,47 +357,45 @@ class ObjectWidgetState extends State<ObjectWidget>{
       return closeAngles[0];
     }
 
-
     // Otherwise, if the object is not in the exit range of any assist angles,
     // but is marked as a drawable with rotational assist, un-mark it
-    if(closeAngles.isEmpty &&
-        (assistDrawables[ObjectDrawableAssist.rotation]?.contains(index) ?? false)){
+    if (closeAngles.isEmpty &&
+        (assistDrawables[ObjectDrawableAssist.rotation]?.contains(index) ??
+            false)) {
       assistDrawables[ObjectDrawableAssist.rotation]?.remove(index);
     }
 
     return null;
-
   }
 
   /// Returns the center point of the painter widget.
   ///
   /// Uses the [GlobalKey] for the painter from [controller].
   Offset get center {
-    final renderBox = widget.controller.painterKey
-        .currentContext?.findRenderObject() as RenderBox?;
-    final center = renderBox == null ? Offset.zero :
-    Offset(
-      renderBox.size.width/2,
-      renderBox.size.height/2,
-    );
+    final renderBox = widget.controller.painterKey.currentContext
+        ?.findRenderObject() as RenderBox?;
+    final center = renderBox == null
+        ? Offset.zero
+        : Offset(
+            renderBox.size.width / 2,
+            renderBox.size.height / 2,
+          );
     return center;
   }
 
   /// Replaces a drawable with a new one.
-  void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable){
+  void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable) {
     setState(() {
       widget.controller.replaceDrawable(oldDrawable, newDrawable);
     });
   }
-
-
 }
 
 /// Represents a [Notification] that [ObjectWidget] dispatches when an event occurs
 /// that requires a parent to handle it.
 ///
 /// Parent widgets can listen using a [NotificationListener] and handle the notification.
-class ObjectDrawableNotification extends Notification{
+class ObjectDrawableNotification extends Notification {
   /// The drawable involved in the notification.
   final ObjectDrawable drawable;
 

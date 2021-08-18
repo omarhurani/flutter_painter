@@ -6,8 +6,7 @@ import 'settings.dart';
 
 /// Represents all the settings used to create and draw drawables.
 @immutable
-class PainterSettings{
-
+class PainterSettings {
   /// Settings for free-style drawables.
   final FreeStyleSettings freeStyle;
 
@@ -38,4 +37,3 @@ class PainterSettings{
     );
   }
 }
-

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Represents settings used to create and draw free-style drawables.
 @immutable
-class FreeStyleSettings{
-
+class FreeStyleSettings {
   /// If free-style painting is enabled or not.
   final bool enabled;
 
@@ -22,16 +21,12 @@ class FreeStyleSettings{
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
-  FreeStyleSettings copyWith({
-    bool? enabled,
-    Color? color,
-    double? strokeWidth
-  }){
+  FreeStyleSettings copyWith(
+      {bool? enabled, Color? color, double? strokeWidth}) {
     return FreeStyleSettings(
       enabled: enabled ?? this.enabled,
       color: color ?? this.color,
       strokeWidth: strokeWidth ?? this.strokeWidth,
     );
   }
-
 }

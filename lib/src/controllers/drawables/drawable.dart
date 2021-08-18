@@ -2,7 +2,6 @@ import 'dart:ui';
 
 /// Abstract class to define a drawable object.
 abstract class Drawable {
-
   /// Whether the drawable is hidden or not.
   final bool hidden;
 
@@ -14,13 +13,12 @@ abstract class Drawable {
 
   /// Checks equality between two [Drawable]s.
   @override
-  bool operator ==(Object other){
+  bool operator ==(Object other) {
     return other is Drawable && other.hidden == hidden;
   }
 
   @override
-  int get hashCode{
+  int get hashCode {
     return hidden.hashCode;
   }
-
 }

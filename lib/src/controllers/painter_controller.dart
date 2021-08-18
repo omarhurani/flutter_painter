@@ -14,7 +14,6 @@ import 'drawables/drawable.dart';
 /// * IMPORTANT: *
 /// Each [FlutterPainter] should have its own controller.
 class PainterController extends ValueNotifier<PainterControllerValue> {
-
   /// A controller for an event stream which widgets will listen to.
   ///
   /// This will dispatch events that represent actions, such as adding a new text drawable.
@@ -41,14 +40,13 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     List<Drawable>? drawables = const [],
     BackgroundDrawable? background,
   }) : this.fromValue(PainterControllerValue(
-      settings: settings,
-      drawables: drawables ?? const [],
-      background: background
-  ));
+            settings: settings,
+            drawables: drawables ?? const [],
+            background: background));
 
   /// Create a [PainterController] from a [PainterControllerValue].
-  PainterController.fromValue(PainterControllerValue value):
-        _eventsSteamController = StreamController<PainterEvent>.broadcast(),
+  PainterController.fromValue(PainterControllerValue value)
+      : _eventsSteamController = StreamController<PainterEvent>.broadcast(),
         painterKey = GlobalKey(),
         super(value);
 
@@ -63,18 +61,14 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// this value should only be set between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
   set settings(PainterSettings settings) =>
-    value = value.copyWith(
-      settings: settings
-    );
+      value = value.copyWith(settings: settings);
 
   /// Setting this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this value should only be set between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
   set background(BackgroundDrawable? background) =>
-    value = value.copyWith(
-      background: background
-    );
+      value = value.copyWith(background: background);
 
   /// Add the [drawables] to the controller value drawables.
   ///
@@ -82,12 +76,10 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void addDrawables(Iterable<Drawable> drawables){
+  void addDrawables(Iterable<Drawable> drawables) {
     final currentDrawables = List<Drawable>.from(value.drawables);
     currentDrawables.addAll(drawables);
-    value = value.copyWith(
-      drawables: currentDrawables
-    );
+    value = value.copyWith(drawables: currentDrawables);
   }
 
   /// Inserts the [drawables] to the controller value drawables at the provided [index].
@@ -96,12 +88,10 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void insertDrawables(int index, Iterable<Drawable> drawables){
+  void insertDrawables(int index, Iterable<Drawable> drawables) {
     final currentDrawables = List<Drawable>.from(value.drawables);
     currentDrawables.insertAll(index, drawables);
-    value = value.copyWith(
-      drawables: currentDrawables
-    );
+    value = value.copyWith(drawables: currentDrawables);
   }
 
   /// Replace [oldDrawable] with [newDrawable] in the controller value.
@@ -115,16 +105,15 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if the return value is `false`.
-  bool replaceDrawable(Drawable oldDrawable, Drawable newDrawable){
+  bool replaceDrawable(Drawable oldDrawable, Drawable newDrawable) {
     final oldDrawableIndex = value.drawables.indexOf(oldDrawable);
-    if(oldDrawableIndex < 0) // not found
+    if (oldDrawableIndex < 0) // not found
       return false;
 
     final currentDrawables = List<Drawable>.from(value.drawables);
-    currentDrawables.setRange(oldDrawableIndex, oldDrawableIndex+1, [newDrawable]);
-    value = value.copyWith(
-      drawables: currentDrawables
-    );
+    currentDrawables
+        .setRange(oldDrawableIndex, oldDrawableIndex + 1, [newDrawable]);
+    value = value.copyWith(drawables: currentDrawables);
     return true;
   }
 
@@ -138,13 +127,10 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if the return value is `false`.
-  bool removeDrawable(Drawable drawable){
+  bool removeDrawable(Drawable drawable) {
     final currentDrawables = List<Drawable>.from(value.drawables);
     final removed = currentDrawables.remove(drawable);
-    if(removed)
-      value = value.copyWith(
-        drawables: currentDrawables
-      );
+    if (removed) value = value.copyWith(drawables: currentDrawables);
     return removed;
   }
 
@@ -156,14 +142,11 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if there are no drawables in the controller value.
-  void removeLastDrawable(){
+  void removeLastDrawable() {
     final currentDrawables = List<Drawable>.from(value.drawables);
-    if(currentDrawables.isEmpty)
-      return;
+    if (currentDrawables.isEmpty) return;
     currentDrawables.removeAt(currentDrawables.length - 1);
-    value = value.copyWith(
-      drawables: currentDrawables
-    );
+    value = value.copyWith(drawables: currentDrawables);
   }
 
   /// Removes all drawables from the controller value.
@@ -172,14 +155,12 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void clearDrawables(){
-    value = value.copyWith(
-      drawables: const <Drawable>[]
-    );
+  void clearDrawables() {
+    value = value.copyWith(drawables: const <Drawable>[]);
   }
 
   /// Dispatches a [AddTextPainterEvent] on `events` stream.
-  void addText(){
+  void addText() {
     _eventsSteamController.add(AddTextPainterEvent());
   }
 
@@ -196,10 +177,10 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
       background: value.background,
     );
     painter.paint(canvas, size);
-    return await recorder.endRecording()
+    return await recorder
+        .endRecording()
         .toImage(size.width.floor(), size.height.floor());
   }
-
 }
 
 /// The current paint mode, drawables and background values of a [FlutterPainter] widget.
@@ -233,7 +214,7 @@ class PainterControllerValue {
     PainterSettings? settings,
     List<Drawable>? drawables,
     BackgroundDrawable? background,
-  }){
+  }) {
     return PainterControllerValue(
       settings: settings ?? this.settings,
       drawables: drawables ?? this._drawables,

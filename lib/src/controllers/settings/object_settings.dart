@@ -6,8 +6,7 @@ import 'haptic_feedback_settings.dart';
 
 /// Represents settings used to control object drawables in the UI
 @immutable
-class ObjectSettings{
-
+class ObjectSettings {
   /// The layout-assist settings of the current object.
   final ObjectLayoutAssistSettings layoutAssist;
 
@@ -17,9 +16,7 @@ class ObjectSettings{
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
-  ObjectSettings copyWith({
-    ObjectLayoutAssistSettings? layoutAssist
-  }){
+  ObjectSettings copyWith({ObjectLayoutAssistSettings? layoutAssist}) {
     return ObjectSettings(
       layoutAssist: layoutAssist ?? this.layoutAssist,
     );
@@ -31,8 +28,7 @@ class ObjectSettings{
 /// Layout assist helps in arranging objects by snapping them to common arrangements
 /// (such as vertical and horizontal centers, right angle rotations, etc...).
 @immutable
-class ObjectLayoutAssistSettings{
-
+class ObjectLayoutAssistSettings {
   /// The default value for [positionalEnterDistance].
   static const double defaultPositionalEnterDistance = 1;
 
@@ -40,10 +36,10 @@ class ObjectLayoutAssistSettings{
   static const double defaultPositionalExitDistance = 10;
 
   /// The default value for [rotationalEnterAngle].
-  static const double defaultRotationalEnterAngle = pi/80;
+  static const double defaultRotationalEnterAngle = pi / 80;
 
   /// The default value for [rotationalExitAngle].
-  static const double defaultRotationalExitAngle = pi/16;
+  static const double defaultRotationalExitAngle = pi / 16;
 
   /// Have layout assist enabled or not.
   ///
@@ -85,7 +81,6 @@ class ObjectLayoutAssistSettings{
     this.rotationalExitAngle = defaultRotationalExitAngle,
   });
 
-
   /// Creates a copy of this but with the given fields replaced with the new values.
   ObjectLayoutAssistSettings copyWith({
     bool? enabled,
@@ -94,12 +89,14 @@ class ObjectLayoutAssistSettings{
     double? positionalExitDistance,
     double? rotationalEnterAngle,
     double? rotationalExitAngle,
-  }){
+  }) {
     return ObjectLayoutAssistSettings(
       enabled: enabled ?? this.enabled,
       hapticFeedback: hapticFeedback ?? this.hapticFeedback,
-      positionalEnterDistance: positionalEnterDistance ?? this.positionalEnterDistance,
-      positionalExitDistance: positionalExitDistance ?? this.positionalExitDistance,
+      positionalEnterDistance:
+          positionalEnterDistance ?? this.positionalEnterDistance,
+      positionalExitDistance:
+          positionalExitDistance ?? this.positionalExitDistance,
       rotationalEnterAngle: rotationalEnterAngle ?? this.rotationalEnterAngle,
       rotationalExitAngle: rotationalExitAngle ?? this.rotationalExitAngle,
     );

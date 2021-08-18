@@ -16,9 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Flutter Painter Example",
       theme: ThemeData(
-        primaryColor: Colors.brown,
-        accentColor: Colors.amberAccent
-      ),
+          primaryColor: Colors.brown, accentColor: Colors.amberAccent),
       home: FlutterPainterExample(),
     );
   }
@@ -32,7 +30,6 @@ class FlutterPainterExample extends StatefulWidget {
 }
 
 class _FlutterPainterExampleState extends State<FlutterPainterExample> {
-
   static const Color red = Color(0xFFFF0000);
   FocusNode textFocusNode = FocusNode();
   late PainterController controller;
@@ -42,22 +39,17 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   void initState() {
     super.initState();
     controller = PainterController(
-      settings: PainterSettings(
-        text: TextSettings(
-          focusNode: textFocusNode,
-          textStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: red,
-            fontSize: 18
-          ),
-        ),
-        freeStyle: FreeStyleSettings(
-          enabled: false,
-          color: red,
-          strokeWidth: 5,
-        )
-      )
-    );
+        settings: PainterSettings(
+            text: TextSettings(
+              focusNode: textFocusNode,
+              textStyle: TextStyle(
+                  fontWeight: FontWeight.bold, color: red, fontSize: 18),
+            ),
+            freeStyle: FreeStyleSettings(
+              enabled: false,
+              color: red,
+              strokeWidth: 5,
+            )));
     // Listen to focus events of the text field
     textFocusNode.addListener(onFocus);
     // Initialize background
@@ -77,7 +69,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   }
 
   /// Updates UI when the focus changes
-  void onFocus(){
+  void onFocus() {
     setState(() {});
   }
 
@@ -89,115 +81,112 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         title: Text("Flutter Painter Example"),
         actions: [
           IconButton(
-            icon: Icon(Icons.undo,),
+            icon: Icon(
+              Icons.undo,
+            ),
             onPressed: removeLastDrawable,
           ),
           IconButton(
             icon: Icon(
               Icons.gesture,
-              color: controller.freeStyleSettings.enabled ? Theme.of(context).accentColor : null,
+              color: controller.freeStyleSettings.enabled
+                  ? Theme.of(context).accentColor
+                  : null,
             ),
             onPressed: toggleFreeStyle,
           ),
-
           IconButton(
             icon: Icon(
               Icons.title,
-              color: textFocusNode.hasFocus ? Theme.of(context).accentColor : null,
+              color:
+                  textFocusNode.hasFocus ? Theme.of(context).accentColor : null,
             ),
             onPressed: addText,
           ),
-
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.image,),
+        child: Icon(
+          Icons.image,
+        ),
         onPressed: renderAndDisplayImage,
       ),
       body: Column(
         children: [
-          if(backgroundImage != null)
+          if (backgroundImage != null)
             // Enforces constraints
             AspectRatio(
-              aspectRatio: backgroundImage!.width/backgroundImage!.height,
+              aspectRatio: backgroundImage!.width / backgroundImage!.height,
               child: FlutterPainter(
                 controller: controller,
               ),
             ),
+          if (controller.freeStyleSettings.enabled) ...[
+            // Control free style stroke width
+            Slider.adaptive(
+                min: 3,
+                max: 15,
+                value: controller.freeStyleSettings.strokeWidth,
+                onChanged: setFreeStyleStrokeWidth),
 
-          if(controller.freeStyleSettings.enabled)
-            ...[
-              // Control free style stroke width
-              Slider.adaptive(
-                  min: 3,
-                  max: 15,
-                  value: controller.freeStyleSettings.strokeWidth,
-                  onChanged: setFreeStyleStrokeWidth
-              ),
+            // Control free style color hue
+            Slider.adaptive(
+                min: 0,
+                max: 359.99,
+                value:
+                    HSVColor.fromColor(controller.freeStyleSettings.color).hue,
+                activeColor: controller.freeStyleSettings.color,
+                onChanged: setFreeStyleColor),
+          ],
+          if (textFocusNode.hasFocus) ...[
+            // Control text font size
+            Slider.adaptive(
+                min: 12,
+                max: 48,
+                value: controller.textSettings.textStyle.fontSize ?? 14,
+                onChanged: setTextFontSize),
 
-              // Control free style color hue
-              Slider.adaptive(
-                  min: 0,
-                  max: 359.99,
-                  value: HSVColor.fromColor(controller.freeStyleSettings.color).hue,
-                  activeColor: controller.freeStyleSettings.color,
-                  onChanged: setFreeStyleColor
-              ),
-            ],
-
-          if(textFocusNode.hasFocus)
-            ...[
-              // Control text font size
-              Slider.adaptive(
-                  min: 12,
-                  max: 48,
-                  value: controller.textSettings.textStyle.fontSize ?? 14,
-                  onChanged: setTextFontSize
-              ),
-
-              // Control text color hue
-              Slider.adaptive(
-                  min: 0,
-                  max: 359.99,
-                  value: HSVColor.fromColor(controller.textSettings.textStyle.color ?? red).hue,
-                  activeColor: controller.textSettings.textStyle.color,
-                  onChanged: setTextColor
-              ),
-            ]
+            // Control text color hue
+            Slider.adaptive(
+                min: 0,
+                max: 359.99,
+                value: HSVColor.fromColor(
+                        controller.textSettings.textStyle.color ?? red)
+                    .hue,
+                activeColor: controller.textSettings.textStyle.color,
+                onChanged: setTextColor),
+          ]
         ],
       ),
     );
   }
 
-  void removeLastDrawable(){
+  void removeLastDrawable() {
     controller.removeLastDrawable();
   }
 
-  void toggleFreeStyle(){
+  void toggleFreeStyle() {
     // Set state is just to update the current UI, the [FlutterPainter] UI updates without it
     setState(() {
-      controller.freeStyleSettings = controller.freeStyleSettings.copyWith(
-        enabled: !controller.freeStyleSettings.enabled
-      );
+      controller.freeStyleSettings = controller.freeStyleSettings
+          .copyWith(enabled: !controller.freeStyleSettings.enabled);
     });
   }
 
-  void addText(){
-    if(controller.freeStyleSettings.enabled)
-      toggleFreeStyle();
+  void addText() {
+    if (controller.freeStyleSettings.enabled) toggleFreeStyle();
     controller.addText();
   }
 
-  void setFreeStyleStrokeWidth(double value){
+  void setFreeStyleStrokeWidth(double value) {
     // Set state is just to update the current UI, the [FlutterPainter] UI updates without it
     setState(() {
-      controller.freeStyleSettings = controller.freeStyleSettings.copyWith(
-        strokeWidth: value
-      );
+      controller.freeStyleSettings =
+          controller.freeStyleSettings.copyWith(strokeWidth: value);
     });
   }
 
-  void setFreeStyleColor(double hue){
+  void setFreeStyleColor(double hue) {
     // Set state is just to update the current UI, the [FlutterPainter] UI updates without it
     setState(() {
       controller.freeStyleSettings = controller.freeStyleSettings.copyWith(
@@ -206,40 +195,34 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     });
   }
 
-  void setTextFontSize(double size){
+  void setTextFontSize(double size) {
     // Set state is just to update the current UI, the [FlutterPainter] UI updates without it
     setState(() {
       controller.textSettings = controller.textSettings.copyWith(
-        textStyle: controller.textSettings.textStyle.copyWith(
-          fontSize: size
-        )
-      );
+          textStyle:
+              controller.textSettings.textStyle.copyWith(fontSize: size));
     });
   }
 
-  void setTextColor(double hue){
+  void setTextColor(double hue) {
     // Set state is just to update the current UI, the [FlutterPainter] UI updates without it
     setState(() {
       controller.textSettings = controller.textSettings.copyWith(
-        textStyle: controller.textSettings.textStyle.copyWith(
-          color: HSVColor.fromAHSV(1, hue, 1, 1).toColor(),
-        )
-      );
+          textStyle: controller.textSettings.textStyle.copyWith(
+        color: HSVColor.fromAHSV(1, hue, 1, 1).toColor(),
+      ));
     });
   }
 
-  void renderAndDisplayImage(){
-
-    if(backgroundImage == null)
-      return;
+  void renderAndDisplayImage() {
+    if (backgroundImage == null) return;
     final backgroundImageSize = Size(
-      backgroundImage!.width.toDouble(),
-      backgroundImage!.height.toDouble()
-    );
+        backgroundImage!.width.toDouble(), backgroundImage!.height.toDouble());
 
     // Render the image
     // Returns a [ui.Image] object, convert to to byte data and then to Uint8List
-    final imageFuture = controller.renderImage(backgroundImageSize)
+    final imageFuture = controller
+        .renderImage(backgroundImageSize)
         .then<Uint8List?>((ui.Image image) => image.pngBytes);
 
     // From here, you can write the PNG image data a file or do whatever you want with it
@@ -252,22 +235,16 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 
     // Show a dialog with the image
     showDialog(
-      context: context,
-      builder: (context) => RenderedImageDialog(imageFuture: imageFuture)
-    );
+        context: context,
+        builder: (context) => RenderedImageDialog(imageFuture: imageFuture));
   }
-
 }
 
 class RenderedImageDialog extends StatelessWidget {
-
   final Future<Uint8List?> imageFuture;
 
-  const RenderedImageDialog({
-    Key? key,
-    required this.imageFuture
-  }) : super(key: key);
-
+  const RenderedImageDialog({Key? key, required this.imageFuture})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -275,20 +252,15 @@ class RenderedImageDialog extends StatelessWidget {
       title: Text("Rendered Image"),
       content: FutureBuilder<Uint8List?>(
         future: imageFuture,
-        builder: (context, snapshot){
-          if(snapshot.connectionState != ConnectionState.done)
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done)
             return SizedBox(
               height: 50,
-              child: Center(
-                child: CircularProgressIndicator.adaptive()
-              ),
+              child: Center(child: CircularProgressIndicator.adaptive()),
             );
-          if(!snapshot.hasData || snapshot.data == null)
-            return SizedBox();
+          if (!snapshot.hasData || snapshot.data == null) return SizedBox();
           return InteractiveViewer(
-            maxScale: 10,
-            child: Image.memory(snapshot.data!)
-          );
+              maxScale: 10, child: Image.memory(snapshot.data!));
         },
       ),
     );

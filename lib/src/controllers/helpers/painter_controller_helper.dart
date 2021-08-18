@@ -5,8 +5,7 @@ import '../drawables/drawables.dart';
 /// Adds extra getters and setters in [PainterController] to make it easier to use.
 ///
 /// This was made as an extension to not clutter up the [PainterController] class even more.
-extension PainterControllerHelper on PainterController{
-
+extension PainterControllerHelper on PainterController {
   /// Getter for the current painter settings directly from `value`.
   PainterSettings get settings => value.settings;
 
@@ -31,12 +30,10 @@ extension PainterControllerHelper on PainterController{
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this value should only be set between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  set objectSettings(ObjectSettings objectSettings) =>
-    value = value.copyWith(
-      settings: settings.copyWith(
+  set objectSettings(ObjectSettings objectSettings) => value = value.copyWith(
+          settings: settings.copyWith(
         object: objectSettings,
-      )
-    );
+      ));
 
   /// Setter to for `settings.text` directly.
   ///
@@ -44,12 +41,10 @@ extension PainterControllerHelper on PainterController{
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this value should only be set between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  set textSettings(TextSettings textSettings) =>
-    value = value.copyWith(
-      settings: settings.copyWith(
+  set textSettings(TextSettings textSettings) => value = value.copyWith(
+          settings: settings.copyWith(
         text: textSettings,
-      )
-    );
+      ));
 
   /// Setter to for `settings.freeStyle` directly.
   ///
@@ -58,11 +53,8 @@ extension PainterControllerHelper on PainterController{
   /// this value should only be set between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
   set freeStyleSettings(FreeStyleSettings freeStyleSettings) =>
-    value = value.copyWith(
-      settings: settings.copyWith(
+      value = value.copyWith(
+          settings: settings.copyWith(
         freeStyle: freeStyleSettings,
-      )
-    );
-
-
+      ));
 }

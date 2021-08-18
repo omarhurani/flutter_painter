@@ -2,7 +2,6 @@ part of 'flutter_painter.dart';
 
 /// Flutter widget to detect user input and request drawing [FreeStyleDrawable]s.
 class TextWidget extends StatefulWidget {
-
   /// The controller for the current [FlutterPainter].
   final PainterController controller;
 
@@ -20,7 +19,7 @@ class TextWidget extends StatefulWidget {
   TextWidgetState createState() => TextWidgetState();
 }
 
-class TextWidgetState extends State<TextWidget>{
+class TextWidgetState extends State<TextWidget> {
   /// The currently selected text drawable that is being edited.
   TextDrawable? selectedDrawable;
 
@@ -36,8 +35,7 @@ class TextWidgetState extends State<TextWidget>{
     // Listen to the stream of events from the paint controller
     controllerEventSubscription = widget.controller.events.listen((event) {
       // When an [AddTextPainterEvent] event is received, create a new text drawable
-      if(event is AddTextPainterEvent)
-        createDrawable();
+      if (event is AddTextPainterEvent) createDrawable();
     });
   }
 
@@ -57,18 +55,17 @@ class TextWidgetState extends State<TextWidget>{
   }
 
   /// Getter for [TextSettings] from `widget.controller.value` to make code more readable.
-  TextSettings get settings =>
-      widget.controller.value.settings.text;
+  TextSettings get settings => widget.controller.value.settings.text;
 
   /// Handles any [ObjectDrawableNotification] that might be dispatched in the widget tree.
   ///
   /// This handles notifications of type [ObjectDrawableNotificationType.tapped] to edit
   /// an existing [TextDrawable].
-  bool onObjectDrawableNotification(ObjectDrawableNotification notification){
-
+  bool onObjectDrawableNotification(ObjectDrawableNotification notification) {
     final drawable = notification.drawable;
 
-    if(notification.type == ObjectDrawableNotificationType.tapped && drawable is TextDrawable){
+    if (notification.type == ObjectDrawableNotificationType.tapped &&
+        drawable is TextDrawable) {
       openTextEditor(drawable);
       // Mark notification as handled
       return true;
@@ -78,17 +75,18 @@ class TextWidgetState extends State<TextWidget>{
   }
 
   /// Creates a new [TextDrawable], adds it to the controller and opens the editing widget.
-  void createDrawable(){
-    if(selectedDrawable != null)
-      return;
+  void createDrawable() {
+    if (selectedDrawable != null) return;
 
     // Calculate the center of the painter
-    final renderBox = widget.controller.painterKey.currentContext?.findRenderObject() as RenderBox?;
-    final center = renderBox == null ? Offset.zero :
-        Offset(
-          renderBox.size.width/2,
-          renderBox.size.height/2,
-        );
+    final renderBox = widget.controller.painterKey.currentContext
+        ?.findRenderObject() as RenderBox?;
+    final center = renderBox == null
+        ? Offset.zero
+        : Offset(
+            renderBox.size.width / 2,
+            renderBox.size.height / 2,
+          );
 
     // Create a new hidden empty entry in the center of the painter
     final drawable = TextDrawable(
@@ -103,35 +101,35 @@ class TextWidgetState extends State<TextWidget>{
       selectedDrawable = drawable;
     });
 
-    openTextEditor(drawable).then((value){
+    openTextEditor(drawable).then((value) {
       setState(() {
         selectedDrawable = null;
       });
     });
-
   }
 
   /// Opens an editor to edit the text of [drawable].
   Future<void> openTextEditor(TextDrawable drawable) async {
-    await Navigator.push(context, PageRouteBuilder(
-      transitionDuration: Duration(milliseconds: 300),
-      reverseTransitionDuration: Duration(milliseconds: 300),
-        opaque: false,
-        pageBuilder: (context, animation, secondaryAnimation) => EditTextWidget(
-            controller: widget.controller,
-            drawable: drawable
-        ),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
-          opacity: animation,
-          child: child,
-        )
-    ));
+    await Navigator.push(
+        context,
+        PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 300),
+            reverseTransitionDuration: Duration(milliseconds: 300),
+            opaque: false,
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                EditTextWidget(
+                    controller: widget.controller, drawable: drawable),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) =>
+                    FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    )));
   }
 }
 
 /// A dialog-like widget to edit text drawables in.
 class EditTextWidget extends StatefulWidget {
-
   /// The controller for the current [FlutterPainter].
   final PainterController controller;
 
@@ -148,8 +146,8 @@ class EditTextWidget extends StatefulWidget {
   EditTextWidgetState createState() => EditTextWidgetState();
 }
 
-class EditTextWidgetState extends State<EditTextWidget> with WidgetsBindingObserver {
-
+class EditTextWidgetState extends State<EditTextWidget>
+    with WidgetsBindingObserver {
   /// Text editing controller for the [TextField].
   TextEditingController textEditingController = TextEditingController();
 
@@ -165,8 +163,7 @@ class EditTextWidgetState extends State<EditTextWidget> with WidgetsBindingObser
   double bottomViewInsets = 0;
 
   /// Getter for [TextSettings] from `widget.controller.value` to make code more readable.
-  TextSettings get settings =>
-      widget.controller.value.settings.text;
+  TextSettings get settings => widget.controller.value.settings.text;
 
   @override
   void initState() {
@@ -199,8 +196,7 @@ class EditTextWidgetState extends State<EditTextWidget> with WidgetsBindingObser
     textFieldNode.removeListener(focusListener);
 
     // If the focus node was an inner node (not from [TextSettings]), dispose of it
-    if(settings.focusNode == null)
-      textFieldNode.dispose();
+    if (settings.focusNode == null) textFieldNode.dispose();
 
     // Dispose of the text editing controller
     textEditingController.dispose();
@@ -249,7 +245,8 @@ class EditTextWidgetState extends State<EditTextWidget> with WidgetsBindingObser
 
     // If the previous value of bottom view insets is larger than the current value,
     // the keyboard is closing, so lose focus from the focus node
-    if ((value ?? bottomViewInsets) < bottomViewInsets && textFieldNode.hasFocus) {
+    if ((value ?? bottomViewInsets) < bottomViewInsets &&
+        textFieldNode.hasFocus) {
       textFieldNode.unfocus();
     }
 
@@ -258,10 +255,9 @@ class EditTextWidgetState extends State<EditTextWidget> with WidgetsBindingObser
   }
 
   /// Listener to focus events for [textFieldNode]
-  void focusListener(){
-    if(!mounted)
-      return;
-    if(!textFieldNode.hasFocus){
+  void focusListener() {
+    if (!mounted) return;
+    if (!textFieldNode.hasFocus) {
       onEditingComplete();
     }
   }
@@ -269,12 +265,10 @@ class EditTextWidgetState extends State<EditTextWidget> with WidgetsBindingObser
   /// Saves the changes to the [widget.drawable] text and closes the editor.
   ///
   /// If the text is empty, it will remove the drawable from the controller.
-  void onEditingComplete(){
-
+  void onEditingComplete() {
     if (textEditingController.text.trim().isEmpty) {
       widget.controller.removeDrawable(widget.drawable);
-    }
-    else {
+    } else {
       final drawable = widget.drawable.copyWith(
         text: textEditingController.text.trim(),
         style: settings.textStyle,
@@ -282,12 +276,11 @@ class EditTextWidgetState extends State<EditTextWidget> with WidgetsBindingObser
       );
       updateDrawable(widget.drawable, drawable);
     }
-    if(mounted)
-      Navigator.pop(context);
+    if (mounted) Navigator.pop(context);
   }
 
   /// Updates the drawable in the painter controller.
-  void updateDrawable(TextDrawable oldDrawable, TextDrawable newDrawable){
+  void updateDrawable(TextDrawable oldDrawable, TextDrawable newDrawable) {
     widget.controller.replaceDrawable(oldDrawable, newDrawable);
   }
 
@@ -295,9 +288,9 @@ class EditTextWidgetState extends State<EditTextWidget> with WidgetsBindingObser
   ///
   /// By default, [TextField] shows a character counter if the maxLength attribute
   /// is used. This is to override the counter and display nothing.
-  Widget? buildEmptyCounter(BuildContext context, {
-    required int currentLength,
-    int? maxLength, required bool isFocused
-  }) => null;
-
+  Widget? buildEmptyCounter(BuildContext context,
+          {required int currentLength,
+          int? maxLength,
+          required bool isFocused}) =>
+      null;
 }

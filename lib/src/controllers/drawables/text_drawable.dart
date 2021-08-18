@@ -30,38 +30,33 @@ class TextDrawable extends ObjectDrawable<String> {
     this.direction = TextDirection.ltr,
     bool hidden = false,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-  }) :
-        textPainter = TextPainter(
-          text: TextSpan(
-            text: text,
-            style: style
-          ),
+  })  : textPainter = TextPainter(
+          text: TextSpan(text: text, style: style),
           textAlign: TextAlign.center,
           textScaleFactor: scale,
           textDirection: direction,
         ),
         super(
-          object: text,
-          position: position,
-          rotationAngle: rotation,
-          scale: scale,
-          assists: assists,
-          hidden: hidden
-        );
+            object: text,
+            position: position,
+            rotationAngle: rotation,
+            scale: scale,
+            assists: assists,
+            hidden: hidden);
 
   /// Returns the value of the text to be painted.
   String get text => object;
 
   /// Draws the text on the provided [canvas] of size [size].
   @override
-  void drawObject(Canvas canvas, Size size){
+  void drawObject(Canvas canvas, Size size) {
     // Render the text according to the size of the canvas taking the scale in mind
     textPainter.layout(maxWidth: size.width * scale);
 
-
     // Paint the text on the canvas
     // It is shifted back by half of its width and height to be drawn in the center
-    textPainter.paint(canvas, position - Offset(textPainter.width/2, textPainter.height/2));
+    textPainter.paint(canvas,
+        position - Offset(textPainter.width / 2, textPainter.height / 2));
   }
 
   /// Creates a copy of this but with the given fields replaced with the new values.
@@ -75,7 +70,7 @@ class TextDrawable extends ObjectDrawable<String> {
     double? scale,
     TextStyle? style,
     TextDirection? direction,
-  }){
+  }) {
     return TextDrawable(
       text: text ?? this.object,
       position: position ?? this.position,
@@ -89,8 +84,7 @@ class TextDrawable extends ObjectDrawable<String> {
   }
 
   @override
-  Size getSize({ double minWidth = 0.0, double maxWidth = double.infinity}) {
-
+  Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
     // Generate the text as a visual layout
     textPainter.layout(minWidth: minWidth, maxWidth: maxWidth * scale);
     return textPainter.size;
@@ -107,14 +101,13 @@ class TextDrawable extends ObjectDrawable<String> {
 
   @override
   int get hashCode => hashValues(
-    hidden,
-    hashList(assists),
-    hashList(assistPaints.entries),
-    object,
-    position,
-    rotationAngle,
-    scale,
-    style,
-    direction
-  );
+      hidden,
+      hashList(assists),
+      hashList(assistPaints.entries),
+      object,
+      position,
+      rotationAngle,
+      scale,
+      style,
+      direction);
 }
