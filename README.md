@@ -1,6 +1,6 @@
 # Flutter Painter 🎨🖌️
 
-[![pub package](https://img.shields.io/pub/v/flutter_painter?label=flutter_painter&color=blue)](https://pub.dev/packages/flutter_painter) <a href="https://www.buymeacoffee.com/omarhurani" target="_blank"><img src="https://i.imgur.com/OUmVzk7.png" alt="Buy Me A Coffee" style="height: 22px" > </a>
+[![pub package](https://img.shields.io/pub/v/flutter_painter?label=flutter_painter&color=blue)](https://pub.dev/packages/flutter_painter) <a href="https://www.buymeacoffee.com/omarhurani" target="_blank"><img src="https://i.imgur.com/OUmVzk7.png" alt="Buy Me A Pizza" height=22px/ > </a>
 
 A pure-Flutter package for painting. 
 
@@ -146,11 +146,12 @@ Uint8List? renderImage(Size size) async {
 
 You can check out the example tab for an example on how to use the package.
 
-Here is a video recording showing the example running:
+A video recording showing the example running:
 
-<iframe width="360" height="800" src="https://www.youtube.com/embed/v-nvgpHIQnU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<img src="https://user-images.githubusercontent.com/26940488/129899431-3265b212-6b21-4b92-b3a5-ed0734c2f4f4.gif" alt="Flutter Painter Video Demo" height=800px/>
+
 
 ## Support Me
 
 
-<a href="https://www.buymeacoffee.com/omarhurani" target="_blank"><img src="https://i.imgur.com/OUmVzk7.png" alt="Buy Me A Coffee" style="height: 60px" > </a>
+<a href="https://www.buymeacoffee.com/omarhurani" target="_blank"><img src="https://i.imgur.com/OUmVzk7.png" alt="Buy Me A Pizza" height=60px/> </a>
