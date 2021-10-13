@@ -39,6 +39,13 @@ class ObjectWidgetState extends State<ObjectWidget> {
   };
 
   static double get objectPadding => 25;
+  static double get controlsSize => kIsWeb ? 10 : 20;
+  static Duration get controlsTransitionDuration => Duration(milliseconds: 100);
+
+  /// Keeps track of the selected object drawable.
+  ///
+  /// This is used to display controls for scale and rotation of the object.
+  int? selectedDrawableIndex;
 
   /// Keeps track of the initial local focal point when scaling starts.
   ///
@@ -59,6 +66,15 @@ class ObjectWidgetState extends State<ObjectWidget> {
       key: (e) => e,
       value: (e) => <int>{});
 
+  /// Keeps track of which controls are being used.
+  ///
+  /// Used to highlight the controls when they are in use.
+  Map<int, bool> controlsAreActive = Map.fromIterable(
+    List.generate(8, (index) => index),
+    key: (e) => e,
+    value: (e) => false,
+  );
+
   /// Getter for the list of [ObjectDrawable]s in the controller
   /// to make code more readable.
   List<ObjectDrawable> get drawables =>
@@ -66,17 +82,24 @@ class ObjectWidgetState extends State<ObjectWidget> {
 
   @override
   Widget build(BuildContext context) {
+
     return LayoutBuilder(builder: (context, constraints) {
       return Stack(
         children: [
-          Positioned.fill(child: widget.child),
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: onBackgroundTapped,
+              child: widget.child
+            )
+          ),
           ...drawables.asMap().entries.map((entry) {
             final drawable = entry.value;
-            final size = drawable.getSize(
-                maxWidth: constraints.maxWidth * drawable.scale);
+            final selected = entry.key == selectedDrawableIndex;
+            final size = drawable.getSize(maxWidth: constraints.maxWidth);
+            // print("Container Size $size ${constraints.maxWidth}");
             final widget = Padding(
               padding: EdgeInsets.all(objectPadding),
-              child: SizedBox(
+              child: Container(
                 width: size.width,
                 height: size.height,
               ),
@@ -93,7 +116,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
                   child: freeStyleSettings.enabled
                       ? widget
                       : MouseRegion(
-                          cursor: SystemMouseCursors.click,
+                          cursor: SystemMouseCursors.allScroll,
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () => tapDrawable(drawable),
@@ -102,13 +125,130 @@ class ObjectWidgetState extends State<ObjectWidget> {
                             onScaleUpdate: (details) =>
                                 onDrawableScaleUpdate(entry, details),
                             onScaleEnd: (_) => onDrawableScaleEnd(entry),
-                            child: widget,
+
+                            child: AnimatedSwitcher(
+                              duration: controlsTransitionDuration,
+                              child: selected ? Stack(
+                                children: [
+                                  widget,
+                                  Positioned(
+                                    top: objectPadding - (controlsSize/2),
+                                    bottom: objectPadding - (controlsSize/2),
+                                    left: objectPadding - (controlsSize/2),
+                                    right: objectPadding - (controlsSize/2),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.white,
+                                          ),
+                                          boxShadow: [
+                                            BorderBoxShadow(
+                                              color: Colors.black,
+                                              blurRadius: 2,
+                                            )
+                                          ]
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: objectPadding - (controlsSize),
+                                    left: objectPadding - (controlsSize),
+                                    width: controlsSize,
+                                    height: controlsSize,
+                                    child: MouseRegion(
+                                      cursor: SystemMouseCursors.resizeUpLeft,
+                                      child: GestureDetector(
+                                        onPanStart: (details) => onScaleControlPanStart(0, entry, details),
+                                        onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, true),
+                                        onPanEnd: (details) => onScaleControlPanEnd(0, entry, details),
+                                        child: ControlBox(active: controlsAreActive[0] ?? false,),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: objectPadding - (controlsSize),
+                                    left: objectPadding - (controlsSize),
+                                    width: controlsSize,
+                                    height: controlsSize,
+                                    child: MouseRegion(
+                                      cursor: SystemMouseCursors.resizeDownLeft,
+                                      child: GestureDetector(
+                                        onPanStart: (details) => onScaleControlPanStart(1, entry, details),
+                                        onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, true),
+                                        onPanEnd: (details) => onScaleControlPanEnd(1, entry, details),
+                                        child: ControlBox(active: controlsAreActive[1] ?? false,),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: objectPadding - (controlsSize),
+                                    right: objectPadding - (controlsSize),
+                                    width: controlsSize,
+                                    height: controlsSize,
+                                    child: MouseRegion(
+                                      cursor: initialScaleDrawables.containsKey(entry.key) ?
+                                      SystemMouseCursors.grabbing :
+                                      SystemMouseCursors.grab,
+                                      child: GestureDetector(
+                                        onPanStart: (details) => onRotationControlPanStart(2, entry, details),
+                                        onPanUpdate: (details) => onRotationControlPanUpdate(entry, details, size),
+                                        onPanEnd: (details) => onRotationControlPanEnd(2, entry, details),
+                                        child: ControlBox(
+                                          shape: BoxShape.circle,
+                                          active: controlsAreActive[2] ?? false,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: objectPadding - (controlsSize),
+                                    right: objectPadding - (controlsSize),
+                                    width: controlsSize,
+                                    height: controlsSize,
+                                    child: MouseRegion(
+                                      cursor: SystemMouseCursors.resizeDownRight,
+                                      child: GestureDetector(
+                                        onPanStart: (details) => onScaleControlPanStart(3, entry, details),
+                                        onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, false),
+                                        onPanEnd: (details) => onScaleControlPanEnd(3, entry, details),
+                                        child: ControlBox(active: controlsAreActive[3] ?? false,),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ) : widget,
+                              transitionBuilder: (child, animation){
+                                return FadeTransition(opacity: animation, child: child,);
+                              },
+                            ),
                           ),
                         ),
                 ),
               ),
             );
           }),
+          // if(selectedDrawableIndex != null)
+          //   ...[
+          //     Positioned(
+          //
+          //       child: Container(
+          //         decoration: BoxDecoration(
+          //             border:  Border.all(
+          //               color: Colors.white,
+          //               width: 2,
+          //             ),
+          //             boxShadow: [
+          //               BorderBoxShadow(
+          //                 color: Colors.black,
+          //                 blurRadius: 1,
+          //               )
+          //             ]
+          //         ),
+          //         width: size.width,
+          //         height: size.height,
+          //       ),
+          //     )
+          //   ]
         ],
       );
     });
@@ -124,12 +264,26 @@ class ObjectWidgetState extends State<ObjectWidget> {
   FreeStyleSettings get freeStyleSettings =>
       widget.controller.value.settings.freeStyle;
 
+  /// Triggers when the user taps an empty space.
+  ///
+  /// Deselects the selected object drawable.
+  void onBackgroundTapped(){
+    setState(() {
+      selectedDrawableIndex = null;
+    });
+  }
+
   /// Callback when an object is tapped.
   ///
   /// Dispatches an [ObjectDrawableNotification] that the object was tapped.
   void tapDrawable(ObjectDrawable drawable) {
-    ObjectDrawableNotification(drawable, ObjectDrawableNotificationType.tapped)
-        .dispatch(context);
+    if(selectedDrawableIndex != null && drawables.length > selectedDrawableIndex! && drawables[selectedDrawableIndex!] == drawable)
+      ObjectDrawableNotification(drawable, ObjectDrawableNotificationType.tapped)
+          .dispatch(context);
+
+    setState(() {
+      selectedDrawableIndex = drawables.indexOf(drawable);
+    });
   }
 
   /// Callback when the object drawable starts being moved, scaled and/or rotated.
@@ -143,6 +297,10 @@ class ObjectWidgetState extends State<ObjectWidget> {
     final drawable = entry.value;
 
     if (index < 0) return;
+
+    setState(() {
+      selectedDrawableIndex = index;
+    });
 
     initialScaleDrawables[index] = drawable;
 
@@ -389,6 +547,107 @@ class ObjectWidgetState extends State<ObjectWidget> {
       widget.controller.replaceDrawable(oldDrawable, newDrawable);
     });
   }
+
+  void onRotationControlPanStart(int controlIndex, MapEntry<int, ObjectDrawable> entry, DragStartDetails details){
+    setState(() {
+      controlsAreActive[controlIndex] = true;
+    });
+    onDrawableScaleStart(entry, ScaleStartDetails(
+      pointerCount: 2,
+      localFocalPoint: entry.value.position,
+    ));
+  }
+
+  void onRotationControlPanUpdate(MapEntry<int, ObjectDrawable> entry, DragUpdateDetails details, Size size){
+    final index = entry.key;
+    final initial = initialScaleDrawables[index];
+    if(initial == null)
+      return;
+    final initialOffset = Offset((size.width/2), (-size.height/2));
+    final initialAngle = atan2(initialOffset.dx, initialOffset.dy);
+    final angle = atan2((details.localPosition.dx + initialOffset.dx), (details.localPosition.dy + initialOffset.dy));
+    final rotation = initialAngle - angle;
+    onDrawableScaleUpdate(entry, ScaleUpdateDetails(
+      pointerCount: 2,
+      rotation: rotation,
+      scale: 1,
+      localFocalPoint: entry.value.position,
+    ));
+  }
+
+  void onRotationControlPanEnd(int controlIndex, MapEntry<int, ObjectDrawable> entry, DragEndDetails details){
+    setState(() {
+      controlsAreActive[controlIndex] = false;
+    });
+    onDrawableScaleEnd(entry);
+  }
+
+  void onScaleControlPanStart(int controlIndex, MapEntry<int, ObjectDrawable> entry, DragStartDetails details){
+    setState(() {
+      controlsAreActive[controlIndex] = true;
+    });
+    onDrawableScaleStart(entry, ScaleStartDetails(
+      pointerCount: 1,
+      localFocalPoint: entry.value.position,
+    ));
+  }
+
+  void onScaleControlPanUpdate(
+      MapEntry<int, ObjectDrawable> entry,
+      DragUpdateDetails details,
+      BoxConstraints constraints,[
+        bool isReversed = true
+      ]){
+    final index = entry.key;
+    final initial = initialScaleDrawables[index];
+    if(initial == null)
+      return;
+    final length = details.localPosition.dx * (isReversed ? -1 : 1);
+    final initialSize = initial.getSize(maxWidth: constraints.maxWidth);
+    final initialLength = initialSize.width/2;
+    final double scale = ((length + initialLength) / initialLength).clamp(0.001, double.infinity);
+    onDrawableScaleUpdate(entry, ScaleUpdateDetails(
+      pointerCount: 1,
+      rotation: 0,
+      scale: scale,
+      localFocalPoint: entry.value.position,
+    ));
+  }
+
+  void onScaleControlPanEnd(int controlIndex, MapEntry<int, ObjectDrawable> entry, DragEndDetails details){
+    setState(() {
+      controlsAreActive[controlIndex] = false;
+    });
+    onDrawableScaleEnd(entry);
+  }
+
+}
+
+class ControlBox extends StatelessWidget {
+  final BoxShape shape;
+  final bool active;
+  const ControlBox({
+    Key? key,
+    this.shape = BoxShape.rectangle,
+    this.active = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: ObjectWidgetState.controlsTransitionDuration,
+      decoration: BoxDecoration(
+        color: active ? Theme.of(context).accentColor : Colors.white,
+        shape: shape,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black,
+            blurRadius: 2,
+          )
+        ],
+      ),
+    );
+  }
 }
 
 /// Represents a [Notification] that [ObjectWidget] dispatches when an event occurs
@@ -411,3 +670,4 @@ enum ObjectDrawableNotificationType {
   /// Represents the event of tapping an [ObjectDrawable] inside the [ObjectWidget].
   tapped,
 }
+
