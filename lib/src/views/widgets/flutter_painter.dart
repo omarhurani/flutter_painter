@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../../controllers/drawables/object_drawable.dart';
@@ -10,6 +11,7 @@ import '../../controllers/drawables/free_style_drawable.dart';
 import '../../controllers/settings/settings.dart';
 import '../painters/painter.dart';
 import '../../controllers/painter_controller.dart';
+import '../../controllers/helpers/border_box_shadow.dart';
 
 part 'free_style_widget.dart';
 part 'text_widget.dart';
