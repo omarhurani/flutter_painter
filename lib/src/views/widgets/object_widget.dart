@@ -164,7 +164,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
                                             onPanStart: (details) => onScaleControlPanStart(0, entry, details),
                                             onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, true),
                                             onPanEnd: (details) => onScaleControlPanEnd(0, entry, details),
-                                            child: ControlBox(active: controlsAreActive[0] ?? false,),
+                                            child: _ObjectControlBox(active: controlsAreActive[0] ?? false,),
                                           ),
                                         ),
                                       ),
@@ -179,7 +179,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
                                             onPanStart: (details) => onScaleControlPanStart(1, entry, details),
                                             onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, true),
                                             onPanEnd: (details) => onScaleControlPanEnd(1, entry, details),
-                                            child: ControlBox(active: controlsAreActive[1] ?? false,),
+                                            child: _ObjectControlBox(active: controlsAreActive[1] ?? false,),
                                           ),
                                         ),
                                       ),
@@ -196,7 +196,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
                                             onPanStart: (details) => onRotationControlPanStart(2, entry, details),
                                             onPanUpdate: (details) => onRotationControlPanUpdate(entry, details, size),
                                             onPanEnd: (details) => onRotationControlPanEnd(2, entry, details),
-                                            child: ControlBox(
+                                            child: _ObjectControlBox(
                                               shape: BoxShape.circle,
                                               active: controlsAreActive[2] ?? false,
                                             ),
@@ -214,7 +214,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
                                             onPanStart: (details) => onScaleControlPanStart(3, entry, details),
                                             onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, false),
                                             onPanEnd: (details) => onScaleControlPanEnd(3, entry, details),
-                                            child: ControlBox(active: controlsAreActive[3] ?? false,),
+                                            child: _ObjectControlBox(active: controlsAreActive[3] ?? false,),
                                           ),
                                         ),
                                       ),
@@ -627,10 +627,18 @@ class ObjectWidgetState extends State<ObjectWidget> {
 
 }
 
-class ControlBox extends StatelessWidget {
+/// The control box container (only the UI, no logic).
+class _ObjectControlBox extends StatelessWidget {
+  /// Shape of the control box.
   final BoxShape shape;
+
+  /// Whether the box is being used or not.
   final bool active;
-  const ControlBox({
+
+  /// Creates an [_ObjectControlBox] with the given [shape] and [active].
+  ///
+  /// By default, it will be a [BoxShape.rectangle] shape and not active.
+  const _ObjectControlBox({
     Key? key,
     this.shape = BoxShape.rectangle,
     this.active = false,
