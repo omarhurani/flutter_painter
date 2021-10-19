@@ -1,18 +1,52 @@
+import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 import 'haptic_feedback_settings.dart';
+
+typedef ObjectEnlargeControlsFunction = bool Function();
+typedef ObjectShowScaleRotationControlsFunction = bool Function();
 
 /// Represents settings used to control object drawables in the UI
 @immutable
 class ObjectSettings {
+  /// Target platforms of mobile operating systems.
+  ///
+  /// This is used to detect the operating system for Flutter Web applications.
+  static const Set<TargetPlatform> _mobileTargetPlatforms = {
+    TargetPlatform.android,
+    TargetPlatform.fuchsia,
+    TargetPlatform.iOS
+  };
+
   /// The layout-assist settings of the current object.
   final ObjectLayoutAssistSettings layoutAssist;
+
+  /// A function used to decide whether to enlarge the object controls or not.
+  /// This is because on touch screens, larger controls are needed to make them easier to tap and drag.
+  ///
+  /// By default, it enlarges controls on mobile operating systems (see [_enlargeControls]).
+  ///
+  /// If you need more custom control, you can for example use the cursor state from a [MouseRegion]
+  /// to determine if the user is using a mouse or not (for example, if someone is using an iPad with a mouse and keyboard).
+  final ObjectEnlargeControlsFunction enlargeControls;
+
+  /// A function used to decide whether to show scale and rotation controls or not.
+  /// This is because on touch screens, scale and rotation can be controlled with pinching.
+  /// (However, controlling the size for [Sized2DDrawable]s still needs the controls).
+  ///
+  /// By default, it hides scale and rotation controls on mobile operating systems (see [_showScaleRotationControls]).
+  ///
+  /// If you need more custom control, you can for example use the cursor state from a [MouseRegion]
+  /// to determine if the user is using a mouse or not (for example, if someone is using an iPad with a mouse and keyboard).
+  final ObjectShowScaleRotationControlsFunction showScaleRotationControls;
 
   /// Creates a [TextSettings] with the given [layoutAssist].
   const ObjectSettings({
     this.layoutAssist = const ObjectLayoutAssistSettings(),
+    this.enlargeControls = _enlargeControls,
+    this.showScaleRotationControls = _showScaleRotationControls,
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
@@ -20,6 +54,25 @@ class ObjectSettings {
     return ObjectSettings(
       layoutAssist: layoutAssist ?? this.layoutAssist,
     );
+  }
+
+  /// Default value for [enlargeControls].
+  ///
+  /// Returns `true` on mobile devices.
+  static bool _enlargeControls() {
+    if(kIsWeb)
+      return _mobileTargetPlatforms.contains(defaultTargetPlatform);
+    return Platform.isAndroid ||
+        Platform.isIOS ||
+        Platform.isFuchsia;
+  }
+
+  static bool _showScaleRotationControls() {
+    if(kIsWeb)
+      return !_mobileTargetPlatforms.contains(defaultTargetPlatform);
+    return Platform.isWindows ||
+        Platform.isIOS ||
+        Platform.isLinux;
   }
 }
 

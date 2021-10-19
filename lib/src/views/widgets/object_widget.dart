@@ -39,8 +39,9 @@ class ObjectWidgetState extends State<ObjectWidget> {
   };
 
   static double get objectPadding => 25;
-  static double get controlsSize => kIsWeb ? 10 : 20;
   static Duration get controlsTransitionDuration => Duration(milliseconds: 100);
+
+  double get controlsSize => settings.enlargeControls() ? 20 : 10;
 
   /// Keeps track of the selected object drawable.
   ///
@@ -150,71 +151,74 @@ class ObjectWidgetState extends State<ObjectWidget> {
                                       ),
                                     ),
                                   ),
-                                  Positioned(
-                                    top: objectPadding - (controlsSize),
-                                    left: objectPadding - (controlsSize),
-                                    width: controlsSize,
-                                    height: controlsSize,
-                                    child: MouseRegion(
-                                      cursor: SystemMouseCursors.resizeUpLeft,
-                                      child: GestureDetector(
-                                        onPanStart: (details) => onScaleControlPanStart(0, entry, details),
-                                        onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, true),
-                                        onPanEnd: (details) => onScaleControlPanEnd(0, entry, details),
-                                        child: ControlBox(active: controlsAreActive[0] ?? false,),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: objectPadding - (controlsSize),
-                                    left: objectPadding - (controlsSize),
-                                    width: controlsSize,
-                                    height: controlsSize,
-                                    child: MouseRegion(
-                                      cursor: SystemMouseCursors.resizeDownLeft,
-                                      child: GestureDetector(
-                                        onPanStart: (details) => onScaleControlPanStart(1, entry, details),
-                                        onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, true),
-                                        onPanEnd: (details) => onScaleControlPanEnd(1, entry, details),
-                                        child: ControlBox(active: controlsAreActive[1] ?? false,),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: objectPadding - (controlsSize),
-                                    right: objectPadding - (controlsSize),
-                                    width: controlsSize,
-                                    height: controlsSize,
-                                    child: MouseRegion(
-                                      cursor: initialScaleDrawables.containsKey(entry.key) ?
-                                      SystemMouseCursors.grabbing :
-                                      SystemMouseCursors.grab,
-                                      child: GestureDetector(
-                                        onPanStart: (details) => onRotationControlPanStart(2, entry, details),
-                                        onPanUpdate: (details) => onRotationControlPanUpdate(entry, details, size),
-                                        onPanEnd: (details) => onRotationControlPanEnd(2, entry, details),
-                                        child: ControlBox(
-                                          shape: BoxShape.circle,
-                                          active: controlsAreActive[2] ?? false,
+                                  if(settings.showScaleRotationControls())
+                                    ...[
+                                      Positioned(
+                                        top: objectPadding - (controlsSize),
+                                        left: objectPadding - (controlsSize),
+                                        width: controlsSize,
+                                        height: controlsSize,
+                                        child: MouseRegion(
+                                          cursor: SystemMouseCursors.resizeUpLeft,
+                                          child: GestureDetector(
+                                            onPanStart: (details) => onScaleControlPanStart(0, entry, details),
+                                            onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, true),
+                                            onPanEnd: (details) => onScaleControlPanEnd(0, entry, details),
+                                            child: ControlBox(active: controlsAreActive[0] ?? false,),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: objectPadding - (controlsSize),
-                                    right: objectPadding - (controlsSize),
-                                    width: controlsSize,
-                                    height: controlsSize,
-                                    child: MouseRegion(
-                                      cursor: SystemMouseCursors.resizeDownRight,
-                                      child: GestureDetector(
-                                        onPanStart: (details) => onScaleControlPanStart(3, entry, details),
-                                        onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, false),
-                                        onPanEnd: (details) => onScaleControlPanEnd(3, entry, details),
-                                        child: ControlBox(active: controlsAreActive[3] ?? false,),
+                                      Positioned(
+                                        bottom: objectPadding - (controlsSize),
+                                        left: objectPadding - (controlsSize),
+                                        width: controlsSize,
+                                        height: controlsSize,
+                                        child: MouseRegion(
+                                          cursor: SystemMouseCursors.resizeDownLeft,
+                                          child: GestureDetector(
+                                            onPanStart: (details) => onScaleControlPanStart(1, entry, details),
+                                            onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, true),
+                                            onPanEnd: (details) => onScaleControlPanEnd(1, entry, details),
+                                            child: ControlBox(active: controlsAreActive[1] ?? false,),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                      Positioned(
+                                        top: objectPadding - (controlsSize),
+                                        right: objectPadding - (controlsSize),
+                                        width: controlsSize,
+                                        height: controlsSize,
+                                        child: MouseRegion(
+                                          cursor: initialScaleDrawables.containsKey(entry.key) ?
+                                          SystemMouseCursors.grabbing :
+                                          SystemMouseCursors.grab,
+                                          child: GestureDetector(
+                                            onPanStart: (details) => onRotationControlPanStart(2, entry, details),
+                                            onPanUpdate: (details) => onRotationControlPanUpdate(entry, details, size),
+                                            onPanEnd: (details) => onRotationControlPanEnd(2, entry, details),
+                                            child: ControlBox(
+                                              shape: BoxShape.circle,
+                                              active: controlsAreActive[2] ?? false,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: objectPadding - (controlsSize),
+                                        right: objectPadding - (controlsSize),
+                                        width: controlsSize,
+                                        height: controlsSize,
+                                        child: MouseRegion(
+                                          cursor: SystemMouseCursors.resizeDownRight,
+                                          child: GestureDetector(
+                                            onPanStart: (details) => onScaleControlPanStart(3, entry, details),
+                                            onPanUpdate: (details) => onScaleControlPanUpdate(entry, details, constraints, false),
+                                            onPanEnd: (details) => onScaleControlPanEnd(3, entry, details),
+                                            child: ControlBox(active: controlsAreActive[3] ?? false,),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                 ],
                               ) : widget,
                               transitionBuilder: (child, animation){
