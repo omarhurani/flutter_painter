@@ -13,17 +13,9 @@ abstract class Sized1DDrawable extends ObjectDrawable{
   /// The length of the drawable.
   final double length;
 
-  /// Padding of drawable.
-  ///
-  /// This padding is added to the size in the [getSize] method.
-  /// Implementing classes can set this value to increase/decrease the size.
-  final EdgeInsets padding;
-
-
   /// Creates a new [Sized1DDrawable] with the given [length] and [padding].
   const Sized1DDrawable({
     required this.length,
-    this.padding = EdgeInsets.zero,
     required Offset position,
     double rotationAngle = 0,
     double scale = 1,
@@ -39,6 +31,12 @@ abstract class Sized1DDrawable extends ObjectDrawable{
     hidden: hidden
   );
 
+  /// Getter for padding of drawable.
+  ///
+  /// This padding is added to the size in the [getSize] method.
+  /// Implementing classes can change this getter to increase/decrease the size.
+  EdgeInsets get padding => EdgeInsets.zero;
+
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override
   Sized1DDrawable copyWith({
@@ -48,7 +46,6 @@ abstract class Sized1DDrawable extends ObjectDrawable{
     double? rotation,
     double? scale,
     double? length,
-    EdgeInsets? padding,
   });
 
   /// Calculates the size of the rendered object.

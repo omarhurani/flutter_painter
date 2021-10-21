@@ -10,17 +10,9 @@ abstract class Sized2DDrawable extends ObjectDrawable{
   /// The size of the drawable.
   final Size size;
 
-  /// Padding of drawable.
-  ///
-  /// This padding is added to the size in the [getSize] method.
-  /// Implementing classes can set this value to increase/decrease the size.
-  final EdgeInsets padding;
-
-
   /// Creates a new [Sized2DDrawable] with the given [size] and [painting].
   const Sized2DDrawable({
     required this.size,
-    this.padding = EdgeInsets.zero,
     required Offset position,
     double rotationAngle = 0,
     double scale = 1,
@@ -36,6 +28,12 @@ abstract class Sized2DDrawable extends ObjectDrawable{
       hidden: hidden
   );
 
+  /// Getter for padding of drawable.
+  ///
+  /// This padding is added to the size in the [getSize] method.
+  /// Implementing classes can change this getter to increase/decrease the size.
+  EdgeInsets get padding => EdgeInsets.zero;
+
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override
   Sized2DDrawable copyWith({
@@ -45,7 +43,6 @@ abstract class Sized2DDrawable extends ObjectDrawable{
     double? rotation,
     double? scale,
     Size? size,
-    EdgeInsets? padding,
   });
 
   /// Calculates the size of the rendered object.
