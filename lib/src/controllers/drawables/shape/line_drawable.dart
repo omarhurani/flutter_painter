@@ -23,7 +23,7 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
     Map<ObjectDrawableAssist, Paint> assistPaints = const <ObjectDrawableAssist, Paint>{},
     bool hidden = false,
-  }) : this.paint = paint != null ? paint : ShapeDrawable.defaultPaint,
+  }) : this.paint = paint ?? ShapeDrawable.defaultPaint,
         super(
             length: length,
             position: position,
@@ -44,8 +44,8 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
   @override
   void drawObject(Canvas canvas, Size size) {
     canvas.drawLine(
-      position.translate(-length/2, -length/2),
-      position.translate(length/2, length/2),
+      position.translate(-length/2, 0),
+      position.translate(length/2, 0),
       paint
     );
   }
