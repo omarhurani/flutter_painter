@@ -83,6 +83,7 @@ class TextDrawable extends ObjectDrawable{
     );
   }
 
+  /// Calculates the size of the rendered object.
   @override
   Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
     // Generate the text as a visual layout
