@@ -49,8 +49,8 @@ abstract class Sized2DDrawable extends ObjectDrawable{
   @override
   Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
     return Size(
-      (size.width + padding.horizontal).clamp(0, double.infinity),
-      (size.height + padding.vertical).clamp(0, double.infinity),
+      (size.width * scale + padding.horizontal).clamp(0, double.infinity),
+      (size.height * scale + padding.vertical).clamp(0, double.infinity),
     );
   }
 }
