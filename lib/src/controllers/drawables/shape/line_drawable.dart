@@ -1,0 +1,95 @@
+import 'dart:ui';
+
+import 'package:flutter/rendering.dart';
+
+import '../object_drawable.dart';
+import 'shape_drawable.dart';
+import '../sized1ddrawable.dart';
+
+/// A drawable of a simple line shape.
+class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
+
+  /// The paint to be used for the line drawable.
+  @override
+  Paint paint;
+
+  /// Creates a new [LineDrawable] with the given [length].
+  LineDrawable({
+    Paint? paint,
+    required double length,
+    required Offset position,
+    double rotationAngle = 0,
+    double scale = 1,
+    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
+    Map<ObjectDrawableAssist, Paint> assistPaints = const <ObjectDrawableAssist, Paint>{},
+    bool hidden = false,
+  }) : this.paint = paint != null ? paint : ShapeDrawable.defaultPaint,
+        super(
+            length: length,
+            position: position,
+            rotationAngle: rotationAngle,
+            scale: scale,
+            assists: assists,
+            assistPaints: assistPaints,
+            hidden: hidden
+        );
+
+  /// Getter for padding of drawable.
+  ///
+  /// Add padding equal to the stroke width of the line.
+  @override
+  EdgeInsets get padding => EdgeInsets.all(paint.strokeWidth/2);
+
+  /// Draws the line on the provided [canvas] of size [size].
+  @override
+  void drawObject(Canvas canvas, Size size) {
+    canvas.drawLine(
+      position.translate(-length/2, -length/2),
+      position.translate(length/2, length/2),
+      paint
+    );
+  }
+
+  /// Creates a copy of this but with the given fields replaced with the new values.
+  @override
+  LineDrawable copyWith({
+    bool? hidden,
+    Set<ObjectDrawableAssist>? assists,
+    Offset? position,
+    double? rotation,
+    double? scale,
+    double? length,
+    Paint? paint,
+  }){
+    return LineDrawable(
+      hidden: hidden ?? this.hidden,
+      assists: assists ?? this.assists,
+      position: position ?? this.position,
+      rotationAngle: rotation ?? this.rotationAngle,
+      scale: scale ?? this.scale,
+      length: length ?? this.length,
+      paint: paint ?? this.paint,
+    );
+  }
+
+  /// Compares two [LineDrawable]s for equality.
+  @override
+  bool operator ==(Object other) {
+    return other is LineDrawable &&
+        super == other &&
+        other.paint == paint &&
+        other.length == length;
+  }
+
+  @override
+  int get hashCode => hashValues(
+      hidden,
+      hashList(assists),
+      hashList(assistPaints.entries),
+      position,
+      rotationAngle,
+      scale,
+      paint,
+      length);
+  
+}
