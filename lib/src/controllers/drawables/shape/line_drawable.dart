@@ -13,7 +13,7 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
   @override
   Paint paint;
 
-  /// Creates a new [LineDrawable] with the given [length].
+  /// Creates a new [LineDrawable] with the given [length] and [paint].
   LineDrawable({
     Paint? paint,
     required double length,
