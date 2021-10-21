@@ -44,8 +44,8 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
   @override
   void drawObject(Canvas canvas, Size size) {
     canvas.drawLine(
-      position.translate(-length/2, 0),
-      position.translate(length/2, 0),
+      position.translate(-length/2 * scale, 0),
+      position.translate(length/2 * scale, 0),
       paint
     );
   }
