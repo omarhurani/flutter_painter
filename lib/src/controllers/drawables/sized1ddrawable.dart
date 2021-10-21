@@ -20,7 +20,7 @@ abstract class Sized1DDrawable extends ObjectDrawable{
   final EdgeInsets padding;
 
 
-  /// Creates a new [Sized1DDrawable] with the given [length].
+  /// Creates a new [Sized1DDrawable] with the given [length] and [padding].
   const Sized1DDrawable({
     required this.length,
     this.padding = EdgeInsets.zero,
@@ -48,6 +48,7 @@ abstract class Sized1DDrawable extends ObjectDrawable{
     double? rotation,
     double? scale,
     double? length,
+    EdgeInsets? padding,
   });
 
   /// Calculates the size of the rendered object.
