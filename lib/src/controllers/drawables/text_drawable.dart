@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 import 'object_drawable.dart';
 
 /// Text Drawable
-class TextDrawable extends ObjectDrawable<String> {
+class TextDrawable extends ObjectDrawable{
+
+  /// The text to be drawn.
+  final String text;
+
   /// The style the text will be drawn with.
   final TextStyle style;
 
@@ -19,7 +23,7 @@ class TextDrawable extends ObjectDrawable<String> {
   ///
   /// The path will be drawn with the passed [style] if provided.
   TextDrawable({
-    required String text,
+    required this.text,
     required Offset position,
     double rotation = 0,
     double scale = 1,
@@ -37,15 +41,11 @@ class TextDrawable extends ObjectDrawable<String> {
           textDirection: direction,
         ),
         super(
-            object: text,
             position: position,
             rotationAngle: rotation,
             scale: scale,
             assists: assists,
             hidden: hidden);
-
-  /// Returns the value of the text to be painted.
-  String get text => object;
 
   /// Draws the text on the provided [canvas] of size [size].
   @override
@@ -72,7 +72,7 @@ class TextDrawable extends ObjectDrawable<String> {
     TextDirection? direction,
   }) {
     return TextDrawable(
-      text: text ?? this.object,
+      text: text ?? this.text,
       position: position ?? this.position,
       rotation: rotation ?? this.rotationAngle,
       scale: scale ?? this.scale,
@@ -104,7 +104,6 @@ class TextDrawable extends ObjectDrawable<String> {
       hidden,
       hashList(assists),
       hashList(assistPaints.entries),
-      object,
       position,
       rotationAngle,
       scale,

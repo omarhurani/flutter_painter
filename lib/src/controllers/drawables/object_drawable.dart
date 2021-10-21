@@ -7,7 +7,7 @@ import 'drawable.dart';
 import 'dart:math';
 
 /// An abstract drawable that can be moved and rotated and scaled.
-abstract class ObjectDrawable<T> extends Drawable {
+abstract class ObjectDrawable extends Drawable {
   /// Default paint used for horizontal and vertical assist lines.
   static final Paint defaultAssistPaint = Paint()
     ..strokeWidth = 1.5
@@ -17,10 +17,6 @@ abstract class ObjectDrawable<T> extends Drawable {
   static final defaultRotationAssistPaint = Paint()
     ..strokeWidth = 1.5
     ..color = Colors.pink;
-
-  /// The object to be drawn.
-  @protected
-  final T object;
 
   /// The location of the object to be painted.
   final Offset position;
@@ -48,7 +44,6 @@ abstract class ObjectDrawable<T> extends Drawable {
 
   /// Default constructor for [ObjectDrawable].
   const ObjectDrawable({
-    required this.object,
     required this.position,
     this.rotationAngle = 0,
     this.scale = 1,
@@ -137,7 +132,6 @@ abstract class ObjectDrawable<T> extends Drawable {
   bool operator ==(Object other) {
     return other is ObjectDrawable &&
         super == other &&
-        other.object == object &&
         other.position == position &&
         other.rotationAngle == rotationAngle &&
         other.scale == scale;
@@ -157,7 +151,7 @@ abstract class ObjectDrawable<T> extends Drawable {
 
   @override
   int get hashCode => hashValues(hidden, hashList(assists),
-      hashList(assistPaints.entries), object, position, rotationAngle);
+      hashList(assistPaints.entries), position, rotationAngle);
 
   /// Calculates the intersection points between a line passing through point [point]
   /// with an angle tangent [angleTan] with the rectangular box of size [size].
