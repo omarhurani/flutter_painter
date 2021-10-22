@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 import '../object_drawable.dart';
@@ -37,6 +38,7 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
   /// Getter for padding of drawable.
   ///
   /// Add padding equal to the stroke width of the line.
+  @protected
   @override
   EdgeInsets get padding => EdgeInsets.all(paint.strokeWidth/2);
 
