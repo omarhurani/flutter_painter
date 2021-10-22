@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 import 'object_drawable.dart';
@@ -32,6 +33,7 @@ abstract class Sized2DDrawable extends ObjectDrawable{
   ///
   /// This padding is added to the size in the [getSize] method.
   /// Implementing classes can change this getter to increase/decrease the size.
+  @protected
   EdgeInsets get padding => EdgeInsets.zero;
 
   /// Creates a copy of this but with the given fields replaced with the new values.
