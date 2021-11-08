@@ -52,7 +52,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
   @override
   EdgeInsets get padding => EdgeInsets.symmetric(
     horizontal: paint.strokeWidth/2,
-    vertical: paint.strokeWidth/2 + _arrowHeadSize
+    vertical: paint.strokeWidth/2 + (_arrowHeadSize/2)
   );
 
   /// Draws the arrow on the provided [canvas] of size [size].
@@ -73,14 +73,14 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
           paint
       );
 
-    final pathDx = dx.clamp(-arrowHeadSize/2, double.infinity);
+    final pathDx = dx/*.clamp(-arrowHeadSize/2, double.infinity)*/;
 
     final path = Path();
     path.moveTo(position.dx + pathDx + arrowHeadSize, position.dy);
     path.lineTo(position.dx + pathDx,
-        position.dy - arrowHeadSize);
+        position.dy - (arrowHeadSize/2));
     path.lineTo(position.dx + pathDx,
-        position.dy + arrowHeadSize);
+        position.dy + (arrowHeadSize/2));
     path.lineTo(position.dx + pathDx + arrowHeadSize, position.dy);
 
     final headPaint = paint.copyWith(
@@ -120,7 +120,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
   Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
     final size = super.getSize();
     return Size(
-      size.width.clamp(_arrowHeadSize, double.infinity),
+      size.width,
       size.height
     );
   }
