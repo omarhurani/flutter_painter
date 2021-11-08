@@ -65,6 +65,7 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable{
     double? scale,
     Size? size,
     Paint? paint,
+    BorderRadius? borderRadius,
   }){
     return RectangleDrawable(
       hidden: hidden ?? this.hidden,
@@ -74,6 +75,7 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable{
       scale: scale ?? this.scale,
       size: size ?? this.size,
       paint: paint ?? this.paint,
+      borderRadius: borderRadius ?? this.borderRadius,
     );
   }
 
