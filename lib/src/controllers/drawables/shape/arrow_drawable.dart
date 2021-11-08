@@ -8,7 +8,7 @@ import 'shape_drawable.dart';
 import '../sized1ddrawable.dart';
 import '../../helpers/paint_copy.dart';
 
-/// A drawable of a simple line shape.
+/// A drawable of a simple arrow shape.
 class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
 
   /// The paint to be used for the line drawable.
