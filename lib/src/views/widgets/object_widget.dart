@@ -609,7 +609,9 @@ class ObjectWidgetState extends State<ObjectWidget> {
     final length = details.localPosition.dx * (isReversed ? -1 : 1);
     final initialSize = initial.getSize(maxWidth: constraints.maxWidth);
     final initialLength = initialSize.width/2;
-    final double scale = ((length + initialLength) / initialLength).clamp(0.001, double.infinity);
+    final double scale = initialLength == 0 ?
+      (length*2).clamp(0.001, double.infinity) :
+      ((length + initialLength) / initialLength).clamp(0.001, double.infinity);
     onDrawableScaleUpdate(entry, ScaleUpdateDetails(
       pointerCount: 1,
       rotation: 0,
