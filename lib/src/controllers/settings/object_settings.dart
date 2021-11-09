@@ -50,9 +50,15 @@ class ObjectSettings {
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
-  ObjectSettings copyWith({ObjectLayoutAssistSettings? layoutAssist}) {
+  ObjectSettings copyWith({
+    ObjectLayoutAssistSettings? layoutAssist,
+    ObjectEnlargeControlsFunction? enlargeControls,
+    ObjectShowScaleRotationControlsFunction? showScaleRotationControls,
+  }) {
     return ObjectSettings(
       layoutAssist: layoutAssist ?? this.layoutAssist,
+      enlargeControls: enlargeControls ?? this.enlargeControls,
+      showScaleRotationControls: showScaleRotationControls ?? this.showScaleRotationControls,
     );
   }
 
