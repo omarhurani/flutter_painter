@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 import '../object_drawable.dart';
@@ -38,6 +39,13 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable{
           assistPaints: assistPaints,
           hidden: hidden
       );
+
+  /// Getter for padding of drawable.
+  ///
+  /// Add padding equal to the stroke width of the paint.
+  @protected
+  @override
+  EdgeInsets get padding => EdgeInsets.all(paint.strokeWidth/2);
 
   /// Draws the arrow on the provided [canvas] of size [size].
   @override
