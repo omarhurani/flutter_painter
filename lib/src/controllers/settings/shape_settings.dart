@@ -7,16 +7,24 @@ class ShapeSettings {
   /// If this is not null, whenever the user drags on the UI, a shape from the creator is drawn.
   final ShapeCreator? creator;
 
+  /// If the shape should be drawn once or continuously.
+  /// If `true`, after the shape is drawn, the [creator] will be set back to `null`.
+  /// If `false`, the user will be able to keep drawing shapes until [creator] is set to `null` explicitly.
+  final bool drawOnce;
+
   /// Creates a new instance of [ShapeSettings] with the given [creator].
   const ShapeSettings({
-    this.creator
+    this.creator,
+    this.drawOnce = true,
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   ShapeSettings copyWith({
     ShapeCreator? shapeCreator = _NoShapePassedCreator.instance,
+    bool? drawOnce,
   }) => ShapeSettings(
     creator: shapeCreator == _NoShapePassedCreator.instance ? this.creator : shapeCreator,
+    drawOnce: drawOnce ?? this.drawOnce,
   );
 
 }
