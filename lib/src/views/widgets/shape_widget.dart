@@ -29,6 +29,8 @@ class _ShapeWidgetState extends State<ShapeWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if(settings.creator == null) return widget.child;
+
     return GestureDetector(
       onScaleStart: onScaleStart,
       onScaleUpdate: onScaleUpdate,
