@@ -43,7 +43,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
       );
 
   /// The actual arrow head size used in drawing.
-  double get _arrowHeadSize => this.arrowHeadSize ?? paint.strokeWidth * 2;
+  double get _arrowHeadSize => this.arrowHeadSize ?? paint.strokeWidth * 3;
 
   /// Getter for padding of drawable.
   ///
