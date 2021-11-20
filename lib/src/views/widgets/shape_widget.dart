@@ -84,10 +84,6 @@ class _ShapeWidgetState extends State<ShapeWidget> {
         (details.localFocalPoint.dx - startingPosition.dx),
         (details.localFocalPoint.dy - startingPosition.dy)
       );
-      print([newSize, Size(
-          newSize.width.abs(),
-          newSize.height.abs()
-      )]);
       final newPosition = startingPosition + Offset(newSize.width/2, newSize.height/2);
       final newDrawable = sized2DDrawable.copyWith(
         position: newPosition,
