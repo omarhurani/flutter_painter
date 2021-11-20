@@ -81,9 +81,13 @@ class _ShapeWidgetState extends State<ShapeWidget> {
       final startingPosition = shapeDrawable.position - Offset(size.width/2, size.height/2);
 
       final newSize = Size(
-        (details.localFocalPoint.dx - startingPosition.dx).abs(),
-        (details.localFocalPoint.dy - startingPosition.dy).abs()
+        (details.localFocalPoint.dx - startingPosition.dx),
+        (details.localFocalPoint.dy - startingPosition.dy)
       );
+      print([newSize, Size(
+          newSize.width.abs(),
+          newSize.height.abs()
+      )]);
       final newPosition = startingPosition + Offset(newSize.width/2, newSize.height/2);
       final newDrawable = sized2DDrawable.copyWith(
         position: newPosition,
@@ -97,6 +101,17 @@ class _ShapeWidgetState extends State<ShapeWidget> {
 
 
   void onScaleEnd(ScaleEndDetails details){
+    final shapeDrawable = currentShapeDrawable;
+    if(shapeDrawable is Sized2DDrawable){
+      final sized2DDrawable = (shapeDrawable as Sized2DDrawable);
+      final newDrawable = sized2DDrawable.copyWith(
+        size: Size(
+          sized2DDrawable.size.width.abs(),
+          sized2DDrawable.size.height.abs(),
+        ),
+      );
+      updateDrawable(sized2DDrawable as ShapeDrawable, newDrawable);
+    }
     setState(() {
       currentShapeDrawable = null;
     });
