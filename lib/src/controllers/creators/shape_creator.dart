@@ -6,12 +6,12 @@ import '../drawables/shape/shape_drawable.dart';
 abstract class ShapeCreator<T extends ShapeDrawable>{
 
   /// The paint to be used in the created drawable.
-  Paint paint;
+  final Paint? paint;
 
   /// Creates an instance of [ShapeCreator] with the given [paint].
-  ShapeCreator({
+  const ShapeCreator({
     Paint? paint,
-  }) : paint = paint ?? ShapeDrawable.defaultPaint;
+  }) : paint = paint;
 
   /// Creates the desired shape drawable.
   /// Inheriting classes must override this method to create the appropriate [ShapeDrawable].

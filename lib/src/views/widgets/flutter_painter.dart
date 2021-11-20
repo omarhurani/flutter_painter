@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import '../../controllers/drawables/sized1ddrawable.dart';
+import '../../controllers/drawables/shape/shape_drawable.dart';
 import '../../controllers/drawables/sized2ddrawable.dart';
 import '../../controllers/drawables/object_drawable.dart';
 import '../../controllers/events/events.dart';
@@ -17,6 +19,7 @@ import '../../controllers/helpers/border_box_shadow.dart';
 part 'free_style_widget.dart';
 part 'text_widget.dart';
 part 'object_widget.dart';
+part 'shape_widget.dart';
 
 /// Widget that allows user to draw on it
 class FlutterPainter extends StatelessWidget {
@@ -45,13 +48,16 @@ class FlutterPainter extends StatelessWidget {
                                 controller: controller,
                                 child: TextWidget(
                                   controller: controller,
-                                  child: ObjectWidget(
+                                  child: ShapeWidget(
                                     controller: controller,
-                                    interactionEnabled: true,
-                                    child: CustomPaint(
-                                      painter: Painter(
-                                        drawables: value.drawables,
-                                        background: value.background,
+                                    child: ObjectWidget(
+                                      controller: controller,
+                                      interactionEnabled: true,
+                                      child: CustomPaint(
+                                        painter: Painter(
+                                          drawables: value.drawables,
+                                          background: value.background,
+                                        ),
                                       ),
                                     ),
                                   ),
