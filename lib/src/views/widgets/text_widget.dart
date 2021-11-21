@@ -97,14 +97,16 @@ class TextWidgetState extends State<TextWidget> {
     );
     widget.controller.addDrawables([drawable]);
 
-    setState(() {
-      selectedDrawable = drawable;
-    });
+    if(mounted)
+      setState(() {
+        selectedDrawable = drawable;
+      });
 
     openTextEditor(drawable).then((value) {
-      setState(() {
-        selectedDrawable = null;
-      });
+      if(mounted)
+        setState(() {
+          selectedDrawable = null;
+        });
     });
   }
 
