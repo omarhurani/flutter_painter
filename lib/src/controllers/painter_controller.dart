@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import './events/remove_drawable_event.dart';
 import 'events/events.dart';
 import 'drawables/background/background_drawable.dart';
 import 'settings/settings.dart';
@@ -130,7 +131,10 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   bool removeDrawable(Drawable drawable) {
     final currentDrawables = List<Drawable>.from(value.drawables);
     final removed = currentDrawables.remove(drawable);
-    if (removed) value = value.copyWith(drawables: currentDrawables);
+    if (removed){
+      value = value.copyWith(drawables: currentDrawables);
+      _eventsSteamController.add(RemoveDrawableEvent(drawable));
+    }
     return removed;
   }
 

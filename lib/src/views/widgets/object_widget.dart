@@ -76,14 +76,41 @@ class ObjectWidgetState extends State<ObjectWidget> {
     value: (e) => false,
   );
 
+  /// Subscription to the events coming from the controller.
+  StreamSubscription<PainterEvent>? controllerEventSubscription;
+
   /// Getter for the list of [ObjectDrawable]s in the controller
   /// to make code more readable.
   List<ObjectDrawable> get drawables =>
       widget.controller.value.drawables.whereType<ObjectDrawable>().toList();
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
 
+    // Listen to the stream of events from the paint controller
+    controllerEventSubscription = widget.controller.events.listen((event) {
+      // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object, deselect it.
+      if (event is RemoveDrawableEvent && event.drawable is ObjectDrawable){
+        if(drawables.indexOf(event.drawable as ObjectDrawable) == selectedDrawableIndex){
+          setState(() {
+            selectedDrawableIndex = null;
+          });
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // Cancel subscription to events from painter controller
+    controllerEventSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final drawables = this.drawables;
     return LayoutBuilder(builder: (context, constraints) {
       return Stack(
         children: [
