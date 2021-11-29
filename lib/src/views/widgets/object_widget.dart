@@ -370,9 +370,13 @@ class ObjectWidgetState extends State<ObjectWidget> {
   ///
   /// Dispatches an [ObjectDrawableNotification] that the object was tapped.
   void tapDrawable(ObjectDrawable drawable) {
-    if(selectedDrawableIndex != null && drawables.length > selectedDrawableIndex! && drawables[selectedDrawableIndex!] == drawable)
-      ObjectDrawableNotification(drawable, ObjectDrawableNotificationType.tapped)
-          .dispatch(context);
+    if(selectedDrawableIndex != null){
+      if(drawables.length > selectedDrawableIndex! && drawables[selectedDrawableIndex!] == drawable)
+        ObjectDrawableReselectedNotification(drawable).dispatch(context);
+      else
+        SelectedObjectDrawableUpdatedNotification(drawable).dispatch(context);
+    }
+
 
     setState(() {
       selectedDrawableIndex = drawables.indexOf(drawable);
@@ -850,25 +854,3 @@ class _ObjectControlBox extends StatelessWidget {
     );
   }
 }
-
-/// Represents a [Notification] that [ObjectWidget] dispatches when an event occurs
-/// that requires a parent to handle it.
-///
-/// Parent widgets can listen using a [NotificationListener] and handle the notification.
-class ObjectDrawableNotification extends Notification {
-  /// The drawable involved in the notification.
-  final ObjectDrawable drawable;
-
-  /// The type of event that caused this notification to trigger.
-  final ObjectDrawableNotificationType type;
-
-  /// Creates an [ObjectDrawableNotification] with the given [drawable] and [type].
-  const ObjectDrawableNotification(this.drawable, this.type);
-}
-
-/// The types of events that are dispatched with an [ObjectDrawableNotification].
-enum ObjectDrawableNotificationType {
-  /// Represents the event of tapping an [ObjectDrawable] inside the [ObjectWidget].
-  tapped,
-}
-

@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import '../../controllers/drawables/drawable.dart';
+import '../../controllers/notifications/notifications.dart';
 import '../../controllers/events/remove_drawable_event.dart';
 import '../../controllers/drawables/sized1ddrawable.dart';
 import '../../controllers/drawables/shape/shape_drawable.dart';
@@ -22,15 +24,36 @@ part 'text_widget.dart';
 part 'object_widget.dart';
 part 'shape_widget.dart';
 
+typedef DrawableCreatedCallback = Function(Drawable drawable);
+
+typedef DrawableDeletedCallback = Function(Drawable drawable);
+
+
 /// Widget that allows user to draw on it
 class FlutterPainter extends StatelessWidget {
   /// The controller for this painter.
   final PainterController controller;
 
-  /// Creates a [FlutterPainter] with the given [controller].
+  /// Callback when a [Drawable] is created internally in [FlutterPainter].
+  final DrawableCreatedCallback? onDrawableCreated;
+
+  /// Callback when a [Drawable] is deleted internally in [FlutterPainter].
+  final DrawableDeletedCallback? onDrawableDeleted;
+
+  /// Callback when the selected [ObjectDrawable] changes.
+  final ValueChanged<ObjectDrawable?>? onSelectedObjectDrawableChanged;
+
+  /// Callback when the [PainterSettings] of [PainterController] are updated internally.
+  final ValueChanged<PainterSettings>? onPainterSettingsChanged;
+
+  /// Creates a [FlutterPainter] with the given [controller] and optional callbacks.
   const FlutterPainter({
     Key? key,
     required this.controller,
+    this.onDrawableCreated,
+    this.onDrawableDeleted,
+    this.onSelectedObjectDrawableChanged,
+    this.onPainterSettingsChanged
   }) : super(key: key);
 
   @override
@@ -45,25 +68,40 @@ class FlutterPainter extends StatelessWidget {
                       key: controller.painterKey,
                       valueListenable: controller,
                       builder: (context, value, child) => ClipRect(
-                            child: FreeStyleWidget(
-                                controller: controller,
-                                child: TextWidget(
+                            child: NotificationListener<FlutterPainterNotification>(
+                              onNotification: onNotification,
+                              child: FreeStyleWidget(
                                   controller: controller,
-                                  child: ShapeWidget(
+                                  child: TextWidget(
                                     controller: controller,
-                                    child: ObjectWidget(
+                                    child: ShapeWidget(
                                       controller: controller,
-                                      interactionEnabled: true,
-                                      child: CustomPaint(
-                                        painter: Painter(
-                                          drawables: value.drawables,
-                                          background: value.background,
+                                      child: ObjectWidget(
+                                        controller: controller,
+                                        interactionEnabled: true,
+                                        child: CustomPaint(
+                                          painter: Painter(
+                                            drawables: value.drawables,
+                                            background: value.background,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                )),
+                                  )),
+                            ),
                           )),
             ));
+  }
+
+  bool onNotification(FlutterPainterNotification notification){
+    if(notification is DrawableCreatedNotification)
+      onDrawableCreated?.call(notification.drawable);
+    else if(notification is DrawableDeletedNotification)
+      onDrawableDeleted?.call(notification.drawable);
+    else if(notification is SelectedObjectDrawableUpdatedNotification)
+      onSelectedObjectDrawableChanged?.call(notification.drawable);
+    else if(notification is SettingsUpdatedNotification)
+      onPainterSettingsChanged?.call(notification.settings);
+    return true;
   }
 }

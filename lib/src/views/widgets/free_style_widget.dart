@@ -57,6 +57,8 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
     );
     // Add the drawable to the controller's drawables
     widget.controller.addDrawables([drawable]);
+    DrawableCreatedNotification(drawable).dispatch(context);
+
     // Set the drawable as the current drawable
     this.drawable = drawable;
   }

@@ -50,6 +50,7 @@ class _ShapeWidgetState extends State<ShapeWidget> {
 
     setState(() {
       widget.controller.addDrawables([shapeDrawable]);
+      DrawableCreatedNotification(shapeDrawable).dispatch(context);
       currentShapeDrawable = shapeDrawable;
     });
 
@@ -116,6 +117,7 @@ class _ShapeWidgetState extends State<ShapeWidget> {
           shapeCreator: null,
         )
       );
+      SettingsUpdatedNotification(widget.controller.value.settings).dispatch(context);
     }
     setState(() {
       currentShapeDrawable = null;

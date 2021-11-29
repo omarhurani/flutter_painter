@@ -48,7 +48,7 @@ class TextWidgetState extends State<TextWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<ObjectDrawableNotification>(
+    return NotificationListener<ObjectDrawableReselectedNotification>(
       onNotification: onObjectDrawableNotification,
       child: widget.child,
     );
@@ -57,15 +57,14 @@ class TextWidgetState extends State<TextWidget> {
   /// Getter for [TextSettings] from `widget.controller.value` to make code more readable.
   TextSettings get settings => widget.controller.value.settings.text;
 
-  /// Handles any [ObjectDrawableNotification] that might be dispatched in the widget tree.
+  /// Handles any [ObjectDrawableReselectedNotification] that might be dispatched in the widget tree.
   ///
-  /// This handles notifications of type [ObjectDrawableNotificationType.tapped] to edit
+  /// This handles notifications of type [ObjectDrawableReselectedNotification] to edit
   /// an existing [TextDrawable].
-  bool onObjectDrawableNotification(ObjectDrawableNotification notification) {
+  bool onObjectDrawableNotification(ObjectDrawableReselectedNotification notification) {
     final drawable = notification.drawable;
 
-    if (notification.type == ObjectDrawableNotificationType.tapped &&
-        drawable is TextDrawable) {
+    if (drawable is TextDrawable) {
       openTextEditor(drawable);
       // Mark notification as handled
       return true;
@@ -97,10 +96,12 @@ class TextWidgetState extends State<TextWidget> {
     );
     widget.controller.addDrawables([drawable]);
 
-    if(mounted)
+    if(mounted){
+      DrawableCreatedNotification(drawable).dispatch(context);
       setState(() {
         selectedDrawable = drawable;
       });
+    }
 
     openTextEditor(drawable).then((value) {
       if(mounted)
@@ -287,6 +288,7 @@ class EditTextWidgetState extends State<EditTextWidget>
   void onEditingComplete() {
     if (textEditingController.text.trim().isEmpty) {
       widget.controller.removeDrawable(widget.drawable);
+      DrawableDeletedNotification(widget.drawable).dispatch(context);
     } else {
       final drawable = widget.drawable.copyWith(
         text: textEditingController.text.trim(),
