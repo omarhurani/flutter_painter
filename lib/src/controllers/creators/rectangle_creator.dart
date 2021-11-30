@@ -11,12 +11,12 @@ class RectangleCreator extends ShapeCreator<RectangleDrawable>{
   /// The border radius of the [RectangleDrawable]s created by this creator.
   BorderRadius? borderRadius;
 
-  /// Creates an instance of [RectangleCreator] with the given [paint].
-  RectangleCreator({Paint? paint, this.borderRadius}): super(paint: paint);
+  /// Creates an instance of [RectangleCreator].
+  RectangleCreator({this.borderRadius});
 
-  /// Creates and returns a [RectangleDrawable] of zero size and the passed [position].
+  /// Creates and returns a [RectangleDrawable] of zero size and the passed [position] and [paint].
   @override
-  RectangleDrawable create(Offset position) {
+  RectangleDrawable create(Offset position, [Paint? paint]) {
     final borderRadius = this.borderRadius;
     if(borderRadius != null)
       return RectangleDrawable(size: Size.zero, position: position, borderRadius: borderRadius, paint: paint);

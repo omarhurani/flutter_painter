@@ -12,19 +12,26 @@ class ShapeSettings {
   /// If `false`, the user will be able to keep drawing shapes until [creator] is set to `null` explicitly.
   final bool drawOnce;
 
+  /// The paint to be used when new shapes are drawn.
+  /// If `null`, the [ShapeDrawable.defaultPaint] will be used.
+  final Paint? paint;
+
   /// Creates a new instance of [ShapeSettings] with the given [creator].
   const ShapeSettings({
     this.creator,
     this.drawOnce = true,
+    this.paint,
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   ShapeSettings copyWith({
     ShapeCreator? shapeCreator = _NoShapePassedCreator.instance,
     bool? drawOnce,
+    Paint? paint,
   }) => ShapeSettings(
     creator: shapeCreator == _NoShapePassedCreator.instance ? this.creator : shapeCreator,
     drawOnce: drawOnce ?? this.drawOnce,
+    paint: paint ?? this.paint,
   );
 
 }
@@ -36,7 +43,7 @@ class _NoShapePassedCreator extends ShapeCreator{
   const _NoShapePassedCreator._();
 
   @override
-  ShapeDrawable create(Offset position) {
+  ShapeDrawable create(Offset position, [Paint? paint]) {
     throw UnimplementedError();
   }
 

@@ -46,7 +46,7 @@ class _ShapeWidgetState extends State<ShapeWidget> {
     if(creator == null || details.pointerCount > 1)
       return;
 
-    final shapeDrawable = creator.create(details.localFocalPoint);
+    final shapeDrawable = creator.create(details.localFocalPoint, settings.paint);
 
     setState(() {
       widget.controller.addDrawables([shapeDrawable]);
