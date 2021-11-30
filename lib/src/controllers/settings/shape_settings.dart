@@ -36,12 +36,17 @@ class ShapeSettings {
 
 }
 
+/// Private class that is used internally to represent no
+/// [ShapeCreator] argument passed for [ShapeSettings.copyWith].
 class _NoShapePassedCreator extends ShapeCreator{
 
+  /// Single instance.
   static const _NoShapePassedCreator instance = _NoShapePassedCreator._();
 
+  /// Private constructor.
   const _NoShapePassedCreator._();
 
+  /// Unimplemented implementation of the create method.
   @override
   ShapeDrawable create(Offset position, [Paint? paint]) {
     throw UnimplementedError();
