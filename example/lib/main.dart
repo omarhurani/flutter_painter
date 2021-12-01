@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
 
 import 'dart:ui' as ui;
-import 'dart:js' as js;
-import 'dart:html' as html;
 
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -507,32 +505,6 @@ class RenderedImageDialog extends StatelessWidget {
               maxScale: 10, child: Image.memory(snapshot.data!));
         },
       ),
-      actions: [
-        if (kIsWeb)
-          FutureBuilder<Uint8List?>(
-            future: imageFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState != ConnectionState.done ||
-                  !snapshot.hasData ||
-                  snapshot.data == null) return SizedBox();
-              return TextButton(
-                child: Text("Save"),
-                onPressed: () {
-                  // Saves the image for Flutter Web.
-                  // Add this line to 'web/index.html' for this to work:
-                  // <script src="https://cdnjs.cloudflare.com/ajax/libs/amcharts/3.21.15/plugins/export/libs/FileSaver.js/FileSaver.min.js"></script>
-                  js.context.callMethod(
-                    "saveAs",
-                    [
-                      html.Blob([snapshot.data]),
-                      "image.png"
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-      ],
     );
   }
 }
