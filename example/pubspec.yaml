@@ -26,6 +26,7 @@ dependencies:
 
   flutter_painter:
     path: ../
+  phosphor_flutter: ^1.3.1
 
 dev_dependencies:
   flutter_test:

@@ -1,10 +1,15 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
 
 import 'dart:ui' as ui;
+import 'dart:js' as js;
+import 'dart:html' as html;
+
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,6 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: "Flutter Painter Example",
       theme: ThemeData(
           primaryColor: Colors.brown, accentColor: Colors.amberAccent),
@@ -34,6 +40,11 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   FocusNode textFocusNode = FocusNode();
   late PainterController controller;
   ui.Image? backgroundImage;
+  Paint shapePaint = Paint()
+    ..strokeWidth = 5
+    ..color = Colors.red
+    ..style = PaintingStyle.stroke
+    ..strokeCap = StrokeCap.round;
 
   @override
   void initState() {
@@ -49,6 +60,9 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
               enabled: false,
               color: red,
               strokeWidth: 5,
+            ),
+            shape: ShapeSettings(
+              paint: shapePaint,
             )));
     // Listen to focus events of the text field
     textFocusNode.addListener(onFocus);
@@ -82,13 +96,13 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         actions: [
           IconButton(
             icon: Icon(
-              Icons.undo,
+              PhosphorIcons.arrowCounterClockwise,
             ),
             onPressed: removeLastDrawable,
           ),
           IconButton(
             icon: Icon(
-              Icons.gesture,
+              PhosphorIcons.scribbleLoop,
               color: controller.freeStyleSettings.enabled
                   ? Theme.of(context).accentColor
                   : null,
@@ -97,65 +111,276 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
           ),
           IconButton(
             icon: Icon(
-              Icons.title,
+              PhosphorIcons.textT,
               color:
                   textFocusNode.hasFocus ? Theme.of(context).accentColor : null,
             ),
             onPressed: addText,
           ),
+          PopupMenuButton<ShapeFactory?>(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                  value: LineFactory(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        PhosphorIcons.lineSegment,
+                        color: Colors.black,
+                      ),
+                      Text(" Line")
+                    ],
+                  )),
+              PopupMenuItem(
+                  value: ArrowFactory(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        PhosphorIcons.arrowUpRight,
+                        color: Colors.black,
+                      ),
+                      Text(" Arrow")
+                    ],
+                  )),
+              PopupMenuItem(
+                  value: RectangleFactory(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        PhosphorIcons.rectangle,
+                        color: Colors.black,
+                      ),
+                      Text(" Rectangle")
+                    ],
+                  )),
+              PopupMenuItem(
+                  value: OvalFactory(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        PhosphorIcons.circle,
+                        color: Colors.black,
+                      ),
+                      Text(" Oval")
+                    ],
+                  )),
+            ],
+            onSelected: selectShape,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(
+                controller.shapeSettings.factory is LineFactory
+                    ? PhosphorIcons.lineSegment
+                    : controller.shapeSettings.factory is ArrowFactory
+                        ? PhosphorIcons.arrowUpRight
+                        : controller.shapeSettings.factory is RectangleFactory
+                            ? PhosphorIcons.rectangle
+                            : controller.shapeSettings.factory is OvalFactory
+                                ? PhosphorIcons.circle
+                                : PhosphorIcons.polygon,
+                color: controller.shapeSettings.factory != null
+                    ? Theme.of(context).accentColor
+                    : null,
+              ),
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(
-          Icons.image,
+          PhosphorIcons.imageFill,
         ),
         onPressed: renderAndDisplayImage,
       ),
-      body: Column(
+      body: Stack(
         children: [
           if (backgroundImage != null)
             // Enforces constraints
-            AspectRatio(
-              aspectRatio: backgroundImage!.width / backgroundImage!.height,
-              child: FlutterPainter(
-                controller: controller,
+            Positioned.fill(
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: backgroundImage!.width / backgroundImage!.height,
+                  child: FlutterPainter(
+                    onPainterSettingsChanged: (_) => setState(() {}),
+                    controller: controller,
+                  ),
+                ),
               ),
             ),
-          if (controller.freeStyleSettings.enabled) ...[
-            // Control free style stroke width
-            Slider.adaptive(
-                min: 3,
-                max: 15,
-                value: controller.freeStyleSettings.strokeWidth,
-                onChanged: setFreeStyleStrokeWidth),
+          Positioned(
+            bottom: 0,
+            right: MediaQuery.of(context).size.width * 0.35,
+            left: MediaQuery.of(context).size.width * 0.35,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                color: Colors.white54,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (controller.freeStyleSettings.enabled) ...[
+                    Divider(),
+                    Text("Free Style Drawing Settings"),
+                    // Control free style stroke width
+                    Row(
+                      children: [
+                        Expanded(flex: 1, child: Text("Stroke Width")),
+                        Expanded(
+                          flex: 3,
+                          child: Slider.adaptive(
+                              min: 2,
+                              max: 25,
+                              value: controller.freeStyleSettings.strokeWidth,
+                              onChanged: setFreeStyleStrokeWidth),
+                        ),
+                      ],
+                    ),
 
-            // Control free style color hue
-            Slider.adaptive(
-                min: 0,
-                max: 359.99,
-                value:
-                    HSVColor.fromColor(controller.freeStyleSettings.color).hue,
-                activeColor: controller.freeStyleSettings.color,
-                onChanged: setFreeStyleColor),
-          ],
-          if (textFocusNode.hasFocus) ...[
-            // Control text font size
-            Slider.adaptive(
-                min: 12,
-                max: 48,
-                value: controller.textSettings.textStyle.fontSize ?? 14,
-                onChanged: setTextFontSize),
+                    Row(
+                      children: [
+                        Expanded(flex: 1, child: Text("Color")),
+                        // Control free style color hue
+                        Expanded(
+                          flex: 3,
+                          child: Slider.adaptive(
+                              min: 0,
+                              max: 359.99,
+                              value: HSVColor.fromColor(
+                                      controller.freeStyleSettings.color)
+                                  .hue,
+                              activeColor: controller.freeStyleSettings.color,
+                              onChanged: setFreeStyleColor),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (textFocusNode.hasFocus) ...[
+                    Divider(),
+                    Text("Text settings"),
+                    // Control text font size
+                    Row(
+                      children: [
+                        Expanded(flex: 1, child: Text("Font Size")),
+                        Expanded(
+                          flex: 3,
+                          child: Slider.adaptive(
+                              min: 8,
+                              max: 96,
+                              value:
+                                  controller.textSettings.textStyle.fontSize ??
+                                      14,
+                              onChanged: setTextFontSize),
+                        ),
+                      ],
+                    ),
 
-            // Control text color hue
-            Slider.adaptive(
-                min: 0,
-                max: 359.99,
-                value: HSVColor.fromColor(
-                        controller.textSettings.textStyle.color ?? red)
-                    .hue,
-                activeColor: controller.textSettings.textStyle.color,
-                onChanged: setTextColor),
-          ]
+                    // Control text color hue
+                    Row(
+                      children: [
+                        Expanded(flex: 1, child: Text("Color")),
+                        Expanded(
+                          flex: 3,
+                          child: Slider.adaptive(
+                              min: 0,
+                              max: 359.99,
+                              value: HSVColor.fromColor(
+                                      controller.textSettings.textStyle.color ??
+                                          red)
+                                  .hue,
+                              activeColor:
+                                  controller.textSettings.textStyle.color,
+                              onChanged: setTextColor),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (controller.shapeSettings.factory != null) ...[
+                    Divider(),
+                    Text("Shape Settings"),
+
+                    // Control text color hue
+                    Row(
+                      children: [
+                        Expanded(flex: 1, child: Text("Stroke Width")),
+                        Expanded(
+                          flex: 3,
+                          child: Slider.adaptive(
+                              min: 2,
+                              max: 25,
+                              value:
+                                  controller.shapeSettings.paint?.strokeWidth ??
+                                      shapePaint.strokeWidth,
+                              onChanged: (value) => setShapeFactoryPaint(
+                                      (controller.shapeSettings.paint ??
+                                              shapePaint)
+                                          .copyWith(
+                                    strokeWidth: value,
+                                  ))),
+                        ),
+                      ],
+                    ),
+
+                    // Control shape color hue
+                    Row(
+                      children: [
+                        Expanded(flex: 1, child: Text("Color")),
+                        Expanded(
+                          flex: 3,
+                          child: Slider.adaptive(
+                              min: 0,
+                              max: 359.99,
+                              value: HSVColor.fromColor(
+                                      (controller.shapeSettings.paint ??
+                                              shapePaint)
+                                          .color)
+                                  .hue,
+                              activeColor:
+                                  (controller.shapeSettings.paint ?? shapePaint)
+                                      .color,
+                              onChanged: (hue) => setShapeFactoryPaint(
+                                      (controller.shapeSettings.paint ??
+                                              shapePaint)
+                                          .copyWith(
+                                    color: HSVColor.fromAHSV(1, hue, 1, 1)
+                                        .toColor(),
+                                  ))),
+                        ),
+                      ],
+                    ),
+
+                    Row(
+                      children: [
+                        Expanded(flex: 1, child: Text("Fill shape")),
+                        Expanded(
+                          flex: 3,
+                          child: Center(
+                            child: Switch(
+                                value: (controller.shapeSettings.paint ??
+                                            shapePaint)
+                                        .style ==
+                                    PaintingStyle.fill,
+                                onChanged: (value) => setShapeFactoryPaint(
+                                        (controller.shapeSettings.paint ??
+                                                shapePaint)
+                                            .copyWith(
+                                      style: value
+                                          ? PaintingStyle.fill
+                                          : PaintingStyle.stroke,
+                                    ))),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ]
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );
@@ -204,6 +429,14 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     });
   }
 
+  void setShapeFactoryPaint(Paint paint) {
+    // Set state is just to update the current UI, the [FlutterPainter] UI updates without it
+    setState(() {
+      controller.shapeSettings =
+          controller.shapeSettings.copyWith(paint: paint);
+    });
+  }
+
   void setTextColor(double hue) {
     // Set state is just to update the current UI, the [FlutterPainter] UI updates without it
     setState(() {
@@ -211,6 +444,17 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
           textStyle: controller.textSettings.textStyle.copyWith(
         color: HSVColor.fromAHSV(1, hue, 1, 1).toColor(),
       ));
+    });
+  }
+
+  void selectShape(ShapeFactory? factory) {
+    setState(() {
+      controller.shapeSettings = controller.shapeSettings.copyWith(
+        factory:
+            factory.runtimeType == controller.shapeSettings.factory.runtimeType
+                ? null
+                : factory,
+      );
     });
   }
 
@@ -263,6 +507,29 @@ class RenderedImageDialog extends StatelessWidget {
               maxScale: 10, child: Image.memory(snapshot.data!));
         },
       ),
+      actions: [
+        if (kIsWeb)
+          FutureBuilder<Uint8List?>(
+            future: imageFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done ||
+                  !snapshot.hasData ||
+                  snapshot.data == null) return SizedBox();
+              return TextButton(
+                child: Text("Save"),
+                onPressed: () {
+                  js.context.callMethod(
+                    "saveAs",
+                    [
+                      html.Blob([snapshot.data]),
+                      "image.png"
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+      ],
     );
   }
 }
