@@ -8,8 +8,7 @@ import 'shape_drawable.dart';
 import '../sized2ddrawable.dart';
 
 /// A drawable of a rectangle with a radius.
-class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable{
-
+class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable {
   /// The paint to be used for the line drawable.
   @override
   Paint paint;
@@ -26,41 +25,43 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable{
     double rotationAngle = 0,
     double scale = 1,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints = const <ObjectDrawableAssist, Paint>{},
+    Map<ObjectDrawableAssist, Paint> assistPaints =
+        const <ObjectDrawableAssist, Paint>{},
     bool hidden = false,
     this.borderRadius = const BorderRadius.all(const Radius.circular(5)),
-  }) : this.paint = paint ?? ShapeDrawable.defaultPaint,
+  })  : this.paint = paint ?? ShapeDrawable.defaultPaint,
         super(
-          size: size,
-          position: position,
-          rotationAngle: rotationAngle,
-          scale: scale,
-          assists: assists,
-          assistPaints: assistPaints,
-          hidden: hidden
-      );
+            size: size,
+            position: position,
+            rotationAngle: rotationAngle,
+            scale: scale,
+            assists: assists,
+            assistPaints: assistPaints,
+            hidden: hidden);
 
   /// Getter for padding of drawable.
   ///
   /// Add padding equal to the stroke width of the paint.
   @protected
   @override
-  EdgeInsets get padding => EdgeInsets.all(paint.strokeWidth/2);
+  EdgeInsets get padding => EdgeInsets.all(paint.strokeWidth / 2);
 
   /// Draws the arrow on the provided [canvas] of size [size].
   @override
   void drawObject(Canvas canvas, Size size) {
     final drawingSize = this.size * scale;
     canvas.drawRRect(
-      RRect.fromRectAndCorners(
-        Rect.fromCenter(center: position, width: drawingSize.width, height: drawingSize.height),
-        topLeft: borderRadius.topLeft,
-        topRight: borderRadius.topRight,
-        bottomLeft: borderRadius.bottomLeft,
-        bottomRight: borderRadius.bottomRight,
-      ),
-      paint
-    );
+        RRect.fromRectAndCorners(
+          Rect.fromCenter(
+              center: position,
+              width: drawingSize.width,
+              height: drawingSize.height),
+          topLeft: borderRadius.topLeft,
+          topRight: borderRadius.topRight,
+          bottomLeft: borderRadius.bottomLeft,
+          bottomRight: borderRadius.bottomRight,
+        ),
+        paint);
   }
 
   /// Creates a copy of this but with the given fields replaced with the new values.
@@ -74,7 +75,7 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable{
     Size? size,
     Paint? paint,
     BorderRadius? borderRadius,
-  }){
+  }) {
     return RectangleDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
@@ -91,10 +92,7 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable{
   @override
   Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
     final size = super.getSize();
-    return Size(
-        size.width,
-        size.height
-    );
+    return Size(size.width, size.height);
   }
 
   /// Compares two [RectangleDrawable]s for equality.
@@ -116,5 +114,4 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable{
       scale,
       paint,
       size);
-
 }

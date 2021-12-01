@@ -20,7 +20,6 @@ class ShapeWidget extends StatefulWidget {
 }
 
 class _ShapeWidgetState extends State<ShapeWidget> {
-
   /// The shape that is being currently drawn.
   ShapeDrawable? currentShapeDrawable;
 
@@ -29,7 +28,7 @@ class _ShapeWidgetState extends State<ShapeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if(settings.creator == null) return widget.child;
+    if (settings.factory == null) return widget.child;
 
     return GestureDetector(
       onScaleStart: onScaleStart,
@@ -39,36 +38,33 @@ class _ShapeWidgetState extends State<ShapeWidget> {
     );
   }
 
+  void onScaleStart(ScaleStartDetails details) {
+    final factory = settings.factory;
+    if (factory == null || details.pointerCount > 1) return;
 
-  void onScaleStart(ScaleStartDetails details){
-
-    final creator = settings.creator;
-    if(creator == null || details.pointerCount > 1)
-      return;
-
-    final shapeDrawable = creator.create(details.localFocalPoint, settings.paint);
+    final shapeDrawable =
+        factory.create(details.localFocalPoint, settings.paint);
 
     setState(() {
       widget.controller.addDrawables([shapeDrawable]);
       DrawableCreatedNotification(shapeDrawable).dispatch(context);
       currentShapeDrawable = shapeDrawable;
     });
-
   }
 
-  void onScaleUpdate(ScaleUpdateDetails details){
-
+  void onScaleUpdate(ScaleUpdateDetails details) {
     final shapeDrawable = currentShapeDrawable;
 
-    if(shapeDrawable == null)
-      return;
+    if (shapeDrawable == null) return;
 
-    if(shapeDrawable is Sized1DDrawable){
+    if (shapeDrawable is Sized1DDrawable) {
       final sized1DDrawable = (shapeDrawable as Sized1DDrawable);
       final length = sized1DDrawable.length;
-      final startingPosition = shapeDrawable.position - Offset.fromDirection(sized1DDrawable.rotationAngle, length/2);
+      final startingPosition = shapeDrawable.position -
+          Offset.fromDirection(sized1DDrawable.rotationAngle, length / 2);
       final newLine = (details.localFocalPoint - startingPosition);
-      final newPosition = startingPosition + Offset.fromDirection(newLine.direction, newLine.distance/2);
+      final newPosition = startingPosition +
+          Offset.fromDirection(newLine.direction, newLine.distance / 2);
       final newDrawable = sized1DDrawable.copyWith(
         position: newPosition,
         length: newLine.distance.abs(),
@@ -76,18 +72,16 @@ class _ShapeWidgetState extends State<ShapeWidget> {
       );
       currentShapeDrawable = (newDrawable as ShapeDrawable);
       updateDrawable(sized1DDrawable, newDrawable);
-    }
-
-    else if(shapeDrawable is Sized2DDrawable){
+    } else if (shapeDrawable is Sized2DDrawable) {
       final sized2DDrawable = (shapeDrawable as Sized2DDrawable);
       final size = sized2DDrawable.size;
-      final startingPosition = shapeDrawable.position - Offset(size.width/2, size.height/2);
+      final startingPosition =
+          shapeDrawable.position - Offset(size.width / 2, size.height / 2);
 
-      final newSize = Size(
-        (details.localFocalPoint.dx - startingPosition.dx),
-        (details.localFocalPoint.dy - startingPosition.dy)
-      );
-      final newPosition = startingPosition + Offset(newSize.width/2, newSize.height/2);
+      final newSize = Size((details.localFocalPoint.dx - startingPosition.dx),
+          (details.localFocalPoint.dy - startingPosition.dy));
+      final newPosition =
+          startingPosition + Offset(newSize.width / 2, newSize.height / 2);
       final newDrawable = sized2DDrawable.copyWith(
         position: newPosition,
         size: newSize,
@@ -97,11 +91,9 @@ class _ShapeWidgetState extends State<ShapeWidget> {
     }
   }
 
-
-
-  void onScaleEnd(ScaleEndDetails details){
+  void onScaleEnd(ScaleEndDetails details) {
     final shapeDrawable = currentShapeDrawable;
-    if(shapeDrawable is Sized2DDrawable){
+    if (shapeDrawable is Sized2DDrawable) {
       final sized2DDrawable = (shapeDrawable as Sized2DDrawable);
       final newDrawable = sized2DDrawable.copyWith(
         size: Size(
@@ -111,13 +103,13 @@ class _ShapeWidgetState extends State<ShapeWidget> {
       );
       updateDrawable(sized2DDrawable as ShapeDrawable, newDrawable);
     }
-    if(settings.drawOnce){
+    if (settings.drawOnce) {
       widget.controller.settings = widget.controller.value.settings.copyWith(
-        shape: settings.copyWith(
-          shapeCreator: null,
-        )
-      );
-      SettingsUpdatedNotification(widget.controller.value.settings).dispatch(context);
+          shape: settings.copyWith(
+        factory: null,
+      ));
+      SettingsUpdatedNotification(widget.controller.value.settings)
+          .dispatch(context);
     }
     setState(() {
       currentShapeDrawable = null;
@@ -130,5 +122,4 @@ class _ShapeWidgetState extends State<ShapeWidget> {
       widget.controller.replaceDrawable(oldDrawable, newDrawable);
     });
   }
-
 }

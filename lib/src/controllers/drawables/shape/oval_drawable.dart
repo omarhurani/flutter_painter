@@ -8,8 +8,7 @@ import 'shape_drawable.dart';
 import '../sized2ddrawable.dart';
 
 /// A drawable of an oval.
-class OvalDrawable extends Sized2DDrawable implements ShapeDrawable{
-
+class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
   /// The paint to be used for the line drawable.
   @override
   Paint paint;
@@ -22,31 +21,36 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable{
     double rotationAngle = 0,
     double scale = 1,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints = const <ObjectDrawableAssist, Paint>{},
+    Map<ObjectDrawableAssist, Paint> assistPaints =
+        const <ObjectDrawableAssist, Paint>{},
     bool hidden = false,
-  }) : this.paint = paint ?? ShapeDrawable.defaultPaint,
+  })  : this.paint = paint ?? ShapeDrawable.defaultPaint,
         super(
-          size: size,
-          position: position,
-          rotationAngle: rotationAngle,
-          scale: scale,
-          assists: assists,
-          assistPaints: assistPaints,
-          hidden: hidden
-      );
+            size: size,
+            position: position,
+            rotationAngle: rotationAngle,
+            scale: scale,
+            assists: assists,
+            assistPaints: assistPaints,
+            hidden: hidden);
 
   /// Getter for padding of drawable.
   ///
   /// Add padding equal to the stroke width of the paint.
   @protected
   @override
-  EdgeInsets get padding => EdgeInsets.all(paint.strokeWidth/2);
+  EdgeInsets get padding => EdgeInsets.all(paint.strokeWidth / 2);
 
   /// Draws the arrow on the provided [canvas] of size [size].
   @override
   void drawObject(Canvas canvas, Size size) {
     final drawingSize = this.size * scale;
-    canvas.drawOval(Rect.fromCenter(center: position, width: drawingSize.width, height: drawingSize.height), paint);
+    canvas.drawOval(
+        Rect.fromCenter(
+            center: position,
+            width: drawingSize.width,
+            height: drawingSize.height),
+        paint);
   }
 
   /// Creates a copy of this but with the given fields replaced with the new values.
@@ -59,7 +63,7 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable{
     double? scale,
     Size? size,
     Paint? paint,
-  }){
+  }) {
     return OvalDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
@@ -75,10 +79,7 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable{
   @override
   Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
     final size = super.getSize();
-    return Size(
-        size.width,
-        size.height
-    );
+    return Size(size.width, size.height);
   }
 
   /// Compares two [OvalDrawable]s for equality.
@@ -100,5 +101,4 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable{
       scale,
       paint,
       size);
-
 }

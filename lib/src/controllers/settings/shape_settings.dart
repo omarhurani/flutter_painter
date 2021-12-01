@@ -1,55 +1,56 @@
 import 'package:flutter/painting.dart';
-import 'package:flutter_painter/flutter_painter.dart';
+import '../drawables/shape/shape_drawable.dart';
+import '../factories/shape_factory.dart';
 
 /// Represents settings used to control shape drawables in the UI
 class ShapeSettings {
-  /// A creator for the shape in the UI.
-  /// If this is not null, whenever the user drags on the UI, a shape from the creator is drawn.
-  final ShapeCreator? creator;
+  /// A factory for the shape in the UI.
+  /// If this is not null, whenever the user drags on the UI, a shape from the factory is drawn.
+  final ShapeFactory? factory;
 
   /// If the shape should be drawn once or continuously.
-  /// If `true`, after the shape is drawn, the [creator] will be set back to `null`.
-  /// If `false`, the user will be able to keep drawing shapes until [creator] is set to `null` explicitly.
+  /// If `true`, after the shape is drawn, the [factory] will be set back to `null`.
+  /// If `false`, the user will be able to keep drawing shapes until [factory] is set to `null` explicitly.
   final bool drawOnce;
 
   /// The paint to be used when new shapes are drawn.
   /// If `null`, the [ShapeDrawable.defaultPaint] will be used.
   final Paint? paint;
 
-  /// Creates a new instance of [ShapeSettings] with the given [creator].
+  /// Creates a new instance of [ShapeSettings] with the given [factory].
   const ShapeSettings({
-    this.creator,
+    this.factory,
     this.drawOnce = true,
     this.paint,
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   ShapeSettings copyWith({
-    ShapeCreator? shapeCreator = _NoShapePassedCreator.instance,
+    ShapeFactory? factory = _NoShapePassedFactory.instance,
     bool? drawOnce,
     Paint? paint,
-  }) => ShapeSettings(
-    creator: shapeCreator == _NoShapePassedCreator.instance ? this.creator : shapeCreator,
-    drawOnce: drawOnce ?? this.drawOnce,
-    paint: paint ?? this.paint,
-  );
-
+  }) =>
+      ShapeSettings(
+        factory: factory == _NoShapePassedFactory.instance
+            ? this.factory
+            : factory,
+        drawOnce: drawOnce ?? this.drawOnce,
+        paint: paint ?? this.paint,
+      );
 }
 
 /// Private class that is used internally to represent no
-/// [ShapeCreator] argument passed for [ShapeSettings.copyWith].
-class _NoShapePassedCreator extends ShapeCreator{
-
+/// [ShapeFactory] argument passed for [ShapeSettings.copyWith].
+class _NoShapePassedFactory extends ShapeFactory {
   /// Single instance.
-  static const _NoShapePassedCreator instance = _NoShapePassedCreator._();
+  static const _NoShapePassedFactory instance = _NoShapePassedFactory._();
 
   /// Private constructor.
-  const _NoShapePassedCreator._();
+  const _NoShapePassedFactory._();
 
   /// Unimplemented implementation of the create method.
   @override
   ShapeDrawable create(Offset position, [Paint? paint]) {
     throw UnimplementedError();
   }
-
 }

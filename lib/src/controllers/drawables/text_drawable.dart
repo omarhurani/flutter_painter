@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'object_drawable.dart';
 
 /// Text Drawable
-class TextDrawable extends ObjectDrawable{
-
+class TextDrawable extends ObjectDrawable {
   /// The text to be drawn.
   final String text;
 

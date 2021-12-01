@@ -6,8 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'object_drawable.dart';
 
 /// A drawable that explicitly defines its size in two dimensions (width and height).
-abstract class Sized2DDrawable extends ObjectDrawable{
-
+abstract class Sized2DDrawable extends ObjectDrawable {
   /// The size of the drawable.
   final Size size;
 
@@ -18,16 +17,16 @@ abstract class Sized2DDrawable extends ObjectDrawable{
     double rotationAngle = 0,
     double scale = 1,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints = const <ObjectDrawableAssist, Paint>{},
+    Map<ObjectDrawableAssist, Paint> assistPaints =
+        const <ObjectDrawableAssist, Paint>{},
     bool hidden = false,
   }) : super(
-      position: position,
-      rotationAngle: rotationAngle,
-      scale: scale,
-      assists: assists,
-      assistPaints: assistPaints,
-      hidden: hidden
-  );
+            position: position,
+            rotationAngle: rotationAngle,
+            scale: scale,
+            assists: assists,
+            assistPaints: assistPaints,
+            hidden: hidden);
 
   /// Getter for padding of drawable.
   ///

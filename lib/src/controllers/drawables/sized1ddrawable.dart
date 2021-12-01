@@ -9,8 +9,7 @@ import 'object_drawable.dart';
 ///
 /// This doesn't necessarily mean that the object only has a size in one dimension,
 /// just that it defines one dimension.
-abstract class Sized1DDrawable extends ObjectDrawable{
-
+abstract class Sized1DDrawable extends ObjectDrawable {
   /// The length of the drawable.
   final double length;
 
@@ -21,16 +20,16 @@ abstract class Sized1DDrawable extends ObjectDrawable{
     double rotationAngle = 0,
     double scale = 1,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints = const <ObjectDrawableAssist, Paint>{},
+    Map<ObjectDrawableAssist, Paint> assistPaints =
+        const <ObjectDrawableAssist, Paint>{},
     bool hidden = false,
   }) : super(
-    position: position,
-    rotationAngle: rotationAngle,
-    scale: scale,
-    assists: assists,
-    assistPaints: assistPaints,
-    hidden: hidden
-  );
+            position: position,
+            rotationAngle: rotationAngle,
+            scale: scale,
+            assists: assists,
+            assistPaints: assistPaints,
+            hidden: hidden);
 
   /// Getter for padding of drawable.
   ///

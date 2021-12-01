@@ -8,8 +8,7 @@ import 'shape_drawable.dart';
 import '../sized1ddrawable.dart';
 
 /// A drawable of a simple line shape.
-class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
-
+class LineDrawable extends Sized1DDrawable implements ShapeDrawable {
   /// The paint to be used for the line drawable.
   @override
   Paint paint;
@@ -22,9 +21,10 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
     double rotationAngle = 0,
     double scale = 1,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints = const <ObjectDrawableAssist, Paint>{},
+    Map<ObjectDrawableAssist, Paint> assistPaints =
+        const <ObjectDrawableAssist, Paint>{},
     bool hidden = false,
-  }) : this.paint = paint ?? ShapeDrawable.defaultPaint,
+  })  : this.paint = paint ?? ShapeDrawable.defaultPaint,
         super(
             length: length,
             position: position,
@@ -32,24 +32,20 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
             scale: scale,
             assists: assists,
             assistPaints: assistPaints,
-            hidden: hidden
-        );
+            hidden: hidden);
 
   /// Getter for padding of drawable.
   ///
   /// Add padding equal to the stroke width of the line.
   @protected
   @override
-  EdgeInsets get padding => EdgeInsets.all(paint.strokeWidth/2);
+  EdgeInsets get padding => EdgeInsets.all(paint.strokeWidth / 2);
 
   /// Draws the line on the provided [canvas] of size [size].
   @override
   void drawObject(Canvas canvas, Size size) {
-    canvas.drawLine(
-      position.translate(-length/2 * scale, 0),
-      position.translate(length/2 * scale, 0),
-      paint
-    );
+    canvas.drawLine(position.translate(-length / 2 * scale, 0),
+        position.translate(length / 2 * scale, 0), paint);
   }
 
   /// Creates a copy of this but with the given fields replaced with the new values.
@@ -62,7 +58,7 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
     double? scale,
     double? length,
     Paint? paint,
-  }){
+  }) {
     return LineDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
@@ -93,5 +89,4 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable{
       scale,
       paint,
       length);
-  
 }

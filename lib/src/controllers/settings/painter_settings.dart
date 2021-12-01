@@ -1,7 +1,7 @@
 export 'free_style_settings.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_painter/src/controllers/settings/shape_settings.dart';
+import 'shape_settings.dart';
 import 'object_settings.dart';
 import 'settings.dart';
 

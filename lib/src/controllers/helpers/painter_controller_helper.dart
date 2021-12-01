@@ -1,4 +1,4 @@
-import 'package:flutter_painter/src/controllers/settings/shape_settings.dart';
+import '../settings/shape_settings.dart';
 
 import '../painter_controller.dart';
 import '../settings/settings.dart';
@@ -69,11 +69,8 @@ extension PainterControllerHelper on PainterController {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this value should only be set between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  set shapeSettings(ShapeSettings shapeSettings) =>
-      value = value.copyWith(
+  set shapeSettings(ShapeSettings shapeSettings) => value = value.copyWith(
           settings: settings.copyWith(
         shape: shapeSettings,
       ));
-
-
 }

@@ -4,7 +4,6 @@ import '../object_drawable.dart';
 
 /// Abstract class representing a drawable of a shape.
 abstract class ShapeDrawable extends ObjectDrawable {
-
   /// Default value for [paint].
   static final defaultPaint = Paint()
     ..strokeWidth = 2
@@ -22,20 +21,17 @@ abstract class ShapeDrawable extends ObjectDrawable {
     double rotationAngle = 0,
     double scale = 1,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints = const <
-        ObjectDrawableAssist,
-        Paint>{},
+    Map<ObjectDrawableAssist, Paint> assistPaints =
+        const <ObjectDrawableAssist, Paint>{},
     bool hidden = false,
-  })
-      : this.paint = paint != null ? paint : defaultPaint,
+  })  : this.paint = paint != null ? paint : defaultPaint,
         super(
-          position: position,
-          rotationAngle: rotationAngle,
-          scale: scale,
-          assists: assists,
-          assistPaints: assistPaints,
-          hidden: hidden
-      );
+            position: position,
+            rotationAngle: rotationAngle,
+            scale: scale,
+            assists: assists,
+            assistPaints: assistPaints,
+            hidden: hidden);
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override

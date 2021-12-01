@@ -58,7 +58,8 @@ class ObjectSettings {
     return ObjectSettings(
       layoutAssist: layoutAssist ?? this.layoutAssist,
       enlargeControls: enlargeControls ?? this.enlargeControls,
-      showScaleRotationControls: showScaleRotationControls ?? this.showScaleRotationControls,
+      showScaleRotationControls:
+          showScaleRotationControls ?? this.showScaleRotationControls,
     );
   }
 
@@ -66,19 +67,13 @@ class ObjectSettings {
   ///
   /// Returns `true` on mobile devices.
   static bool _enlargeControls() {
-    if(kIsWeb)
-      return _mobileTargetPlatforms.contains(defaultTargetPlatform);
-    return Platform.isAndroid ||
-        Platform.isIOS ||
-        Platform.isFuchsia;
+    if (kIsWeb) return _mobileTargetPlatforms.contains(defaultTargetPlatform);
+    return Platform.isAndroid || Platform.isIOS || Platform.isFuchsia;
   }
 
   static bool _showScaleRotationControls() {
-    if(kIsWeb)
-      return !_mobileTargetPlatforms.contains(defaultTargetPlatform);
-    return Platform.isWindows ||
-        Platform.isIOS ||
-        Platform.isLinux;
+    if (kIsWeb) return !_mobileTargetPlatforms.contains(defaultTargetPlatform);
+    return Platform.isWindows || Platform.isIOS || Platform.isLinux;
   }
 }
 

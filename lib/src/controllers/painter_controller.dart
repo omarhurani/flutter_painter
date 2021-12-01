@@ -131,7 +131,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   bool removeDrawable(Drawable drawable) {
     final currentDrawables = List<Drawable>.from(value.drawables);
     final removed = currentDrawables.remove(drawable);
-    if (removed){
+    if (removed) {
       value = value.copyWith(drawables: currentDrawables);
       _eventsSteamController.add(RemoveDrawableEvent(drawable));
     }

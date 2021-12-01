@@ -3,8 +3,7 @@ import 'dart:ui';
 import 'package:flutter/painting.dart';
 
 /// Extension to add a copy method for [Paint].
-extension PaintCopy on Paint{
-
+extension PaintCopy on Paint {
   /// Creates a copy of this but with the given fields replaced with the new values.
   Paint copyWith({
     BlendMode? blendMode,
@@ -21,7 +20,7 @@ extension PaintCopy on Paint{
     double? strokeMiterLimit,
     double? strokeWidth,
     PaintingStyle? style,
-  }){
+  }) {
     return Paint()
       ..blendMode = blendMode ?? this.blendMode
       ..color = color ?? this.color
@@ -39,4 +38,3 @@ extension PaintCopy on Paint{
       ..style = style ?? this.style;
   }
 }
-

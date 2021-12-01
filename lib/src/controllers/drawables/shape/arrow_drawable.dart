@@ -9,8 +9,7 @@ import '../sized1ddrawable.dart';
 import '../../helpers/paint_copy.dart';
 
 /// A drawable of a simple arrow shape.
-class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
-
+class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
   /// The paint to be used for the line drawable.
   @override
   Paint paint;
@@ -29,18 +28,18 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
     double rotationAngle = 0,
     double scale = 1,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints = const <ObjectDrawableAssist, Paint>{},
+    Map<ObjectDrawableAssist, Paint> assistPaints =
+        const <ObjectDrawableAssist, Paint>{},
     bool hidden = false,
-  }) : this.paint = paint ?? ShapeDrawable.defaultPaint,
+  })  : this.paint = paint ?? ShapeDrawable.defaultPaint,
         super(
-          length: length,
-          position: position,
-          rotationAngle: rotationAngle,
-          scale: scale,
-          assists: assists,
-          assistPaints: assistPaints,
-          hidden: hidden
-      );
+            length: length,
+            position: position,
+            rotationAngle: rotationAngle,
+            scale: scale,
+            assists: assists,
+            assistPaints: assistPaints,
+            hidden: hidden);
 
   /// The actual arrow head size used in drawing.
   double get _arrowHeadSize => this.arrowHeadSize ?? paint.strokeWidth * 3;
@@ -51,36 +50,27 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
   @protected
   @override
   EdgeInsets get padding => EdgeInsets.symmetric(
-    horizontal: paint.strokeWidth/2,
-    vertical: paint.strokeWidth/2 + (_arrowHeadSize/2)
-  );
+      horizontal: paint.strokeWidth / 2,
+      vertical: paint.strokeWidth / 2 + (_arrowHeadSize / 2));
 
   /// Draws the arrow on the provided [canvas] of size [size].
   @override
   void drawObject(Canvas canvas, Size size) {
-
     final arrowHeadSize = _arrowHeadSize;
 
-    final dx = length/2 * scale - arrowHeadSize;
+    final dx = length / 2 * scale - arrowHeadSize;
 
-    final start = position.translate(-length/2 * scale, 0);
+    final start = position.translate(-length / 2 * scale, 0);
     final end = position.translate(dx, 0);
 
-    if((end-start).dx > 0)
-      canvas.drawLine(
-          start,
-          end,
-          paint
-      );
+    if ((end - start).dx > 0) canvas.drawLine(start, end, paint);
 
-    final pathDx = dx/*.clamp(-arrowHeadSize/2, double.infinity)*/;
+    final pathDx = dx /*.clamp(-arrowHeadSize/2, double.infinity)*/;
 
     final path = Path();
     path.moveTo(position.dx + pathDx + arrowHeadSize, position.dy);
-    path.lineTo(position.dx + pathDx,
-        position.dy - (arrowHeadSize/2));
-    path.lineTo(position.dx + pathDx,
-        position.dy + (arrowHeadSize/2));
+    path.lineTo(position.dx + pathDx, position.dy - (arrowHeadSize / 2));
+    path.lineTo(position.dx + pathDx, position.dy + (arrowHeadSize / 2));
     path.lineTo(position.dx + pathDx + arrowHeadSize, position.dy);
 
     final headPaint = paint.copyWith(
@@ -88,7 +78,6 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
     );
 
     canvas.drawPath(path, headPaint);
-
   }
 
   /// Creates a copy of this but with the given fields replaced with the new values.
@@ -102,7 +91,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
     double? length,
     Paint? paint,
     double? arrowHeadSize,
-  }){
+  }) {
     return ArrowDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
@@ -119,10 +108,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
   @override
   Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
     final size = super.getSize();
-    return Size(
-      size.width,
-      size.height
-    );
+    return Size(size.width, size.height);
   }
 
   /// Compares two [ArrowDrawable]s for equality.
@@ -146,5 +132,4 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable{
       paint,
       length,
       arrowHeadSize);
-
 }

@@ -61,7 +61,8 @@ class TextWidgetState extends State<TextWidget> {
   ///
   /// This handles notifications of type [ObjectDrawableReselectedNotification] to edit
   /// an existing [TextDrawable].
-  bool onObjectDrawableNotification(ObjectDrawableReselectedNotification notification) {
+  bool onObjectDrawableNotification(
+      ObjectDrawableReselectedNotification notification) {
     final drawable = notification.drawable;
 
     if (drawable is TextDrawable) {
@@ -96,7 +97,7 @@ class TextWidgetState extends State<TextWidget> {
     );
     widget.controller.addDrawables([drawable]);
 
-    if(mounted){
+    if (mounted) {
       DrawableCreatedNotification(drawable).dispatch(context);
       setState(() {
         selectedDrawable = drawable;
@@ -104,7 +105,7 @@ class TextWidgetState extends State<TextWidget> {
     }
 
     openTextEditor(drawable).then((value) {
-      if(mounted)
+      if (mounted)
         setState(() {
           selectedDrawable = null;
         });

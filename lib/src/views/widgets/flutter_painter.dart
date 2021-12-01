@@ -28,7 +28,6 @@ typedef DrawableCreatedCallback = Function(Drawable drawable);
 
 typedef DrawableDeletedCallback = Function(Drawable drawable);
 
-
 /// Widget that allows user to draw on it
 class FlutterPainter extends StatelessWidget {
   /// The controller for this painter.
@@ -47,14 +46,14 @@ class FlutterPainter extends StatelessWidget {
   final ValueChanged<PainterSettings>? onPainterSettingsChanged;
 
   /// Creates a [FlutterPainter] with the given [controller] and optional callbacks.
-  const FlutterPainter({
-    Key? key,
-    required this.controller,
-    this.onDrawableCreated,
-    this.onDrawableDeleted,
-    this.onSelectedObjectDrawableChanged,
-    this.onPainterSettingsChanged
-  }) : super(key: key);
+  const FlutterPainter(
+      {Key? key,
+      required this.controller,
+      this.onDrawableCreated,
+      this.onDrawableDeleted,
+      this.onSelectedObjectDrawableChanged,
+      this.onPainterSettingsChanged})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +67,8 @@ class FlutterPainter extends StatelessWidget {
                       key: controller.painterKey,
                       valueListenable: controller,
                       builder: (context, value, child) => ClipRect(
-                            child: NotificationListener<FlutterPainterNotification>(
+                            child: NotificationListener<
+                                FlutterPainterNotification>(
                               onNotification: onNotification,
                               child: FreeStyleWidget(
                                   controller: controller,
@@ -93,14 +93,14 @@ class FlutterPainter extends StatelessWidget {
             ));
   }
 
-  bool onNotification(FlutterPainterNotification notification){
-    if(notification is DrawableCreatedNotification)
+  bool onNotification(FlutterPainterNotification notification) {
+    if (notification is DrawableCreatedNotification)
       onDrawableCreated?.call(notification.drawable);
-    else if(notification is DrawableDeletedNotification)
+    else if (notification is DrawableDeletedNotification)
       onDrawableDeleted?.call(notification.drawable);
-    else if(notification is SelectedObjectDrawableUpdatedNotification)
+    else if (notification is SelectedObjectDrawableUpdatedNotification)
       onSelectedObjectDrawableChanged?.call(notification.drawable);
-    else if(notification is SettingsUpdatedNotification)
+    else if (notification is SettingsUpdatedNotification)
       onPainterSettingsChanged?.call(notification.settings);
     return true;
   }
