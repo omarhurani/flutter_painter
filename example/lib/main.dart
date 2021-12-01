@@ -518,6 +518,9 @@ class RenderedImageDialog extends StatelessWidget {
               return TextButton(
                 child: Text("Save"),
                 onPressed: () {
+                  // Saves the image for Flutter Web.
+                  // Add this line to 'web/index.html' for this to work:
+                  // <script src="https://cdnjs.cloudflare.com/ajax/libs/amcharts/3.21.15/plugins/export/libs/FileSaver.js/FileSaver.min.js"></script>
                   js.context.callMethod(
                     "saveAs",
                     [
