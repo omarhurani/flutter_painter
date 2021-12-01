@@ -44,10 +44,15 @@ class Painter extends CustomPainter {
           .storage);
     }
 
+    canvas.saveLayer(Rect.largest, Paint());
+
     // Draw all the drawables
     for (final drawable in drawables.where((drawable) => !drawable.hidden)) {
       drawable.draw(canvas, size);
     }
+
+    canvas.restore();
+
     // If a scale size is being used, restore the saved canvas, which will scale all the drawn drawables
     if (_scale != null) {
       canvas.restore();

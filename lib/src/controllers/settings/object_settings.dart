@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
+import '../drawables/sized2ddrawable.dart';
 import 'haptic_feedback_settings.dart';
 
 typedef ObjectEnlargeControlsFunction = bool Function();

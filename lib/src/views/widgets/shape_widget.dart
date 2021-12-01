@@ -104,7 +104,7 @@ class _ShapeWidgetState extends State<ShapeWidget> {
       updateDrawable(sized2DDrawable as ShapeDrawable, newDrawable);
     }
     if (settings.drawOnce) {
-      widget.controller.settings = widget.controller.value.settings.copyWith(
+      widget.controller.settings = widget.controller.settings.copyWith(
           shape: settings.copyWith(
         factory: null,
       ));

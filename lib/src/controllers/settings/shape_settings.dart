@@ -31,9 +31,8 @@ class ShapeSettings {
     Paint? paint,
   }) =>
       ShapeSettings(
-        factory: factory == _NoShapePassedFactory.instance
-            ? this.factory
-            : factory,
+        factory:
+            factory == _NoShapePassedFactory.instance ? this.factory : factory,
         drawOnce: drawOnce ?? this.drawOnce,
         paint: paint ?? this.paint,
       );

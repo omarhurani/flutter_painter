@@ -29,6 +29,13 @@ extension PainterControllerHelper on PainterController {
   /// Getter for the shape settings directly from the painter settings.
   ShapeSettings get shapeSettings => settings.shape;
 
+  /// Setting this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this value should only be set between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  set settings(PainterSettings settings) =>
+      value = value.copyWith(settings: settings);
+
   /// Setter to for `settings.object` directly.
   ///
   /// Setting this will notify all the listeners of this [PainterController]
