@@ -9,10 +9,22 @@ A pure-Flutter package for painting.
 `flutter_painter` provides you with a widget that can be used to draw on it. Right now, it supports:
 - **Free-style drawing**: Scribble anything you want with any width and color.
 - **Text**: Add text of any `TextStyle` onto the drawing and control its position, size and rotation in a way you're familiar with with other applications.
+- **Shapes**: Add lines, arrows, ovals and rectangles with any `Paint` and control them the same as **text**.
 
 In `flutter_painter`, these are called **drawables**.
 
 `flutter_painter` also allows you to choose a color or an image for the background of your drawing. You can export your painting as an image.
+
+
+## Example
+
+You can check out the example tab for an example on how to use the package.
+
+The example is hosted [here](https://flutter-painter.web.app) if you want to try it out yourself!
+
+A video recording showing the example running:
+
+<img src="https://github.com/omarhurani/flutter_painter/blob/master/example/flutter_painter_example.gif?raw=true" alt="Flutter Painter Video Demo" height=800px/>
 
 ## Usage
 First, you'll need a `PainterController` object. The `PainterController` controls the different drawables, the background you're drawing on and provides the `FlutterPainter` widget with the settings it needs. Then, in your UI, use the `FlutterPainter` widget with the controller assigned to it.
@@ -33,7 +45,10 @@ class _ExampleWidgetState extends State<ExampleWidget> {
     return SizedBox(
       width: 300,
       height: 300,
-      child: FlutterPainter(controller: controller,),
+      child: FlutterPainter(
+        controller: controller,        
+        // You can also listen to callbacks here.
+      ),
     );
   }
 }
@@ -41,6 +56,15 @@ class _ExampleWidgetState extends State<ExampleWidget> {
 ```
 
 Note that `FlutterWidget` does not define its own constraints on its size, so it is advised to use a widget that can provide its child with size constraints, such as `SizedBox` or `AspectRatio` ([more on constraints here](https://flutter.dev/docs/development/ui/layout/constraints)).
+
+### Callbacks
+
+`FlutterPainter` has some helpful callbacks that are called when internal changes happen in the widget itself.
+- `onDrawableCreated`: Called when a drawable is created from `FlutterPainter`. Passes the drawable as an arugment.
+- `onDrawableDeleted`: Called when a drawable is deleted from `FlutterPainter`. Passes the drawable as an arugment.
+- `onSelectedObjectDrawableChanged`: Called when the selected object drawable changes. This can be useful if you want to display some UI to edit the object's properties. Passes the selected object drawable as an argument.
+- `onPainterSettingsChanged`: Called when the settings of `PainterController` are changed from `FlutterPainter` itself. Passes the new settings as an argument.
+
 
 ## `PainterController`
 
@@ -55,7 +79,8 @@ All setters on `PainterController` directly notify your `FlutterPainter` to resp
 There are currently three types of settings:
 - `freeStyleSettings`: They control the parameters used in drawing scribbles, such as the width and color. It also has a field to enable/disable scribbles, to prevent the user from drawing on the `FlutterPainter`.
 - `textSettings`: They mainly control the `TextStyle` of the text being drawn. It also has a focus node field ([more on focus nodes here](https://flutter.dev/docs/cookbook/forms/focus)) to allow you to detect when the user starts and stops editing text.
-- `objectSettings`: These settings control objects that can be moved, scaled and rotated. Texts are considered objects (they are currently the only ones, but there are plans to add more in the future, such as images). It mainly controls layout assist, which allows to center objects and rotate them at a right angle, as shown here:
+- `objectSettings`: These settings control objects that can be moved, scaled and rotated. Texts are considered objects (they are currently the only ones, but there are plans to add more in the future, such as images). It controls layout assist, which allows to center objects and rotate them at a right angle, and settings regarding the object controls for scaling, rotating and resizing.
+- `shapeSettings`: These control the paint and shape factory used (Shape Factory is used to create shapes), and whether the shape is drawn once or continiously.
 
 You can provide initial settings for the things you want to draw through the settings parameter in the constructor of the `PainterController`.
 
@@ -141,14 +166,6 @@ Uint8List? renderImage(Size size) async {
 - Scaling and rotating objects (such as Text) is not currently possible using a mouse pointer. You can still programmatically set your own scaling and rotation. A suitable implementation for this is planned in the future.
 
 - Testing is not available right now because I'm not familiar with it. If anybody is willing to help out with it, it would be highly appreciated (contact me through [my GitHub](https://github.com/omarhurani)).
-
-## Example
-
-You can check out the example tab for an example on how to use the package.
-
-A video recording showing the example running:
-
-<img src="https://user-images.githubusercontent.com/26940488/129899431-3265b212-6b21-4b92-b3a5-ed0734c2f4f4.gif" alt="Flutter Painter Video Demo" height=800px/>
 
 
 ## Support Me
