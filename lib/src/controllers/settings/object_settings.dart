@@ -74,7 +74,7 @@ class ObjectSettings {
 
   static bool _showScaleRotationControls() {
     if (kIsWeb) return !_mobileTargetPlatforms.contains(defaultTargetPlatform);
-    return Platform.isWindows || Platform.isIOS || Platform.isLinux;
+    return Platform.isWindows || Platform.isMacOS || Platform.isLinux;
   }
 }
 
