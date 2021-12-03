@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/painting.dart';
 
+import '../helpers/renderer_check.dart';
+
 /// Extension to add a copy method for [Paint].
 extension PaintCopy on Paint {
   /// Creates a copy of this but with the given fields replaced with the new values.
@@ -21,7 +23,7 @@ extension PaintCopy on Paint {
     double? strokeWidth,
     PaintingStyle? style,
   }) {
-    return Paint()
+    var paint = Paint()
       ..blendMode = blendMode ?? this.blendMode
       ..color = color ?? this.color
       ..colorFilter = colorFilter ?? this.colorFilter
@@ -33,8 +35,12 @@ extension PaintCopy on Paint {
       ..shader = shader ?? this.shader
       ..strokeCap = strokeCap ?? this.strokeCap
       ..strokeJoin = strokeJoin ?? this.strokeJoin
-      ..strokeMiterLimit = strokeMiterLimit ?? this.strokeMiterLimit
       ..strokeWidth = strokeWidth ?? this.strokeWidth
       ..style = style ?? this.style;
+
+    if(!usingHtmlRenderer)
+      paint.strokeMiterLimit = strokeMiterLimit ?? this.strokeMiterLimit;
+
+    return paint;
   }
 }

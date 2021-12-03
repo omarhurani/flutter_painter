@@ -165,17 +165,37 @@ class ObjectWidgetState extends State<ObjectWidget> {
                                               (controlsSize / 2),
                                           right: objectPadding -
                                               (controlsSize / 2),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.white,
+                                          child: Builder(
+                                            builder: (context){
+                                              if(usingHtmlRenderer)
+                                                return Container(
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: Colors.white,
+                                                        ),
+                                                    ),
+                                                  ),
+                                                );
+                                              return Container(
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: Colors.white,
+                                                    ),
+                                                    boxShadow: [
+                                                      BorderBoxShadow(
+                                                        color: Colors.black,
+                                                        blurRadius: 2,
+                                                      )
+                                                    ]
                                                 ),
-                                                boxShadow: [
-                                                  BorderBoxShadow(
-                                                    color: Colors.black,
-                                                    blurRadius: 2,
-                                                  )
-                                                ]),
+                                              );
+                                            },
                                           ),
                                         ),
                                         if (settings
