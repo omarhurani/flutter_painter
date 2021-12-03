@@ -169,6 +169,8 @@ class EditTextWidgetState extends State<EditTextWidget>
   /// Getter for [TextSettings] from `widget.controller.value` to make code more readable.
   TextSettings get settings => widget.controller.value.settings.text;
 
+  bool disposed = false;
+
   @override
   void initState() {
     super.initState();
@@ -298,7 +300,13 @@ class EditTextWidgetState extends State<EditTextWidget>
       );
       updateDrawable(widget.drawable, drawable);
     }
-    if (mounted) Navigator.pop(context);
+    if (mounted && !disposed){
+      setState(() {
+        disposed = true;
+      });
+      Navigator.pop(context);
+    }
+
   }
 
   /// Updates the drawable in the painter controller.
