@@ -163,9 +163,12 @@ Uint8List? renderImage(Size size) async {
 
 ## Notes
 
-- Scaling and rotating objects (such as Text) is not currently possible using a mouse pointer. You can still programmatically set your own scaling and rotation. A suitable implementation for this is planned in the future.
+- The `html` renderer for Flutter Web is not supported, and using it will cause unexpected behavior and errors (also includes the `auto` renderer which chooses the renderer depending on the device). If you're using it for Flutter Web, make sure to use `--web-renderer canvaskit` as an argument for your `run`/`build` commands. If you need to use `auto` or `html` for any reason (such as better performance), consider using another package.
 
-- Testing is not available right now because I'm not familiar with it. If anybody is willing to help out with it, it would be highly appreciated (contact me through [my GitHub](https://github.com/omarhurani)).
+
+- Testing is not available right now because I'm not familiar with it.
+
+> If anybody is willing to help out with any of these issues, it would be highly appreciated (either contact me through [my GitHub](https://github.com/omarhurani) or contribute and post a pull request).
 
 
 ## Support Me
