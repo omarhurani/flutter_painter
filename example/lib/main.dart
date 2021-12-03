@@ -88,7 +88,6 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("Flutter Painter Example"),
         actions: [
