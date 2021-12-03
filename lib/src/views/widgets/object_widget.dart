@@ -166,8 +166,8 @@ class ObjectWidgetState extends State<ObjectWidget> {
                                           right: objectPadding -
                                               (controlsSize / 2),
                                           child: Builder(
-                                            builder: (context){
-                                              if(usingHtmlRenderer)
+                                            builder: (context) {
+                                              if (usingHtmlRenderer)
                                                 return Container(
                                                   decoration: BoxDecoration(
                                                     border: Border.all(
@@ -176,9 +176,9 @@ class ObjectWidgetState extends State<ObjectWidget> {
                                                   ),
                                                   child: Container(
                                                     decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: Colors.white,
-                                                        ),
+                                                      border: Border.all(
+                                                        color: Colors.white,
+                                                      ),
                                                     ),
                                                   ),
                                                 );
@@ -192,8 +192,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
                                                         color: Colors.black,
                                                         blurRadius: 2,
                                                       )
-                                                    ]
-                                                ),
+                                                    ]),
                                               );
                                             },
                                           ),

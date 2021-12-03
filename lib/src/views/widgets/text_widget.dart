@@ -300,13 +300,12 @@ class EditTextWidgetState extends State<EditTextWidget>
       );
       updateDrawable(widget.drawable, drawable);
     }
-    if (mounted && !disposed){
+    if (mounted && !disposed) {
       setState(() {
         disposed = true;
       });
       Navigator.pop(context);
     }
-
   }
 
   /// Updates the drawable in the painter controller.

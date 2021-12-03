@@ -221,7 +221,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
                       color: Colors.white54,
                     ),
                     child: Column(
@@ -239,7 +240,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                 child: Slider.adaptive(
                                     min: 2,
                                     max: 25,
-                                    value: controller.freeStyleSettings.strokeWidth,
+                                    value: controller
+                                        .freeStyleSettings.strokeWidth,
                                     onChanged: setFreeStyleStrokeWidth),
                               ),
                             ],
@@ -257,7 +259,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                     value: HSVColor.fromColor(
                                             controller.freeStyleSettings.color)
                                         .hue,
-                                    activeColor: controller.freeStyleSettings.color,
+                                    activeColor:
+                                        controller.freeStyleSettings.color,
                                     onChanged: setFreeStyleColor),
                               ),
                             ],
@@ -275,9 +278,9 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                 child: Slider.adaptive(
                                     min: 8,
                                     max: 96,
-                                    value:
-                                        controller.textSettings.textStyle.fontSize ??
-                                            14,
+                                    value: controller
+                                            .textSettings.textStyle.fontSize ??
+                                        14,
                                     onChanged: setTextFontSize),
                               ),
                             ],
@@ -292,9 +295,9 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                 child: Slider.adaptive(
                                     min: 0,
                                     max: 359.99,
-                                    value: HSVColor.fromColor(
-                                            controller.textSettings.textStyle.color ??
-                                                red)
+                                    value: HSVColor.fromColor(controller
+                                                .textSettings.textStyle.color ??
+                                            red)
                                         .hue,
                                     activeColor:
                                         controller.textSettings.textStyle.color,
@@ -316,9 +319,9 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                 child: Slider.adaptive(
                                     min: 2,
                                     max: 25,
-                                    value:
-                                        controller.shapeSettings.paint?.strokeWidth ??
-                                            shapePaint.strokeWidth,
+                                    value: controller
+                                            .shapeSettings.paint?.strokeWidth ??
+                                        shapePaint.strokeWidth,
                                     onChanged: (value) => setShapeFactoryPaint(
                                             (controller.shapeSettings.paint ??
                                                     shapePaint)
@@ -344,7 +347,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                                 .color)
                                         .hue,
                                     activeColor:
-                                        (controller.shapeSettings.paint ?? shapePaint)
+                                        (controller.shapeSettings.paint ??
+                                                shapePaint)
                                             .color,
                                     onChanged: (hue) => setShapeFactoryPaint(
                                             (controller.shapeSettings.paint ??
@@ -368,7 +372,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                                   shapePaint)
                                               .style ==
                                           PaintingStyle.fill,
-                                      onChanged: (value) => setShapeFactoryPaint(
+                                      onChanged: (value) =>
+                                          setShapeFactoryPaint(
                                               (controller.shapeSettings.paint ??
                                                       shapePaint)
                                                   .copyWith(
