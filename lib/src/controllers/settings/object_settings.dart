@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -68,13 +67,11 @@ class ObjectSettings {
   ///
   /// Returns `true` on mobile devices.
   static bool _enlargeControls() {
-    if (kIsWeb) return _mobileTargetPlatforms.contains(defaultTargetPlatform);
-    return Platform.isAndroid || Platform.isIOS || Platform.isFuchsia;
+    return _mobileTargetPlatforms.contains(defaultTargetPlatform);
   }
 
   static bool _showScaleRotationControls() {
-    if (kIsWeb) return !_mobileTargetPlatforms.contains(defaultTargetPlatform);
-    return Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+    return !_mobileTargetPlatforms.contains(defaultTargetPlatform);
   }
 }
 
