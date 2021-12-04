@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import '../../controllers/helpers/renderer_check.dart';
+import '../../controllers/helpers/renderer_check/renderer_check.dart';
 import '../../controllers/drawables/drawable.dart';
 import '../../controllers/notifications/notifications.dart';
 import '../../controllers/events/remove_drawable_event.dart';

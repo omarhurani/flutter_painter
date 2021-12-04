@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/painting.dart';
 
-import '../helpers/renderer_check.dart';
+import 'renderer_check/renderer_check.dart';
 
 /// Extension to add a copy method for [Paint].
 extension PaintCopy on Paint {
