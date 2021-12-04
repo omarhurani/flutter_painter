@@ -1,3 +1,6 @@
+## [0.2.1]
+* Fix a static compatibility issue with Flutter Web.
+
 ## [0.2.0]
 
 * Add support for cursor-based controls; now objects can be scaled and rotated using cursor.
