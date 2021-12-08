@@ -57,6 +57,7 @@ class FreeStyleDrawable extends Drawable {
 
     // Start path from the first point
     path.moveTo(this.path[0].dx, this.path[0].dy);
+    path.lineTo(this.path[0].dx, this.path[0].dy);
 
     // Draw a line between each point on the free path
     this.path.sublist(1).forEach((point) {
