@@ -29,6 +29,7 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
     if (!settings.enabled) return widget.child;
 
     return RawGestureDetector(
+      behavior: HitTestBehavior.opaque,
       gestures: {
         _DragGestureDetector:
             GestureRecognizerFactoryWithHandlers<_DragGestureDetector>(
