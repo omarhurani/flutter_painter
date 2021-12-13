@@ -28,11 +28,19 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
   Widget build(BuildContext context) {
     if (!settings.enabled) return widget.child;
 
-    return GestureDetector(
+    return RawGestureDetector(
       behavior: HitTestBehavior.opaque,
-      onScaleStart: onScaleStart,
-      onScaleUpdate: onScaleUpdate,
-      onScaleEnd: onScaleEnd,
+      gestures: {
+        _DragGestureDetector:
+            GestureRecognizerFactoryWithHandlers<_DragGestureDetector>(
+          () => _DragGestureDetector(
+            onHorizontalDragDown: _handleHorizontalDragDown,
+            onHorizontalDragUpdate: _handleHorizontalDragUpdate,
+            onHorizontalDragUp: _handleHorizontalDragUp,
+          ),
+          (_) {},
+        ),
+      },
       child: widget.child,
     );
   }
@@ -41,17 +49,13 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
   FreeStyleSettings get settings => widget.controller.value.settings.freeStyle;
 
   /// Callback when the user holds their pointer(s) down onto the widget.
-  void onScaleStart(ScaleStartDetails event) {
+  void _handleHorizontalDragDown(Offset globalPosition) {
     // If the user is already drawing, don't create a new drawing
     if (this.drawable != null) return;
 
-    // If the user is trying to draw with multiple pointers, ignore user input
-    // Drawing with two pointers causes an issue, so this is to avoid it
-    if (event.pointerCount > 1) return;
-
     // Create a new free-style drawable representing the current drawing
     final drawable = FreeStyleDrawable(
-      path: [event.localFocalPoint],
+      path: [_globalToLocal(globalPosition)],
       color: settings.color,
       strokeWidth: settings.strokeWidth,
     );
@@ -64,18 +68,15 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
   }
 
   /// Callback when the user moves, rotates or scales the pointer(s).
-  void onScaleUpdate(ScaleUpdateDetails event) {
+  void _handleHorizontalDragUpdate(Offset globalPosition) {
     final drawable = this.drawable;
     // If there is no current drawable, ignore user input
     if (drawable == null) return;
 
-    // If the user is trying to draw with multiple pointers, ignore user input
-    // Drawing with two pointers causes an issue, so this is to avoid it
-    if (event.pointerCount > 1) this.drawable = null;
-
     // Add the new point to a copy of the current drawable
     final newDrawable = drawable.copyWith(
-      path: List<Offset>.from(drawable.path)..add(event.localFocalPoint),
+      path: List<Offset>.from(drawable.path)
+        ..add(_globalToLocal(globalPosition)),
     );
     // Replace the current drawable with the copy with the added point
     widget.controller.replaceDrawable(drawable, newDrawable);
@@ -84,8 +85,59 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
   }
 
   /// Callback when the user removes all pointers from the widget.
-  void onScaleEnd(ScaleEndDetails event) {
+  void _handleHorizontalDragUp() {
     /// Reset the current drawable for the user to draw a new one next time
     drawable = null;
   }
+
+  Offset _globalToLocal(Offset globalPosition) {
+    final getBox = context.findRenderObject() as RenderBox;
+
+    return getBox.globalToLocal(globalPosition);
+  }
+}
+
+/// A custom recognizer that recognize at most only one gesture sequence.
+class _DragGestureDetector extends OneSequenceGestureRecognizer {
+  _DragGestureDetector({
+    required this.onHorizontalDragDown,
+    required this.onHorizontalDragUpdate,
+    required this.onHorizontalDragUp,
+  });
+
+  final ValueSetter<Offset> onHorizontalDragDown;
+  final ValueSetter<Offset> onHorizontalDragUpdate;
+  final VoidCallback onHorizontalDragUp;
+
+  bool _isTrackingGesture = false;
+
+  @override
+  void addPointer(PointerEvent event) {
+    if (!_isTrackingGesture) {
+      resolve(GestureDisposition.accepted);
+      startTrackingPointer(event.pointer);
+      _isTrackingGesture = true;
+    } else {
+      stopTrackingPointer(event.pointer);
+    }
+  }
+
+  @override
+  void handleEvent(PointerEvent event) {
+    if (event is PointerDownEvent) {
+      onHorizontalDragDown(event.position);
+    } else if (event is PointerMoveEvent) {
+      onHorizontalDragUpdate(event.position);
+    } else if (event is PointerUpEvent) {
+      onHorizontalDragUp();
+      stopTrackingPointer(event.pointer);
+      _isTrackingGesture = false;
+    }
+  }
+
+  @override
+  String get debugDescription => '_DragGestureDetector';
+
+  @override
+  void didStopTrackingLastPointer(int pointer) {}
 }
