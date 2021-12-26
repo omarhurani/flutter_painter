@@ -30,6 +30,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
     Map<ObjectDrawableAssist, Paint> assistPaints =
         const <ObjectDrawableAssist, Paint>{},
+    bool locked = false,
     bool hidden = false,
   })  : this.paint = paint ?? ShapeDrawable.defaultPaint,
         super(
@@ -39,6 +40,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
             scale: scale,
             assists: assists,
             assistPaints: assistPaints,
+            locked: locked,
             hidden: hidden);
 
   /// The actual arrow head size used in drawing.
@@ -90,6 +92,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
     double? scale,
     double? length,
     Paint? paint,
+    bool? locked,
     double? arrowHeadSize,
   }) {
     return ArrowDrawable(
@@ -100,6 +103,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
       scale: scale ?? this.scale,
       length: length ?? this.length,
       paint: paint ?? this.paint,
+      locked: locked ?? this.locked,
       arrowHeadSize: arrowHeadSize ?? this.arrowHeadSize,
     );
   }
@@ -124,6 +128,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
   @override
   int get hashCode => hashValues(
       hidden,
+      locked,
       hashList(assists),
       hashList(assistPaints.entries),
       position,

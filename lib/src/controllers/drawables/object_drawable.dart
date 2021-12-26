@@ -42,6 +42,10 @@ abstract class ObjectDrawable extends Drawable {
   /// and [defaultRotationAssistPaint] will be used for [ObjectDrawableAssist.rotation].
   final Map<ObjectDrawableAssist, Paint> assistPaints;
 
+  /// Defines if the object drawable is locked or not.
+  /// If it is locked, it won't be movable, scalable or re-sizable using the UI.
+  final bool locked;
+
   /// Default constructor for [ObjectDrawable].
   const ObjectDrawable({
     required this.position,
@@ -49,6 +53,7 @@ abstract class ObjectDrawable extends Drawable {
     this.scale = 1,
     this.assists = const <ObjectDrawableAssist>{},
     this.assistPaints = const <ObjectDrawableAssist, Paint>{},
+    this.locked = false,
     bool hidden = false,
   }) : super(hidden: hidden);
 
@@ -147,10 +152,11 @@ abstract class ObjectDrawable extends Drawable {
     Offset? position,
     double? rotation,
     double? scale,
+    bool? locked,
   });
 
   @override
-  int get hashCode => hashValues(hidden, hashList(assists),
+  int get hashCode => hashValues(hidden, locked, hashList(assists),
       hashList(assistPaints.entries), position, rotationAngle);
 
   /// Calculates the intersection points between a line passing through point [point]

@@ -19,6 +19,7 @@ abstract class Sized2DDrawable extends ObjectDrawable {
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
     Map<ObjectDrawableAssist, Paint> assistPaints =
         const <ObjectDrawableAssist, Paint>{},
+    bool locked = false,
     bool hidden = false,
   }) : super(
             position: position,
@@ -26,6 +27,7 @@ abstract class Sized2DDrawable extends ObjectDrawable {
             scale: scale,
             assists: assists,
             assistPaints: assistPaints,
+            locked: locked,
             hidden: hidden);
 
   /// Getter for padding of drawable.
@@ -44,6 +46,7 @@ abstract class Sized2DDrawable extends ObjectDrawable {
     double? rotation,
     double? scale,
     Size? size,
+    bool? locked,
   });
 
   /// Calculates the size of the rendered object.

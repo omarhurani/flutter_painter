@@ -23,6 +23,7 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable {
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
     Map<ObjectDrawableAssist, Paint> assistPaints =
         const <ObjectDrawableAssist, Paint>{},
+    bool locked = false,
     bool hidden = false,
   })  : this.paint = paint ?? ShapeDrawable.defaultPaint,
         super(
@@ -32,6 +33,7 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable {
             scale: scale,
             assists: assists,
             assistPaints: assistPaints,
+            locked: locked,
             hidden: hidden);
 
   /// Getter for padding of drawable.
@@ -58,6 +60,7 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable {
     double? scale,
     double? length,
     Paint? paint,
+    bool? locked,
   }) {
     return LineDrawable(
       hidden: hidden ?? this.hidden,
@@ -67,6 +70,7 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable {
       scale: scale ?? this.scale,
       length: length ?? this.length,
       paint: paint ?? this.paint,
+      locked: locked ?? this.locked,
     );
   }
 
@@ -82,6 +86,7 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable {
   @override
   int get hashCode => hashValues(
       hidden,
+      locked,
       hashList(assists),
       hashList(assistPaints.entries),
       position,

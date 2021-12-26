@@ -23,6 +23,7 @@ abstract class ShapeDrawable extends ObjectDrawable {
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
     Map<ObjectDrawableAssist, Paint> assistPaints =
         const <ObjectDrawableAssist, Paint>{},
+    bool locked = false,
     bool hidden = false,
   })  : this.paint = paint != null ? paint : defaultPaint,
         super(
@@ -31,6 +32,7 @@ abstract class ShapeDrawable extends ObjectDrawable {
             scale: scale,
             assists: assists,
             assistPaints: assistPaints,
+            locked: locked,
             hidden: hidden);
 
   /// Creates a copy of this but with the given fields replaced with the new values.
@@ -42,5 +44,6 @@ abstract class ShapeDrawable extends ObjectDrawable {
     double? rotation,
     double? scale,
     Paint? paint,
+    bool? locked,
   });
 }

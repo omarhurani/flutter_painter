@@ -27,6 +27,7 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable {
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
     Map<ObjectDrawableAssist, Paint> assistPaints =
         const <ObjectDrawableAssist, Paint>{},
+    bool locked = false,
     bool hidden = false,
     this.borderRadius = const BorderRadius.all(const Radius.circular(5)),
   })  : this.paint = paint ?? ShapeDrawable.defaultPaint,
@@ -37,6 +38,7 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable {
             scale: scale,
             assists: assists,
             assistPaints: assistPaints,
+            locked: locked,
             hidden: hidden);
 
   /// Getter for padding of drawable.
@@ -74,6 +76,7 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable {
     double? scale,
     Size? size,
     Paint? paint,
+    bool? locked,
     BorderRadius? borderRadius,
   }) {
     return RectangleDrawable(
@@ -84,6 +87,7 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable {
       scale: scale ?? this.scale,
       size: size ?? this.size,
       paint: paint ?? this.paint,
+      locked: locked ?? this.locked,
       borderRadius: borderRadius ?? this.borderRadius,
     );
   }
@@ -107,6 +111,7 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable {
   @override
   int get hashCode => hashValues(
       hidden,
+      locked,
       hashList(assists),
       hashList(assistPaints.entries),
       position,

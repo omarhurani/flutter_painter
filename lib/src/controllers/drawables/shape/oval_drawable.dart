@@ -23,6 +23,7 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
     Map<ObjectDrawableAssist, Paint> assistPaints =
         const <ObjectDrawableAssist, Paint>{},
+    bool locked = false,
     bool hidden = false,
   })  : this.paint = paint ?? ShapeDrawable.defaultPaint,
         super(
@@ -32,6 +33,7 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
             scale: scale,
             assists: assists,
             assistPaints: assistPaints,
+            locked: locked,
             hidden: hidden);
 
   /// Getter for padding of drawable.
@@ -63,6 +65,7 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
     double? scale,
     Size? size,
     Paint? paint,
+    bool? locked,
   }) {
     return OvalDrawable(
       hidden: hidden ?? this.hidden,
@@ -71,6 +74,7 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
       rotationAngle: rotation ?? this.rotationAngle,
       scale: scale ?? this.scale,
       size: size ?? this.size,
+      locked: locked ?? this.locked,
       paint: paint ?? this.paint,
     );
   }
@@ -94,6 +98,7 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
   @override
   int get hashCode => hashValues(
       hidden,
+      locked,
       hashList(assists),
       hashList(assistPaints.entries),
       position,

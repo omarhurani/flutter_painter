@@ -13,7 +13,7 @@ class ObjectWidget extends StatefulWidget {
   /// If `false`, objects won't be movable, scalable or rotatable.
   final bool interactionEnabled;
 
-  /// Creates a [ObjectWidget] with the given [controller], [child] widget..
+  /// Creates a [ObjectWidget] with the given [controller], [child] widget.
   const ObjectWidget({
     Key? key,
     required this.controller,
@@ -141,7 +141,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
                   child: freeStyleSettings.enabled
                       ? widget
                       : MouseRegion(
-                          cursor: SystemMouseCursors.allScroll,
+                          cursor: drawable.locked ? MouseCursor.defer : SystemMouseCursors.allScroll,
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () => tapDrawable(drawable),
@@ -521,6 +521,9 @@ class ObjectWidgetState extends State<ObjectWidget> {
   ///
   /// Dispatches an [ObjectDrawableNotification] that the object was tapped.
   void tapDrawable(ObjectDrawable drawable) {
+    if(drawable.locked)
+      return;
+
     if (selectedDrawableIndex != null) {
       if (drawables.length > selectedDrawableIndex! &&
           drawables[selectedDrawableIndex!] == drawable)
@@ -544,7 +547,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
     final index = entry.key;
     final drawable = entry.value;
 
-    if (index < 0) return;
+    if (index < 0 || drawable.locked) return;
 
     setState(() {
       selectedDrawableIndex = index;

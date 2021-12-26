@@ -31,6 +31,7 @@ class TextDrawable extends ObjectDrawable {
       color: Colors.black,
     ),
     this.direction = TextDirection.ltr,
+    bool locked = false,
     bool hidden = false,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
   })  : textPainter = TextPainter(
@@ -44,6 +45,7 @@ class TextDrawable extends ObjectDrawable {
             rotationAngle: rotation,
             scale: scale,
             assists: assists,
+            locked: locked,
             hidden: hidden);
 
   /// Draws the text on the provided [canvas] of size [size].
@@ -68,6 +70,7 @@ class TextDrawable extends ObjectDrawable {
     double? rotation,
     double? scale,
     TextStyle? style,
+    bool? locked,
     TextDirection? direction,
   }) {
     return TextDrawable(
@@ -79,6 +82,7 @@ class TextDrawable extends ObjectDrawable {
       direction: direction ?? this.direction,
       assists: assists ?? this.assists,
       hidden: hidden ?? this.hidden,
+      locked: locked ?? this.locked,
     );
   }
 
