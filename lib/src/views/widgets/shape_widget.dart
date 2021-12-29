@@ -119,7 +119,7 @@ class _ShapeWidgetState extends State<ShapeWidget> {
   /// Replaces a drawable with a new one.
   void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable) {
     setState(() {
-      widget.controller.replaceDrawable(oldDrawable, newDrawable);
+      widget.controller.replaceDrawable(oldDrawable, newDrawable, newAction: false);
     });
   }
 }

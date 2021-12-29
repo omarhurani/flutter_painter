@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import './events/remove_drawable_event.dart';
+import 'action/actions.dart';
+import 'events/remove_drawable_event.dart';
 import 'events/events.dart';
 import 'drawables/background/background_drawable.dart';
 import 'settings/settings.dart';
@@ -64,28 +66,40 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   set background(BackgroundDrawable? background) =>
       value = value.copyWith(background: background);
 
+  /// Queues used to track the actions performed on drawables in the controller.
+  /// This is used to [undo] and [redo] actions.
+  Queue<ControllerAction> performedActions = DoubleLinkedQueue(), unperformedActions = DoubleLinkedQueue();
+
   /// Add the [drawables] to the controller value drawables.
+  ///
+  /// If [newAction] is `true`, the action is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is connected to the
+  /// previous action and is merged with it.
   ///
   /// Calling this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void addDrawables(Iterable<Drawable> drawables) {
-    final currentDrawables = List<Drawable>.from(value.drawables);
-    currentDrawables.addAll(drawables);
-    value = value.copyWith(drawables: currentDrawables);
+  void addDrawables(Iterable<Drawable> drawables, {bool newAction = true}) {
+    final action = AddDrawablesAction(drawables.toList());
+    action.perform(this);
+    _addAction(action, newAction);
   }
 
   /// Inserts the [drawables] to the controller value drawables at the provided [index].
   ///
+  /// If [newAction] is `true`, the action is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is connected to the
+  /// previous action and is merged with it.
+  ///
   /// Calling this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void insertDrawables(int index, Iterable<Drawable> drawables) {
-    final currentDrawables = List<Drawable>.from(value.drawables);
-    currentDrawables.insertAll(index, drawables);
-    value = value.copyWith(drawables: currentDrawables);
+  void insertDrawables(int index, Iterable<Drawable> drawables, {bool newAction = true}) {
+    final action = InsertDrawablesAction(index, drawables.toList());
+    action.perform(this);
+    _addAction(action, newAction);
   }
 
   /// Replace [oldDrawable] with [newDrawable] in the controller value.
@@ -93,45 +107,51 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// Returns `true` if [oldDrawable] was found and replaced, `false` otherwise.
   /// If the return value is `false`, the controller value is unaffected.
   ///
+  /// If [newAction] is `true`, the action is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is connected to the
+  /// previous action and is merged with it.
+  ///
   /// Calling this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if the return value is `false`.
-  bool replaceDrawable(Drawable oldDrawable, Drawable newDrawable) {
-    final oldDrawableIndex = value.drawables.indexOf(oldDrawable);
-    if (oldDrawableIndex < 0) // not found
-      return false;
-
-    final currentDrawables = List<Drawable>.from(value.drawables);
-    currentDrawables
-        .setRange(oldDrawableIndex, oldDrawableIndex + 1, [newDrawable]);
-    value = value.copyWith(drawables: currentDrawables);
-    return true;
+  bool replaceDrawable(Drawable oldDrawable, Drawable newDrawable, {bool newAction = true}) {
+    final action = ReplaceDrawableAction(oldDrawable, newDrawable);
+    final value = action.perform(this);
+    _addAction(action, newAction);
+    return value;
   }
 
   /// Removes the first occurrence of [drawable] from the controller value.
   ///
   /// Returns `true` if [drawable] was in the controller value, `false` otherwise.
   ///
+  /// If [newAction] is `true`, the action is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is connected to the
+  /// previous action and is merged with it.
+  ///
   /// Calling this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if the return value is `false`.
-  bool removeDrawable(Drawable drawable) {
-    final currentDrawables = List<Drawable>.from(value.drawables);
-    final removed = currentDrawables.remove(drawable);
-    if (removed) {
-      value = value.copyWith(drawables: currentDrawables);
+  bool removeDrawable(Drawable drawable, {bool newAction = true}) {
+    final action = RemoveDrawableAction(drawable);
+    final value = action.perform(this);
+    _addAction(action, newAction);
+    if(value)
       _eventsSteamController.add(RemoveDrawableEvent(drawable));
-    }
-    return removed;
+    return value;
   }
 
-  /// Removes the last drawable from the controller value (acts similar to an undo).
+  /// Removes the last drawable from the controller value.
+  ///
+  /// If [newAction] is `true`, the action is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is connected to the
+  /// previous action and is merged with it.
   ///
   /// Calling this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
@@ -139,21 +159,81 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if there are no drawables in the controller value.
-  void removeLastDrawable() {
-    final currentDrawables = List<Drawable>.from(value.drawables);
-    if (currentDrawables.isEmpty) return;
-    currentDrawables.removeAt(currentDrawables.length - 1);
-    value = value.copyWith(drawables: currentDrawables);
+  void removeLastDrawable({bool newAction = true}) {
+    removeDrawable(value.drawables.last);
   }
 
   /// Removes all drawables from the controller value.
+  ///
+  /// If [newAction] is `true`, the action is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is connected to the
+  /// previous action and is merged with it.
   ///
   /// Calling this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void clearDrawables() {
-    value = value.copyWith(drawables: const <Drawable>[]);
+  void clearDrawables({bool newAction = true}) {
+    final action = ClearDrawablesAction();
+    _addAction(action, newAction);
+  }
+
+  void _addAction(ControllerAction action, bool newAction){
+    performedActions.add(action);
+    if(!newAction)
+      _mergeAction();
+    unperformedActions.clear();
+  }
+
+  /// Whether an [undo] operation can be performed or not.
+  bool get canUndo => performedActions.isNotEmpty;
+
+  /// Whether a [redo] operation can be performed or not.
+  bool get canRedo => unperformedActions.isNotEmpty;
+
+  /// Undoes the last action performed on drawables. The action can later be [redo]ne.
+  ///
+  /// If [canUndo] is `false`, nothing happens and [notifyListeners] is not called.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  void undo(){
+    if(!canUndo)
+      return;
+    final action = performedActions.removeLast();
+    action.unperform(this);
+    unperformedActions.add(action);
+  }
+
+  /// Redoes the last [undo]ne action. The redo operation can be [undo]ne.
+  ///
+  /// If [canRedo] is `false`, nothing happens and [notifyListeners] is not called.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  void redo(){
+    if(!canRedo)
+      return;
+    final action = unperformedActions.removeLast();
+    action.perform(this);
+    performedActions.add(action);
+  }
+
+  /// Merges a newly added action with the previous action.
+  void _mergeAction(){
+    if(performedActions.length < 2)
+      return;
+    final second = performedActions.removeLast();
+    final first = performedActions.removeLast();
+
+    final groupedAction = second.merge(first);
+
+    if(groupedAction != null)
+      performedActions.add(groupedAction);
   }
 
   /// Dispatches a [AddTextPainterEvent] on `events` stream.

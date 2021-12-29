@@ -79,7 +79,7 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
         ..add(_globalToLocal(globalPosition)),
     );
     // Replace the current drawable with the copy with the added point
-    widget.controller.replaceDrawable(drawable, newDrawable);
+    widget.controller.replaceDrawable(drawable, newDrawable, newAction: false);
     // Update the current drawable to be the new copy
     this.drawable = newDrawable;
   }

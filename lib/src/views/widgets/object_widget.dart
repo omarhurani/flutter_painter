@@ -564,6 +564,8 @@ class ObjectWidgetState extends State<ObjectWidget> {
       ..rotateZ(-drawable.rotationAngle);
     drawableInitialLocalFocalPoints[index] =
         Offset(rotateOffset[12], rotateOffset[13]);
+
+    updateDrawable(drawable, drawable, newAction: true);
   }
 
   /// Callback when the object drawable finishes movement, scaling and rotation.
@@ -793,9 +795,9 @@ class ObjectWidgetState extends State<ObjectWidget> {
   }
 
   /// Replaces a drawable with a new one.
-  void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable) {
+  void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable, {bool newAction = false}) {
     setState(() {
-      widget.controller.replaceDrawable(oldDrawable, newDrawable);
+      widget.controller.replaceDrawable(oldDrawable, newDrawable, newAction: newAction);
     });
   }
 
@@ -937,8 +939,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
       ..rotateZ(initial.rotationAngle)
       ..translate(offsetPosition.dx, offsetPosition.dy)
       ..rotateZ(-initial.rotationAngle);
-    final position =
-        /*offsetPosition + */ Offset(rotateOffset[12], rotateOffset[13]);
+    final position = Offset(rotateOffset[12], rotateOffset[13]);
 
     final newDrawable = drawable.copyWith(
       size: Size(
