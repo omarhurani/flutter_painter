@@ -22,11 +22,11 @@ class FreeStyleWidget extends StatefulWidget {
 /// State class
 class FreeStyleWidgetState extends State<FreeStyleWidget> {
   /// The current drawable being drawn.
-  FreeStyleDrawable? drawable;
+  PathDrawable? drawable;
 
   @override
   Widget build(BuildContext context) {
-    if (!settings.enabled) return widget.child;
+    if (settings.mode == FreeStyleMode.none) return widget.child;
 
     return RawGestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -50,17 +50,35 @@ class FreeStyleWidgetState extends State<FreeStyleWidget> {
 
   /// Callback when the user holds their pointer(s) down onto the widget.
   void _handleHorizontalDragDown(Offset globalPosition) {
+
     // If the user is already drawing, don't create a new drawing
     if (this.drawable != null) return;
 
     // Create a new free-style drawable representing the current drawing
-    final drawable = FreeStyleDrawable(
-      path: [_globalToLocal(globalPosition)],
-      color: settings.color,
-      strokeWidth: settings.strokeWidth,
-    );
-    // Add the drawable to the controller's drawables
-    widget.controller.addDrawables([drawable]);
+    final PathDrawable drawable;
+    if(settings.mode == FreeStyleMode.draw){
+      drawable = FreeStyleDrawable(
+        path: [_globalToLocal(globalPosition)],
+        color: settings.color,
+        strokeWidth: settings.strokeWidth,
+      );
+
+      // Add the drawable to the controller's drawables
+      widget.controller.addDrawables([drawable]);
+    }
+
+    else if(settings.mode == FreeStyleMode.erase){
+      drawable = EraseDrawable(
+        path: [_globalToLocal(globalPosition)],
+        strokeWidth: settings.strokeWidth,
+      );
+      widget.controller.groupDrawables();
+
+      // Add the drawable to the controller's drawables
+      widget.controller.addDrawables([drawable], newAction: false);
+    }
+    else return;
+
     DrawableCreatedNotification(drawable).dispatch(context);
 
     // Set the drawable as the current drawable

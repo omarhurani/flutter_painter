@@ -138,7 +138,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
                 angle: drawable.rotationAngle,
                 transformHitTests: true,
                 child: Container(
-                  child: freeStyleSettings.enabled
+                  child: freeStyleSettings.mode != FreeStyleMode.none
                       ? widget
                       : MouseRegion(
                           cursor: drawable.locked ? MouseCursor.defer : SystemMouseCursors.allScroll,

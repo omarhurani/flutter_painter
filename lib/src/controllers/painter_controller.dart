@@ -175,6 +175,21 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// actions, not during the build, layout, or paint phases.
   void clearDrawables({bool newAction = true}) {
     final action = ClearDrawablesAction();
+    action.perform(this);
+    _addAction(action, newAction);
+  }
+
+  /// Groups all drawables in the controller into one drawable.
+  ///
+  /// This is used when an erase drawable is added, to prevent modifications to previous drawables.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  void groupDrawables({bool newAction = true}){
+    final action = MergeDrawablesAction();
+    action.perform(this);
     _addAction(action, newAction);
   }
 

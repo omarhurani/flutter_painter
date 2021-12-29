@@ -23,7 +23,7 @@ class PainterSettings {
   /// Creates a [PainterSettings] with the given settings for [freeStyle], [object]
   /// and [text].
   const PainterSettings({
-    this.freeStyle = const FreeStyleSettings(enabled: false),
+    this.freeStyle = const FreeStyleSettings(),
     this.object = const ObjectSettings(),
     this.text = const TextSettings(),
     this.shape = const ShapeSettings(),

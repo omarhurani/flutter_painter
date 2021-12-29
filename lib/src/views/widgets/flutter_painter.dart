@@ -15,7 +15,7 @@ import '../../controllers/drawables/sized2ddrawable.dart';
 import '../../controllers/drawables/object_drawable.dart';
 import '../../controllers/events/events.dart';
 import '../../controllers/drawables/text_drawable.dart';
-import '../../controllers/drawables/free_style_drawable.dart';
+import '../../controllers/drawables/path/path_drawables.dart';
 import '../../controllers/settings/settings.dart';
 import '../painters/painter.dart';
 import '../../controllers/painter_controller.dart';
