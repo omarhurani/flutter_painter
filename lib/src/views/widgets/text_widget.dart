@@ -103,7 +103,7 @@ class _TextWidgetState extends State<_TextWidget> {
       });
     }
 
-    openTextEditor(drawable).then((value) {
+    openTextEditor(drawable, true).then((value) {
       if (mounted)
         setState(() {
           selectedDrawable = null;
@@ -112,7 +112,7 @@ class _TextWidgetState extends State<_TextWidget> {
   }
 
   /// Opens an editor to edit the text of [drawable].
-  Future<void> openTextEditor(TextDrawable drawable) async {
+  Future<void> openTextEditor(TextDrawable drawable, [bool isNew = false]) async {
     await Navigator.push(
         context,
         PageRouteBuilder(
@@ -121,7 +121,7 @@ class _TextWidgetState extends State<_TextWidget> {
             opaque: false,
             pageBuilder: (context, animation, secondaryAnimation) =>
                 EditTextWidget(
-                    controller: PainterControllerWidget.of(context).controller, drawable: drawable),
+                    controller: PainterControllerWidget.of(context).controller, drawable: drawable, isNew: isNew,),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) =>
                     FadeTransition(
@@ -139,10 +139,16 @@ class EditTextWidget extends StatefulWidget {
   /// The text drawable currently being edited.
   final TextDrawable drawable;
 
+  /// If the text drawable being edited is new or not.
+  /// If it is new, the update action is not marked as a new action, so it is merged with
+  /// the previous action.
+  final bool isNew;
+
   const EditTextWidget({
     Key? key,
     required this.controller,
     required this.drawable,
+    this.isNew = false,
   }) : super(key: key);
 
   @override
@@ -309,7 +315,7 @@ class EditTextWidgetState extends State<EditTextWidget>
 
   /// Updates the drawable in the painter controller.
   void updateDrawable(TextDrawable oldDrawable, TextDrawable newDrawable) {
-    widget.controller.replaceDrawable(oldDrawable, newDrawable);
+    widget.controller.replaceDrawable(oldDrawable, newDrawable, newAction: !widget.isNew);
   }
 
   /// Builds a null widget for the [TextField] counter.
