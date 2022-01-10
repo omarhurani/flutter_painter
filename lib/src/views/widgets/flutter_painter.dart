@@ -92,10 +92,10 @@ class FlutterPainter extends StatelessWidget {
     return PainterControllerWidget(
       controller: controller,
       child: ValueListenableBuilder<PainterControllerValue>(
-          key: controller.painterKey,
           valueListenable: controller,
           builder: (context, value, child) {
             return _builder(context, _FlutterPainterWidget(
+              key: controller.painterKey,
               controller: controller,
               onDrawableCreated: onDrawableCreated,
               onDrawableDeleted: onDrawableDeleted,
