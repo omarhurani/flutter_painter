@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import 'drawable.dart';
@@ -139,7 +140,9 @@ abstract class ObjectDrawable extends Drawable {
         super == other &&
         other.position == position &&
         other.rotationAngle == rotationAngle &&
-        other.scale == scale;
+        other.scale == scale &&
+        SetEquality().equals(other.assists, assists) &&
+        MapEquality().equals(other.assistPaints, assistPaints);
   }
 
   /// Creates a copy of this but with the given fields replaced with the new values.
