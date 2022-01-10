@@ -1,25 +1,21 @@
 part of 'flutter_painter.dart';
 
 /// Flutter widget to detect user input and request drawing [FreeStyleDrawable]s.
-class TextWidget extends StatefulWidget {
-  /// The controller for the current [FlutterPainter].
-  final PainterController controller;
-
+class _TextWidget extends StatefulWidget {
   /// Child widget.
   final Widget child;
 
-  /// Creates a [TextWidget] with the given [controller] and [child] widget.
-  const TextWidget({
+  /// Creates a [_TextWidget] with the given [controller] and [child] widget.
+  const _TextWidget({
     Key? key,
-    required this.controller,
     required this.child,
   }) : super(key: key);
 
   @override
-  TextWidgetState createState() => TextWidgetState();
+  _TextWidgetState createState() => _TextWidgetState();
 }
 
-class TextWidgetState extends State<TextWidget> {
+class _TextWidgetState extends State<_TextWidget> {
   /// The currently selected text drawable that is being edited.
   TextDrawable? selectedDrawable;
 
@@ -33,10 +29,13 @@ class TextWidgetState extends State<TextWidget> {
     super.initState();
 
     // Listen to the stream of events from the paint controller
-    controllerEventSubscription = widget.controller.events.listen((event) {
-      // When an [AddTextPainterEvent] event is received, create a new text drawable
-      if (event is AddTextPainterEvent) createDrawable();
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      controllerEventSubscription = PainterControllerWidget.of(context).controller.events.listen((event) {
+        // When an [AddTextPainterEvent] event is received, create a new text drawable
+        if (event is AddTextPainterEvent) createDrawable();
+      });
     });
+
   }
 
   @override
@@ -55,7 +54,7 @@ class TextWidgetState extends State<TextWidget> {
   }
 
   /// Getter for [TextSettings] from `widget.controller.value` to make code more readable.
-  TextSettings get settings => widget.controller.value.settings.text;
+  TextSettings get settings => PainterControllerWidget.of(context).controller.value.settings.text;
 
   /// Handles any [ObjectDrawableReselectedNotification] that might be dispatched in the widget tree.
   ///
@@ -79,7 +78,7 @@ class TextWidgetState extends State<TextWidget> {
     if (selectedDrawable != null) return;
 
     // Calculate the center of the painter
-    final renderBox = widget.controller.painterKey.currentContext
+    final renderBox = PainterControllerWidget.of(context).controller.painterKey.currentContext
         ?.findRenderObject() as RenderBox?;
     final center = renderBox == null
         ? Offset.zero
@@ -95,7 +94,7 @@ class TextWidgetState extends State<TextWidget> {
       style: settings.textStyle,
       hidden: true,
     );
-    widget.controller.addDrawables([drawable]);
+    PainterControllerWidget.of(context).controller.addDrawables([drawable]);
 
     if (mounted) {
       DrawableCreatedNotification(drawable).dispatch(context);
@@ -122,7 +121,7 @@ class TextWidgetState extends State<TextWidget> {
             opaque: false,
             pageBuilder: (context, animation, secondaryAnimation) =>
                 EditTextWidget(
-                    controller: widget.controller, drawable: drawable),
+                    controller: PainterControllerWidget.of(context).controller, drawable: drawable),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) =>
                     FadeTransition(

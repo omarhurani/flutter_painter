@@ -1,10 +1,7 @@
 part of 'flutter_painter.dart';
 
 /// Flutter widget to move, scale and rotate [ObjectDrawable]s.
-class ObjectWidget extends StatefulWidget {
-  /// The controller for the current [FlutterPainter].
-  final PainterController controller;
-
+class _ObjectWidget extends StatefulWidget {
   /// Child widget.
   final Widget child;
 
@@ -13,19 +10,18 @@ class ObjectWidget extends StatefulWidget {
   /// If `false`, objects won't be movable, scalable or rotatable.
   final bool interactionEnabled;
 
-  /// Creates a [ObjectWidget] with the given [controller], [child] widget.
-  const ObjectWidget({
+  /// Creates a [_ObjectWidget] with the given [controller], [child] widget.
+  const _ObjectWidget({
     Key? key,
-    required this.controller,
     required this.child,
     this.interactionEnabled = true,
   }) : super(key: key);
 
   @override
-  ObjectWidgetState createState() => ObjectWidgetState();
+  _ObjectWidgetState createState() => _ObjectWidgetState();
 }
 
-class ObjectWidgetState extends State<ObjectWidget> {
+class _ObjectWidgetState extends State<_ObjectWidget> {
   static Set<double> assistAngles = <double>{
     0,
     pi / 4,
@@ -82,24 +78,28 @@ class ObjectWidgetState extends State<ObjectWidget> {
   /// Getter for the list of [ObjectDrawable]s in the controller
   /// to make code more readable.
   List<ObjectDrawable> get drawables =>
-      widget.controller.value.drawables.whereType<ObjectDrawable>().toList();
+      PainterControllerWidget.of(context).controller.value.drawables.whereType<ObjectDrawable>().toList();
 
   @override
   void initState() {
     super.initState();
 
     // Listen to the stream of events from the paint controller
-    controllerEventSubscription = widget.controller.events.listen((event) {
-      // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object, deselect it.
-      if (event is RemoveDrawableEvent && event.drawable is ObjectDrawable) {
-        if (drawables.indexOf(event.drawable as ObjectDrawable) ==
-            selectedDrawableIndex) {
-          setState(() {
-            selectedDrawableIndex = null;
-          });
+    WidgetsBinding.instance?.addPostFrameCallback((timestamp){
+      controllerEventSubscription = PainterControllerWidget.of(context).controller.events.listen((event) {
+        // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object, deselect it.
+        if (event is RemoveDrawableEvent && event.drawable is ObjectDrawable) {
+          if (drawables.indexOf(event.drawable as ObjectDrawable) ==
+              selectedDrawableIndex) {
+            setState(() {
+              selectedDrawableIndex = null;
+            });
+          }
         }
-      }
+      });
     });
+
+
   }
 
   @override
@@ -499,14 +499,14 @@ class ObjectWidgetState extends State<ObjectWidget> {
   }
 
   /// Getter for the [ObjectSettings] from the controller to make code more readable.
-  ObjectSettings get settings => widget.controller.value.settings.object;
+  ObjectSettings get settings => PainterControllerWidget.of(context).controller.value.settings.object;
 
   /// Getter for the [FreeStyleSettings] from the controller to make code more readable.
   ///
   /// This is used to disable object movement, scaling and rotation
   /// when free-style drawing is enabled.
   FreeStyleSettings get freeStyleSettings =>
-      widget.controller.value.settings.freeStyle;
+      PainterControllerWidget.of(context).controller.value.settings.freeStyle;
 
   /// Triggers when the user taps an empty space.
   ///
@@ -783,7 +783,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
   ///
   /// Uses the [GlobalKey] for the painter from [controller].
   Offset get center {
-    final renderBox = widget.controller.painterKey.currentContext
+    final renderBox = PainterControllerWidget.of(context).controller.painterKey.currentContext
         ?.findRenderObject() as RenderBox?;
     final center = renderBox == null
         ? Offset.zero
@@ -797,7 +797,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
   /// Replaces a drawable with a new one.
   void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable, {bool newAction = false}) {
     setState(() {
-      widget.controller.replaceDrawable(oldDrawable, newDrawable, newAction: newAction);
+      PainterControllerWidget.of(context).controller.replaceDrawable(oldDrawable, newDrawable, newAction: newAction);
     });
   }
 
@@ -1002,7 +1002,7 @@ class _ObjectControlBox extends StatelessWidget {
     if (theme == ThemeData.fallback()) theme = null;
     final activeColor = this.activeColor ?? theme?.accentColor ?? Colors.blue;
     return AnimatedContainer(
-      duration: ObjectWidgetState.controlsTransitionDuration,
+      duration: _ObjectWidgetState.controlsTransitionDuration,
       decoration: BoxDecoration(
         color: active ? activeColor : inactiveColor,
         shape: shape,

@@ -1,17 +1,13 @@
 part of 'flutter_painter.dart';
 
 /// Flutter widget to draw shapes.
-class ShapeWidget extends StatefulWidget {
-  /// The controller for the current [FlutterPainter].
-  final PainterController controller;
-
+class _ShapeWidget extends StatefulWidget {
   /// Child widget.
   final Widget child;
 
-  /// Creates a [ShapeWidget] with the given [controller], [child] widget.
-  const ShapeWidget({
+  /// Creates a [_ShapeWidget] with the given [controller], [child] widget.
+  const _ShapeWidget({
     Key? key,
-    required this.controller,
     required this.child,
   }) : super(key: key);
 
@@ -19,12 +15,12 @@ class ShapeWidget extends StatefulWidget {
   _ShapeWidgetState createState() => _ShapeWidgetState();
 }
 
-class _ShapeWidgetState extends State<ShapeWidget> {
+class _ShapeWidgetState extends State<_ShapeWidget> {
   /// The shape that is being currently drawn.
   ShapeDrawable? currentShapeDrawable;
 
   /// Getter for shape settings to simplify code.
-  ShapeSettings get settings => widget.controller.value.settings.shape;
+  ShapeSettings get settings => PainterControllerWidget.of(context).controller.value.settings.shape;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +42,7 @@ class _ShapeWidgetState extends State<ShapeWidget> {
         factory.create(details.localFocalPoint, settings.paint);
 
     setState(() {
-      widget.controller.addDrawables([shapeDrawable]);
+      PainterControllerWidget.of(context).controller.addDrawables([shapeDrawable]);
       DrawableCreatedNotification(shapeDrawable).dispatch(context);
       currentShapeDrawable = shapeDrawable;
     });
@@ -104,11 +100,11 @@ class _ShapeWidgetState extends State<ShapeWidget> {
       updateDrawable(sized2DDrawable as ShapeDrawable, newDrawable);
     }
     if (settings.drawOnce) {
-      widget.controller.settings = widget.controller.settings.copyWith(
+      PainterControllerWidget.of(context).controller.settings = PainterControllerWidget.of(context).controller.settings.copyWith(
           shape: settings.copyWith(
         factory: null,
       ));
-      SettingsUpdatedNotification(widget.controller.value.settings)
+      SettingsUpdatedNotification(PainterControllerWidget.of(context).controller.value.settings)
           .dispatch(context);
     }
     setState(() {
@@ -119,7 +115,7 @@ class _ShapeWidgetState extends State<ShapeWidget> {
   /// Replaces a drawable with a new one.
   void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable) {
     setState(() {
-      widget.controller.replaceDrawable(oldDrawable, newDrawable, newAction: false);
+      PainterControllerWidget.of(context).controller.replaceDrawable(oldDrawable, newDrawable, newAction: false);
     });
   }
 }
