@@ -40,7 +40,7 @@ abstract class ControllerAction<T, E>{
 
   @protected
   ControllerAction? merge$(ControllerAction previousAction){
-    return GroupedAction([previousAction, this]);
+    return GroupedAction.from(previousAction, this);
   }
 
 

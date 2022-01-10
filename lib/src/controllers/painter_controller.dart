@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:ui' as ui;
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'action/actions.dart';
 import 'events/remove_drawable_event.dart';
@@ -120,7 +121,8 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   bool replaceDrawable(Drawable oldDrawable, Drawable newDrawable, {bool newAction = true}) {
     final action = ReplaceDrawableAction(oldDrawable, newDrawable);
     final value = action.perform(this);
-    _addAction(action, newAction);
+    if(value)
+      _addAction(action, newAction);
     return value;
   }
 
@@ -244,7 +246,6 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
       return;
     final second = performedActions.removeLast();
     final first = performedActions.removeLast();
-
     final groupedAction = second.merge(first);
 
     if(groupedAction != null)
@@ -313,4 +314,17 @@ class PainterControllerValue {
       background: background ?? this.background,
     );
   }
+
+  /// Checks if two [PainterControllerValue] objects are equal or not.
+  @override
+  bool operator ==(Object other) {
+    return other is PainterControllerValue && (
+      ListEquality().equals(_drawables, other._drawables) &&
+        background == other.background &&
+        settings == other.settings
+    );
+  }
+
+  @override
+  int get hashCode => hashValues(hashList(_drawables), background, settings);
 }
