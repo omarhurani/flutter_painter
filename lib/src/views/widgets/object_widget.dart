@@ -78,7 +78,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   /// Getter for the list of [ObjectDrawable]s in the controller
   /// to make code more readable.
   List<ObjectDrawable> get drawables =>
-      PainterControllerWidget.of(context).controller.value.drawables.whereType<ObjectDrawable>().toList();
+      PainterController.of(context).value.drawables.whereType<ObjectDrawable>().toList();
 
   @override
   void initState() {
@@ -86,7 +86,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
 
     // Listen to the stream of events from the paint controller
     WidgetsBinding.instance?.addPostFrameCallback((timestamp){
-      controllerEventSubscription = PainterControllerWidget.of(context).controller.events.listen((event) {
+      controllerEventSubscription = PainterController.of(context).events.listen((event) {
         // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object, deselect it.
         if (event is RemoveDrawableEvent && event.drawable is ObjectDrawable) {
           if (drawables.indexOf(event.drawable as ObjectDrawable) ==
@@ -499,14 +499,14 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   }
 
   /// Getter for the [ObjectSettings] from the controller to make code more readable.
-  ObjectSettings get settings => PainterControllerWidget.of(context).controller.value.settings.object;
+  ObjectSettings get settings => PainterController.of(context).value.settings.object;
 
   /// Getter for the [FreeStyleSettings] from the controller to make code more readable.
   ///
   /// This is used to disable object movement, scaling and rotation
   /// when free-style drawing is enabled.
   FreeStyleSettings get freeStyleSettings =>
-      PainterControllerWidget.of(context).controller.value.settings.freeStyle;
+      PainterController.of(context).value.settings.freeStyle;
 
   /// Triggers when the user taps an empty space.
   ///
@@ -783,7 +783,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   ///
   /// Uses the [GlobalKey] for the painter from [controller].
   Offset get center {
-    final renderBox = PainterControllerWidget.of(context).controller.painterKey.currentContext
+    final renderBox = PainterController.of(context).painterKey.currentContext
         ?.findRenderObject() as RenderBox?;
     final center = renderBox == null
         ? Offset.zero
@@ -797,7 +797,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   /// Replaces a drawable with a new one.
   void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable, {bool newAction = false}) {
     setState(() {
-      PainterControllerWidget.of(context).controller.replaceDrawable(oldDrawable, newDrawable, newAction: newAction);
+      PainterController.of(context).replaceDrawable(oldDrawable, newDrawable, newAction: newAction);
     });
   }
 

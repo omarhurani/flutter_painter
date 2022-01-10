@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import '../views/widgets/painter_controller_widget.dart';
 import 'action/actions.dart';
 import 'events/remove_drawable_event.dart';
 import 'events/events.dart';
@@ -70,6 +71,12 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// Queues used to track the actions performed on drawables in the controller.
   /// This is used to [undo] and [redo] actions.
   Queue<ControllerAction> performedActions = DoubleLinkedQueue(), unperformedActions = DoubleLinkedQueue();
+
+  /// Uses the [PainterControllerWidget] inherited widget to fetch the [PainterController] instance in this context.
+  /// This is used internally in the library to fetch the controller at different widgets.
+  static PainterController of(BuildContext context) {
+    return PainterControllerWidget.of(context).controller;
+  }
 
   /// Add the [drawables] to the controller value drawables.
   ///

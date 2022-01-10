@@ -30,7 +30,7 @@ class _TextWidgetState extends State<_TextWidget> {
 
     // Listen to the stream of events from the paint controller
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      controllerEventSubscription = PainterControllerWidget.of(context).controller.events.listen((event) {
+      controllerEventSubscription = PainterController.of(context).events.listen((event) {
         // When an [AddTextPainterEvent] event is received, create a new text drawable
         if (event is AddTextPainterEvent) createDrawable();
       });
@@ -54,7 +54,7 @@ class _TextWidgetState extends State<_TextWidget> {
   }
 
   /// Getter for [TextSettings] from `widget.controller.value` to make code more readable.
-  TextSettings get settings => PainterControllerWidget.of(context).controller.value.settings.text;
+  TextSettings get settings => PainterController.of(context).value.settings.text;
 
   /// Handles any [ObjectDrawableReselectedNotification] that might be dispatched in the widget tree.
   ///
@@ -78,7 +78,7 @@ class _TextWidgetState extends State<_TextWidget> {
     if (selectedDrawable != null) return;
 
     // Calculate the center of the painter
-    final renderBox = PainterControllerWidget.of(context).controller.painterKey.currentContext
+    final renderBox = PainterController.of(context).painterKey.currentContext
         ?.findRenderObject() as RenderBox?;
     final center = renderBox == null
         ? Offset.zero
@@ -94,7 +94,7 @@ class _TextWidgetState extends State<_TextWidget> {
       style: settings.textStyle,
       hidden: true,
     );
-    PainterControllerWidget.of(context).controller.addDrawables([drawable]);
+    PainterController.of(context).addDrawables([drawable]);
 
     if (mounted) {
       DrawableCreatedNotification(drawable).dispatch(context);
@@ -121,7 +121,7 @@ class _TextWidgetState extends State<_TextWidget> {
             opaque: false,
             pageBuilder: (context, animation, secondaryAnimation) =>
                 EditTextWidget(
-                    controller: PainterControllerWidget.of(context).controller, drawable: drawable, isNew: isNew,),
+                    controller: PainterController.of(context), drawable: drawable, isNew: isNew,),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) =>
                     FadeTransition(

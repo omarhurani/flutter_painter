@@ -42,7 +42,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
   }
 
   /// Getter for [FreeStyleSettings] from `widget.controller.value` to make code more readable.
-  FreeStyleSettings get settings => PainterControllerWidget.of(context).controller.value.settings.freeStyle;
+  FreeStyleSettings get settings => PainterController.of(context).value.settings.freeStyle;
 
   /// Callback when the user holds their pointer(s) down onto the widget.
   void _handleHorizontalDragDown(Offset globalPosition) {
@@ -60,7 +60,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
       );
 
       // Add the drawable to the controller's drawables
-      PainterControllerWidget.of(context).controller.addDrawables([drawable]);
+      PainterController.of(context).addDrawables([drawable]);
     }
 
     else if(settings.mode == FreeStyleMode.erase){
@@ -68,10 +68,10 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
         path: [_globalToLocal(globalPosition)],
         strokeWidth: settings.strokeWidth,
       );
-      PainterControllerWidget.of(context).controller.groupDrawables();
+      PainterController.of(context).groupDrawables();
 
       // Add the drawable to the controller's drawables
-      PainterControllerWidget.of(context).controller.addDrawables([drawable], newAction: false);
+      PainterController.of(context).addDrawables([drawable], newAction: false);
     }
     else return;
 
@@ -93,7 +93,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
         ..add(_globalToLocal(globalPosition)),
     );
     // Replace the current drawable with the copy with the added point
-    PainterControllerWidget.of(context).controller.replaceDrawable(drawable, newDrawable, newAction: false);
+    PainterController.of(context).replaceDrawable(drawable, newDrawable, newAction: false);
     // Update the current drawable to be the new copy
     this.drawable = newDrawable;
   }
