@@ -15,6 +15,7 @@ class ImageDrawable extends ObjectDrawable {
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
     Map<ObjectDrawableAssist, Paint> assistPaints =
         const <ObjectDrawableAssist, Paint>{},
+    bool locked = false,
     bool hidden = false,
     required this.image,
   }) : super(
@@ -23,7 +24,8 @@ class ImageDrawable extends ObjectDrawable {
             scale: scale,
             assists: assists,
             assistPaints: assistPaints,
-            hidden: hidden);
+            hidden: hidden,
+            locked: locked);
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override
@@ -33,7 +35,8 @@ class ImageDrawable extends ObjectDrawable {
       Offset? position,
       double? rotation,
       double? scale,
-      Image? image}) {
+      Image? image,
+      bool? locked}) {
     return ImageDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
@@ -41,6 +44,7 @@ class ImageDrawable extends ObjectDrawable {
       rotationAngle: rotation ?? this.rotationAngle,
       scale: scale ?? this.scale,
       image: image ?? this.image,
+      locked: locked ?? this.locked,
     );
   }
 
