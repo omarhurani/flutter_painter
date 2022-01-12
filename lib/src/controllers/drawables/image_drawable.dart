@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:flutter/rendering.dart';
+
 import 'object_drawable.dart';
 
 /// A drawable of an image as an object.
@@ -7,7 +9,7 @@ class ImageDrawable extends ObjectDrawable {
   /// The image to be drawn.
   final Image image;
 
-  /// Creates a [ImageDrawable] with the given [image].
+  /// Creates an [ImageDrawable] with the given [image].
   ImageDrawable({
     required Offset position,
     double rotationAngle = 0,
@@ -26,6 +28,30 @@ class ImageDrawable extends ObjectDrawable {
             assistPaints: assistPaints,
             hidden: hidden,
             locked: locked);
+
+  /// Creates an [ImageDrawable] with the given [image], and calculates the scale based on the given [size].
+  /// The scale will be calculated such that the size of the drawable fits into the provided size.
+  ///
+  /// For example, if the image was 512x256 and the provided size was 128x128, the scale would be 0.25,
+  /// fitting the width of the image into the size (128x64).
+  ImageDrawable.fittedToSize({
+    required Offset position,
+    required Size size,
+    double rotationAngle = 0,
+    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
+    Map<ObjectDrawableAssist, Paint> assistPaints =
+    const <ObjectDrawableAssist, Paint>{},
+    bool locked = false,
+    bool hidden = false,
+    required this.image,
+  }) : super(
+    position: position,
+    rotationAngle: rotationAngle,
+    scale: _calculateScaleFittedToSize(image, size),
+    assists: assists,
+    assistPaints: assistPaints,
+    hidden: hidden,
+    locked: locked);
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override
@@ -87,4 +113,11 @@ class ImageDrawable extends ObjectDrawable {
       rotationAngle,
       scale,
       image);
+
+  static double _calculateScaleFittedToSize(Image image, Size size){
+    if(image.width >= image.height)
+      return size.width / image.width;
+    else
+      return size.height / image.height;
+  }
 }
