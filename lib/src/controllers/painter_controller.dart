@@ -6,6 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import '../views/widgets/painter_controller_widget.dart';
 import 'action/actions.dart';
+import 'drawables/image_drawable.dart';
 import 'events/remove_drawable_event.dart';
 import 'events/events.dart';
 import 'drawables/background/background_drawable.dart';
@@ -263,6 +264,44 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   void addText() {
     _eventsSteamController.add(AddTextPainterEvent());
   }
+
+  /// Adds an [ImageDrawable] to the center of the painter.
+  ///
+  /// If [size] is provided, the drawable will scaled to fit that size.
+  /// If not, it will take the original image's size.
+  ///
+  /// Note that if the painter is not rendered yet (for example, this method was used in the initState method),
+  /// the drawable position will be [Offset.zero].
+  /// If you face this issue, call this method in a post-frame callback.
+  /// ```dart
+  /// void initState(){
+  ///   super.initState();
+  ///   WidgetsBinding.instance?.addPostFrameCallback((timestamp){
+  ///     controller.addImage(myImage);
+  ///   });
+  /// }
+  /// ```
+  void addImage(ui.Image image, [Size? size]){
+    // Calculate the center of the painter
+    final renderBox = painterKey.currentContext
+        ?.findRenderObject() as RenderBox?;
+    final center = renderBox == null
+        ? Offset.zero
+        : Offset(
+      renderBox.size.width / 2,
+      renderBox.size.height / 2,
+    );
+
+    final ImageDrawable drawable;
+
+    if(size == null)
+      drawable = ImageDrawable(image: image, position: center);
+    else
+      drawable = ImageDrawable.fittedToSize(image: image, position: center, size: size);
+
+    addDrawables([drawable]);
+  }
+
 
   /// Renders the background and all other drawables to a [ui.Image] object.
   ///
