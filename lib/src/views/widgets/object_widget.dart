@@ -866,8 +866,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     final initialLength = initialSize.width / 2;
     final double scale = initialLength == 0
         ? (length * 2).clamp(0.001, double.infinity)
-        : ((length + initialLength) / initialLength)
-            .clamp(0.001, double.infinity);
+        : ((length + initialLength) / initialLength);
     onDrawableScaleUpdate(
         entry,
         ScaleUpdateDetails(

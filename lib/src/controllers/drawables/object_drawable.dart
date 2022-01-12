@@ -19,6 +19,9 @@ abstract class ObjectDrawable extends Drawable {
     ..strokeWidth = 1.5
     ..color = Colors.pink;
 
+  /// The smallest value for the scale of an object drawable.
+  static const double min_scale = 0.001;
+
   /// The location of the object to be painted.
   final Offset position;
 
@@ -51,12 +54,12 @@ abstract class ObjectDrawable extends Drawable {
   const ObjectDrawable({
     required this.position,
     this.rotationAngle = 0,
-    this.scale = 1,
+    double scale = 1,
     this.assists = const <ObjectDrawableAssist>{},
     this.assistPaints = const <ObjectDrawableAssist, Paint>{},
     this.locked = false,
     bool hidden = false,
-  }) : super(hidden: hidden);
+  }) : scale = scale < min_scale ? min_scale : scale, super(hidden: hidden);
 
   /// Draws any assist lines that the object has on [canvas] with [size].
   void drawAssists(Canvas canvas, Size size) {
