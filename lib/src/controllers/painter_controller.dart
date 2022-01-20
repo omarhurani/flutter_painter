@@ -29,10 +29,20 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   ///
   /// * IMPORTANT: *
   /// DO NOT ASSIGN this key on any widget,
-  /// it is automatically used inside the [FlutterPainter] controller by [this]
+  /// it is automatically used inside the [FlutterPainter] controlled by `this`.
   ///
   /// However, you can use to to grab information about the render object, etc...
   final GlobalKey painterKey;
+
+  /// This controller will be used by the [InteractiveViewer] in [FlutterPainter] to notify
+  /// children widgets of transformation changes.
+  ///
+  /// * IMPORTANT: *
+  /// DO NOT ASSIGN this controller to any widget,
+  /// it is automatically used inside the [InteractiveViewer] in [FlutterPainter] controller by `this`.
+  ///
+  /// However, you can use it to grab information about the transformations.
+  final TransformationController transformationController;
 
   /// Create a [PainterController].
   ///
@@ -54,6 +64,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   PainterController.fromValue(PainterControllerValue value)
       : _eventsSteamController = StreamController<PainterEvent>.broadcast(),
         painterKey = GlobalKey(),
+        transformationController = TransformationController(),
         super(value);
 
   /// The stream of [PainterEvent]s dispatched from this controller.

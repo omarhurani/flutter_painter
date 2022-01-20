@@ -34,10 +34,27 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     2 * pi
   };
 
-  static double get objectPadding => 25;
+  /// The last controller value in the widget tree.
+  /// Updated by [didChangeDependencies] and used in [dispose].
+  PainterController? controller;
+
+  /// Calculates the scale for the [InteractiveViewer] in the widget tree, and scales
+  double transformationScale = 1;
+
+  /// Getter for extra amount of padding added around each object to make it easier to interact with.
+  double get objectPadding => 25 / transformationScale;
+
+  /// Getter for the duration of fade-in and out animations for the object controls.
   static Duration get controlsTransitionDuration => Duration(milliseconds: 100);
 
-  double get controlsSize => settings.enlargeControls() ? 20 : 10;
+  /// Getter for the size of the controls of the selected object.
+  double get controlsSize => (settings.enlargeControls() ? 20 : 10) / transformationScale;
+
+  /// Getter for the blur radius of the selected object highlighting.
+  double get selectedBlurRadius => 2 / transformationScale;
+
+  /// Getter for the border width of the selected object highlighting.
+  double get selectedBorderWidth => 1 / transformationScale;
 
   /// Keeps track of the selected object drawable.
   ///
@@ -97,15 +114,23 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
           }
         }
       });
+
+      // Listen to transformation changes of [InteractiveViewer].
+      PainterController.of(context).transformationController.addListener(onTransformUpdated);
     });
+  }
 
-
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    controller = PainterController.of(context);
   }
 
   @override
   void dispose() {
     // Cancel subscription to events from painter controller
     controllerEventSubscription?.cancel();
+    controller?.transformationController.removeListener(onTransformUpdated);
     super.dispose();
   }
 
@@ -172,12 +197,14 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                   decoration: BoxDecoration(
                                                     border: Border.all(
                                                       color: Colors.black,
+                                                      width: selectedBorderWidth
                                                     ),
                                                   ),
                                                   child: Container(
                                                     decoration: BoxDecoration(
                                                       border: Border.all(
                                                         color: Colors.white,
+                                                        width: selectedBorderWidth
                                                       ),
                                                     ),
                                                   ),
@@ -186,11 +213,12 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                 decoration: BoxDecoration(
                                                     border: Border.all(
                                                       color: Colors.white,
+                                                      width: selectedBorderWidth
                                                     ),
                                                     boxShadow: [
                                                       BorderBoxShadow(
                                                         color: Colors.black,
-                                                        blurRadius: 2,
+                                                        blurRadius: selectedBlurRadius,
                                                       )
                                                     ]),
                                               );
@@ -960,6 +988,16 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
       controlsAreActive[controlIndex] = false;
     });
     onDrawableScaleEnd(entry);
+  }
+
+  /// A callback that is called when a transformation occurs in the [InteractiveViewer] in the widget tree.
+  void onTransformUpdated() {
+    setState(() {
+      final _m4storage = PainterController.of(context).transformationController.value;
+      transformationScale = math.sqrt(_m4storage[8] * _m4storage[8] +
+          _m4storage[9] * _m4storage[9] +
+          _m4storage[10] * _m4storage[10]);
+    });
   }
 }
 

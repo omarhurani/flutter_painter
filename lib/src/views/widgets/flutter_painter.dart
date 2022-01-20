@@ -22,6 +22,7 @@ import '../../controllers/painter_controller.dart';
 import '../../controllers/helpers/border_box_shadow.dart';
 import '../../controllers/helpers/painter_controller_helper.dart';
 import 'painter_controller_widget.dart';
+import 'dart:math' as math;
 
 part 'free_style_widget.dart';
 part 'text_widget.dart';
@@ -144,26 +145,34 @@ class _FlutterPainterWidget extends StatelessWidget {
             settings: settings,
             opaque: false,
             pageBuilder: (context, animation, secondaryAnimation) {
+              final controller = PainterController.of(context);
               return NotificationListener<FlutterPainterNotification>(
                 onNotification: onNotification,
-                child: _FreeStyleWidget(
-                  // controller: controller,
-                    child: _TextWidget(
-                      // controller: controller,
-                      child: _ShapeWidget(
+                child: InteractiveViewer(
+                  transformationController: controller.transformationController,
+                  minScale: controller.settings.scale.enabled ? controller.settings.scale.minScale : 1,
+                  maxScale: controller.settings.scale.enabled ? controller.settings.scale.maxScale : 1,
+                  panEnabled: controller.settings.scale.enabled && (controller.freeStyleSettings.mode == FreeStyleMode.none),
+                  scaleEnabled: controller.settings.scale.enabled,
+                  child: _FreeStyleWidget(
+                    // controller: controller,
+                      child: _TextWidget(
                         // controller: controller,
-                        child: _ObjectWidget(
+                        child: _ShapeWidget(
                           // controller: controller,
-                          interactionEnabled: true,
-                          child: CustomPaint(
-                            painter: Painter(
-                              drawables: controller.value.drawables,
-                              background: controller.value.background,
+                          child: _ObjectWidget(
+                            // controller: controller,
+                            interactionEnabled: true,
+                            child: CustomPaint(
+                              painter: Painter(
+                                drawables: controller.value.drawables,
+                                background: controller.value.background,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    )),
+                      )),
+                ),
               );}
         ));
   }
