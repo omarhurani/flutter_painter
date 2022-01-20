@@ -363,12 +363,12 @@ class PainterControllerValue {
   PainterControllerValue copyWith({
     PainterSettings? settings,
     List<Drawable>? drawables,
-    BackgroundDrawable? background,
+    BackgroundDrawable? background = _NoBackgroundPassedBackgroundDrawable.instance,
   }) {
     return PainterControllerValue(
       settings: settings ?? this.settings,
       drawables: drawables ?? this._drawables,
-      background: background ?? this.background,
+      background: background == _NoBackgroundPassedBackgroundDrawable.instance ? this.background : background,
     );
   }
 
@@ -384,4 +384,22 @@ class PainterControllerValue {
 
   @override
   int get hashCode => hashValues(hashList(_drawables), background, settings);
+}
+
+/// Private class that is used internally to represent no
+/// [BackgroundDrawable] argument passed for [PainterControllerValue.copyWith].
+class _NoBackgroundPassedBackgroundDrawable extends BackgroundDrawable{
+
+  /// Single instance.
+  static const _NoBackgroundPassedBackgroundDrawable instance =
+    _NoBackgroundPassedBackgroundDrawable._();
+
+  /// Private constructor.
+  const _NoBackgroundPassedBackgroundDrawable._() : super();
+
+  /// Unimplemented implementation of the draw method.
+  @override
+  void draw(ui.Canvas canvas, ui.Size size) {
+    throw UnimplementedError("This background drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
+  }
 }

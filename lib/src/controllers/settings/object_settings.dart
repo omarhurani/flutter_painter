@@ -5,8 +5,8 @@ import 'package:flutter/foundation.dart';
 import '../drawables/sized2ddrawable.dart';
 import 'haptic_feedback_settings.dart';
 
-typedef ObjectEnlargeControlsFunction = bool Function();
-typedef ObjectShowScaleRotationControlsFunction = bool Function();
+typedef ObjectEnlargeControlsResolver = bool Function();
+typedef ObjectShowScaleRotationControlsResolver = bool Function();
 
 /// Represents settings used to control object drawables in the UI
 @immutable
@@ -30,7 +30,7 @@ class ObjectSettings {
   ///
   /// If you need more custom control, you can for example use the cursor state from a [MouseRegion]
   /// to determine if the user is using a mouse or not (for example, if someone is using an iPad with a mouse and keyboard).
-  final ObjectEnlargeControlsFunction enlargeControls;
+  final ObjectEnlargeControlsResolver enlargeControlsResolver;
 
   /// A function used to decide whether to show scale and rotation controls or not.
   /// This is because on touch screens, scale and rotation can be controlled with pinching.
@@ -40,30 +40,30 @@ class ObjectSettings {
   ///
   /// If you need more custom control, you can for example use the cursor state from a [MouseRegion]
   /// to determine if the user is using a mouse or not (for example, if someone is using an iPad with a mouse and keyboard).
-  final ObjectShowScaleRotationControlsFunction showScaleRotationControls;
+  final ObjectShowScaleRotationControlsResolver showScaleRotationControlsResolver;
 
   /// Creates a [TextSettings] with the given [layoutAssist].
   const ObjectSettings({
     this.layoutAssist = const ObjectLayoutAssistSettings(),
-    this.enlargeControls = _enlargeControls,
-    this.showScaleRotationControls = _showScaleRotationControls,
+    this.enlargeControlsResolver = _enlargeControls,
+    this.showScaleRotationControlsResolver = _showScaleRotationControls,
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   ObjectSettings copyWith({
     ObjectLayoutAssistSettings? layoutAssist,
-    ObjectEnlargeControlsFunction? enlargeControls,
-    ObjectShowScaleRotationControlsFunction? showScaleRotationControls,
+    ObjectEnlargeControlsResolver? enlargeControlsResolver,
+    ObjectShowScaleRotationControlsResolver? showScaleRotationControlsResolver,
   }) {
     return ObjectSettings(
       layoutAssist: layoutAssist ?? this.layoutAssist,
-      enlargeControls: enlargeControls ?? this.enlargeControls,
-      showScaleRotationControls:
-          showScaleRotationControls ?? this.showScaleRotationControls,
+      enlargeControlsResolver: enlargeControlsResolver ?? this.enlargeControlsResolver,
+      showScaleRotationControlsResolver:
+          showScaleRotationControlsResolver ?? this.showScaleRotationControlsResolver,
     );
   }
 
-  /// Default value for [enlargeControls].
+  /// Default value for [enlargeControlsResolver].
   ///
   /// Returns `true` on mobile devices.
   static bool _enlargeControls() {

@@ -48,7 +48,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   static Duration get controlsTransitionDuration => Duration(milliseconds: 100);
 
   /// Getter for the size of the controls of the selected object.
-  double get controlsSize => (settings.enlargeControls() ? 20 : 10) / transformationScale;
+  double get controlsSize => (settings.enlargeControlsResolver() ? 20 : 10) / transformationScale;
 
   /// Getter for the blur radius of the selected object highlighting.
   double get selectedBlurRadius => 2 / transformationScale;
@@ -226,7 +226,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                           ),
                                         ),
                                         if (settings
-                                            .showScaleRotationControls()) ...[
+                                            .showScaleRotationControlsResolver()) ...[
                                           Positioned(
                                             top: objectPadding - (controlsSize),
                                             left:
