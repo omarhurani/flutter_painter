@@ -87,23 +87,23 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
   }
 
   /// Compares two [OvalDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is OvalDrawable &&
-        super == other &&
-        other.paint == paint &&
-        other.size == size;
-  }
-
-  @override
-  int get hashCode => hashValues(
-      hidden,
-      locked,
-      hashList(assists),
-      hashList(assistPaints.entries),
-      position,
-      rotationAngle,
-      scale,
-      paint,
-      size);
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is OvalDrawable &&
+  //       super == other &&
+  //       other.paint == paint &&
+  //       other.size == size;
+  // }
+  //
+  // @override
+  // int get hashCode => hashValues(
+  //     hidden,
+  //     locked,
+  //     hashList(assists),
+  //     hashList(assistPaints.entries),
+  //     position,
+  //     rotationAngle,
+  //     scale,
+  //     paint,
+  //     size);
 }

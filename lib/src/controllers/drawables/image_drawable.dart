@@ -97,22 +97,22 @@ class ImageDrawable extends ObjectDrawable {
   }
 
   /// Compares two [ImageDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is ImageDrawable &&
-        super == other &&
-        other.image == image;
-  }
-
-  @override
-  int get hashCode => hashValues(
-      hidden,
-      hashList(assists),
-      hashList(assistPaints.entries),
-      position,
-      rotationAngle,
-      scale,
-      image);
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is ImageDrawable &&
+  //       super == other &&
+  //       other.image == image;
+  // }
+  //
+  // @override
+  // int get hashCode => hashValues(
+  //     hidden,
+  //     hashList(assists),
+  //     hashList(assistPaints.entries),
+  //     position,
+  //     rotationAngle,
+  //     scale,
+  //     image);
 
   static double _calculateScaleFittedToSize(Image image, Size size){
     if(image.width >= image.height)

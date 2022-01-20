@@ -1,6 +1,4 @@
 import 'dart:ui';
-
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import 'drawable.dart';
@@ -137,16 +135,16 @@ abstract class ObjectDrawable extends Drawable {
   Size getSize({double minWidth = 0.0, double maxWidth = double.infinity});
 
   /// Compares two [ObjectDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is ObjectDrawable &&
-        super == other &&
-        other.position == position &&
-        other.rotationAngle == rotationAngle &&
-        other.scale == scale &&
-        SetEquality().equals(other.assists, assists) &&
-        MapEquality().equals(other.assistPaints, assistPaints);
-  }
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is ObjectDrawable &&
+  //       super == other &&
+  //       other.position == position &&
+  //       other.rotationAngle == rotationAngle &&
+  //       other.scale == scale &&
+  //       SetEquality().equals(other.assists, assists) &&
+  //       MapEquality().equals(other.assistPaints, assistPaints);
+  // }
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   ///
@@ -161,9 +159,9 @@ abstract class ObjectDrawable extends Drawable {
     bool? locked,
   });
 
-  @override
-  int get hashCode => hashValues(hidden, locked, hashList(assists),
-      hashList(assistPaints.entries), position, rotationAngle);
+  // @override
+  // int get hashCode => hashValues(hidden, locked, hashList(assists),
+  //     hashList(assistPaints.entries), position, rotationAngle);
 
   /// Calculates the intersection points between a line passing through point [point]
   /// with an angle tangent [angleTan] with the rectangular box of size [size].

@@ -116,25 +116,25 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
   }
 
   /// Compares two [ArrowDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is ArrowDrawable &&
-        super == other &&
-        other.paint == paint &&
-        other.length == length &&
-        other.arrowHeadSize == arrowHeadSize;
-  }
-
-  @override
-  int get hashCode => hashValues(
-      hidden,
-      locked,
-      hashList(assists),
-      hashList(assistPaints.entries),
-      position,
-      rotationAngle,
-      scale,
-      paint,
-      length,
-      arrowHeadSize);
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is ArrowDrawable &&
+  //       super == other &&
+  //       other.paint == paint &&
+  //       other.length == length &&
+  //       other.arrowHeadSize == arrowHeadSize;
+  // }
+  //
+  // @override
+  // int get hashCode => hashValues(
+  //     hidden,
+  //     locked,
+  //     hashList(assists),
+  //     hashList(assistPaints.entries),
+  //     position,
+  //     rotationAngle,
+  //     scale,
+  //     paint,
+  //     length,
+  //     arrowHeadSize);
 }

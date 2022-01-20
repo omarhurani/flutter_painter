@@ -12,13 +12,13 @@ abstract class Drawable {
   void draw(Canvas canvas, Size size);
 
   /// Checks equality between two [Drawable]s.
-  @override
-  bool operator ==(Object other) {
-    return other is Drawable && other.hidden == hidden;
-  }
-
-  @override
-  int get hashCode {
-    return hidden.hashCode;
-  }
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is Drawable && other.hidden == hidden;
+  // }
+  //
+  // @override
+  // int get hashCode {
+  //   return hidden.hashCode;
+  // }
 }

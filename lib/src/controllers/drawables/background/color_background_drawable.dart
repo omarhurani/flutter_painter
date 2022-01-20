@@ -20,14 +20,14 @@ class ColorBackgroundDrawable extends BackgroundDrawable {
     canvas.drawColor(color, BlendMode.src);
   }
 
-  /// Compares two [ColorBackgroundDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is ColorBackgroundDrawable && other.color == color;
-  }
-
-  @override
-  int get hashCode => color.hashCode;
+  // /// Compares two [ColorBackgroundDrawable]s for equality.
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is ColorBackgroundDrawable && other.color == color;
+  // }
+  //
+  // @override
+  // int get hashCode => color.hashCode;
 }
 
 /// An extension on Color to create a background drawable easily.

@@ -95,22 +95,23 @@ class TextDrawable extends ObjectDrawable {
   }
 
   /// Compares two [TextDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is TextDrawable &&
-        super == other &&
-        other.style == style &&
-        other.direction == direction;
-  }
-
-  @override
-  int get hashCode => hashValues(
-      hidden,
-      hashList(assists),
-      hashList(assistPaints.entries),
-      position,
-      rotationAngle,
-      scale,
-      style,
-      direction);
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is TextDrawable &&
+  //       super == other &&
+  //       other.text == text &&
+  //       other.style == style &&
+  //       other.direction == direction;
+  // }
+  //
+  // @override
+  // int get hashCode => hashValues(
+  //     hidden,
+  //     hashList(assists),
+  //     hashList(assistPaints.entries),
+  //     position,
+  //     rotationAngle,
+  //     scale,
+  //     style,
+  //     direction);
 }

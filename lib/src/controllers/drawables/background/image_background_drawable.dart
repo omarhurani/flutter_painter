@@ -25,14 +25,14 @@ class ImageBackgroundDrawable extends BackgroundDrawable {
         Paint());
   }
 
-  /// Compares two [ImageBackgroundDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is ImageBackgroundDrawable && other.image == image;
-  }
-
-  @override
-  int get hashCode => image.hashCode;
+  // /// Compares two [ImageBackgroundDrawable]s for equality.
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is ImageBackgroundDrawable && other.image == image;
+  // }
+  //
+  // @override
+  // int get hashCode => image.hashCode;
 }
 
 /// An extension on ui.Image to create a background drawable easily.

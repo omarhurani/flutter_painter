@@ -1,7 +1,5 @@
 import 'dart:ui';
 
-import 'package:collection/collection.dart';
-
 import 'drawable.dart';
 
 class GroupedDrawable extends Drawable{
@@ -23,13 +21,13 @@ class GroupedDrawable extends Drawable{
   }
 
   /// Compares two [GroupedDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is GroupedDrawable &&
-        super == other &&
-        ListEquality().equals(drawables, other.drawables);
-  }
-
-  @override
-  int get hashCode => hashValues(hidden, hashList(drawables));
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is GroupedDrawable &&
+  //       super == other &&
+  //       ListEquality().equals(drawables, other.drawables);
+  // }
+  //
+  // @override
+  // int get hashCode => hashValues(hidden, hashList(drawables));
 }

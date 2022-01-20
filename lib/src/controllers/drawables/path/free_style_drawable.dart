@@ -2,8 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'package:collection/collection.dart';
-
 import 'path_drawable.dart';
 
 /// Free-style Drawable (hand scribble).
@@ -53,15 +51,15 @@ class FreeStyleDrawable extends PathDrawable {
     ..strokeWidth = strokeWidth;
 
   /// Compares two [FreeStyleDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is FreeStyleDrawable &&
-        super == other &&
-        other.color == color &&
-        other.strokeWidth == strokeWidth &&
-        ListEquality().equals(other.path, path);
-  }
-
-  @override
-  int get hashCode => hashValues(hidden, hashList(path), color, strokeWidth);
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is FreeStyleDrawable &&
+  //       super == other &&
+  //       other.color == color &&
+  //       other.strokeWidth == strokeWidth &&
+  //       ListEquality().equals(other.path, path);
+  // }
+  //
+  // @override
+  // int get hashCode => hashValues(hidden, hashList(path), color, strokeWidth);
 }

@@ -3,8 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'path_drawable.dart';
 
-import 'package:collection/collection.dart';
-
 /// Free-style Erase Drawable .
 class EraseDrawable extends PathDrawable {
 
@@ -40,14 +38,14 @@ class EraseDrawable extends PathDrawable {
     ..strokeWidth = strokeWidth;
 
   /// Compares two [EraseDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is EraseDrawable &&
-        super == other &&
-        other.strokeWidth == strokeWidth &&
-        ListEquality().equals(other.path, path);
-  }
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is EraseDrawable &&
+  //       super == other &&
+  //       other.strokeWidth == strokeWidth &&
+  //       ListEquality().equals(other.path, path);
+  // }
 
-  @override
-  int get hashCode => hashValues(hidden, hashList(path), strokeWidth);
+  // @override
+  // int get hashCode => hashValues(hidden, hashList(path), strokeWidth);
 }

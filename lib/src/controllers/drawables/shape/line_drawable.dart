@@ -75,23 +75,23 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable {
   }
 
   /// Compares two [LineDrawable]s for equality.
-  @override
-  bool operator ==(Object other) {
-    return other is LineDrawable &&
-        super == other &&
-        other.paint == paint &&
-        other.length == length;
-  }
-
-  @override
-  int get hashCode => hashValues(
-      hidden,
-      locked,
-      hashList(assists),
-      hashList(assistPaints.entries),
-      position,
-      rotationAngle,
-      scale,
-      paint,
-      length);
+  // @override
+  // bool operator ==(Object other) {
+  //   return other is LineDrawable &&
+  //       super == other &&
+  //       other.paint == paint &&
+  //       other.length == length;
+  // }
+  //
+  // @override
+  // int get hashCode => hashValues(
+  //     hidden,
+  //     locked,
+  //     hashList(assists),
+  //     hashList(assistPaints.entries),
+  //     position,
+  //     rotationAngle,
+  //     scale,
+  //     paint,
+  //     length);
 }
