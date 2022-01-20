@@ -22,7 +22,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (settings.mode == FreeStyleMode.none) return widget.child;
+    if (settings.mode == FreeStyleMode.none || shapeSettings.factory != null) return widget.child;
 
     return RawGestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -43,6 +43,9 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
   /// Getter for [FreeStyleSettings] from `widget.controller.value` to make code more readable.
   FreeStyleSettings get settings => PainterController.of(context).value.settings.freeStyle;
+
+  /// Getter for [ShapeSettings] from `widget.controller.value` to make code more readable.
+  ShapeSettings get shapeSettings => PainterController.of(context).value.settings.shape;
 
   /// Callback when the user holds their pointer(s) down onto the widget.
   void _handleHorizontalDragDown(Offset globalPosition) {
