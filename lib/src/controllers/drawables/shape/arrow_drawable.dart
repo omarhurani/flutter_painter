@@ -6,7 +6,7 @@ import 'package:flutter/rendering.dart';
 import '../object_drawable.dart';
 import 'shape_drawable.dart';
 import '../sized1ddrawable.dart';
-import '../../helpers/paint_copy.dart';
+import '../../../extensions/paint_copy_extension.dart';
 
 /// A drawable of a simple arrow shape.
 class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {

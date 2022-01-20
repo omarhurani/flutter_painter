@@ -20,7 +20,7 @@ import '../../controllers/settings/settings.dart';
 import '../painters/painter.dart';
 import '../../controllers/painter_controller.dart';
 import '../../controllers/helpers/border_box_shadow.dart';
-import '../../controllers/helpers/painter_controller_helper.dart';
+import '../../extensions/painter_controller_helper_extension.dart';
 import 'painter_controller_widget.dart';
 import 'dart:math' as math;
 

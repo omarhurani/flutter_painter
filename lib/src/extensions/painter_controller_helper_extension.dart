@@ -1,12 +1,12 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import '../factories/shape_factory.dart';
+import '../controllers/factories/shape_factory.dart';
 
-import '../settings/shape_settings.dart';
+import '../controllers/settings/shape_settings.dart';
 
-import '../painter_controller.dart';
-import '../settings/settings.dart';
-import '../drawables/drawables.dart';
+import '../controllers/painter_controller.dart';
+import '../controllers/settings/settings.dart';
+import '../controllers/drawables/drawables.dart';
 
 /// Adds extra getters and setters in [PainterController] to make it easier to use.
 ///
