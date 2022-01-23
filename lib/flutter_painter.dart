@@ -3,5 +3,5 @@
 /// From this library, you can access all the APIs of Flutter Painter.
 library flutter_painter;
 
-export 'src/views/views.dart';
-export 'src/controllers/controllers.dart';
+export 'flutter_painter_extensions.dart';
+export 'flutter_painter_pure.dart';
