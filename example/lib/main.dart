@@ -91,6 +91,17 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
       appBar: AppBar(
         title: Text("Flutter Painter Example"),
         actions: [
+          controller.value.selectedDrawable == null
+              ? Container()
+              : IconButton(
+                  icon: const Icon(
+                    PhosphorIcons.trash,
+                  ),
+                  color: Colors.red,
+                  onPressed: () => removeDrawable(
+                    controller.value.selectedDrawable!,
+                  ),
+                ),
           IconButton(
             icon: Icon(
               PhosphorIcons.arrowCounterClockwise,
@@ -396,6 +407,10 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         ],
       ),
     );
+  }
+
+  void removeDrawable(Drawable selectedDrawable) {
+    controller.removeDrawable(selectedDrawable);
   }
 
   void removeLastDrawable() {

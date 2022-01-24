@@ -40,10 +40,13 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     PainterSettings settings = const PainterSettings(),
     List<Drawable>? drawables = const [],
     BackgroundDrawable? background,
+    Drawable? selectedDrawable,
   }) : this.fromValue(PainterControllerValue(
-            settings: settings,
-            drawables: drawables ?? const [],
-            background: background));
+          settings: settings,
+          drawables: drawables ?? const [],
+          background: background,
+          selectedDrawable: selectedDrawable,
+        ));
 
   /// Create a [PainterController] from a [PainterControllerValue].
   PainterController.fromValue(PainterControllerValue value)
@@ -56,6 +59,16 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// This stream is for children widgets of [FlutterPainter] to listen to external events.
   /// For example, adding a new text drawable.
   Stream<PainterEvent> get events => _eventsSteamController.stream;
+
+  /// This will let us update the selected drawable index value
+  /// With this we able to use [selectedDrawable] + [drawables] to delete selected drawable
+  ///
+  /// Setting this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this value should only be set between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  set selectedDrawable(Drawable? selectedDrawable) =>
+      value = value.copyWith(selectedDrawable: selectedDrawable);
 
   /// Setting this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
@@ -192,6 +205,9 @@ class PainterControllerValue {
   /// The current background drawable of the widget.
   final BackgroundDrawable? background;
 
+  /// The current selected drawable index of the widget.
+  final Drawable? selectedDrawable;
+
   /// Creates a new [PainterControllerValue] with the provided [settings] and [background].
   ///
   /// The user can pass a list of initial [drawables] which will be drawn without user interaction.
@@ -199,6 +215,7 @@ class PainterControllerValue {
     required this.settings,
     List<Drawable> drawables = const [],
     this.background,
+    this.selectedDrawable,
   }) : this._drawables = drawables;
 
   /// Getter for the current drawables.
@@ -211,11 +228,13 @@ class PainterControllerValue {
     PainterSettings? settings,
     List<Drawable>? drawables,
     BackgroundDrawable? background,
+    Drawable? selectedDrawable,
   }) {
     return PainterControllerValue(
       settings: settings ?? this.settings,
       drawables: drawables ?? this._drawables,
       background: background ?? this.background,
+      selectedDrawable: selectedDrawable,
     );
   }
 }

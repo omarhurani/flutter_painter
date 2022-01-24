@@ -96,6 +96,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
             selectedDrawableIndex) {
           setState(() {
             selectedDrawableIndex = null;
+            widget.controller.selectedDrawable = null;
           });
         }
       }
@@ -514,6 +515,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
   void onBackgroundTapped() {
     setState(() {
       selectedDrawableIndex = null;
+      widget.controller.selectedDrawable = null;
     });
   }
 
@@ -531,6 +533,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
 
     setState(() {
       selectedDrawableIndex = drawables.indexOf(drawable);
+      widget.controller.selectedDrawable = drawable;
     });
   }
 
@@ -548,6 +551,7 @@ class ObjectWidgetState extends State<ObjectWidget> {
 
     setState(() {
       selectedDrawableIndex = index;
+      widget.controller.selectedDrawable = drawable;
     });
 
     initialScaleDrawables[index] = drawable;
