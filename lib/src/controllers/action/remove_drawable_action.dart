@@ -23,9 +23,14 @@ class RemoveDrawableAction extends ControllerAction<bool, bool>{
     final index = currentDrawables.indexOf(drawable);
     if (index < 0)
       return false;
+    final selectedObject = controller.value.selectedObjectDrawable;
+    final isSelectedObject = currentDrawables[index] == selectedObject;
     currentDrawables.removeAt(index);
     _removedIndex = index;
-    controller.value = value.copyWith(drawables: currentDrawables);
+    controller.value = value.copyWith(
+      drawables: currentDrawables,
+      selectedObjectDrawable: isSelectedObject ? null : selectedObject,
+    );
     return true;
   }
 

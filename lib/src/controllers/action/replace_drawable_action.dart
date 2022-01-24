@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_painter/flutter_painter.dart';
 
 import '../drawables/drawable.dart';
 
@@ -22,9 +23,14 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool>{
       return false;
 
     final currentDrawables = List<Drawable>.from(value.drawables);
+    final selectedObject = controller.value.selectedObjectDrawable;
+    final isSelectedObject = oldDrawable == selectedObject;
     currentDrawables
         .setRange(oldDrawableIndex, oldDrawableIndex + 1, [newDrawable]);
-    controller.value = value.copyWith(drawables: currentDrawables);
+    controller.value = value.copyWith(
+      drawables: currentDrawables,
+      selectedObjectDrawable: isSelectedObject && newDrawable is ObjectDrawable ? (newDrawable as ObjectDrawable) : selectedObject,
+    );
     return true;
   }
 
@@ -37,9 +43,14 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool>{
       return false;
 
     final currentDrawables = List<Drawable>.from(value.drawables);
+    final selectedObject = controller.value.selectedObjectDrawable;
+    final isSelectedObject = newDrawable == selectedObject;
     currentDrawables
         .setRange(newDrawableIndex, newDrawableIndex + 1, [oldDrawable]);
-    controller.value = value.copyWith(drawables: currentDrawables);
+    controller.value = value.copyWith(
+      drawables: currentDrawables,
+      selectedObjectDrawable: isSelectedObject && oldDrawable is ObjectDrawable ? (oldDrawable as ObjectDrawable) : selectedObject,
+    );
     return true;
   }
 

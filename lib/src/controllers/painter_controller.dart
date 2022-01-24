@@ -10,6 +10,7 @@ import 'drawables/image_drawable.dart';
 import 'events/remove_drawable_event.dart';
 import 'events/events.dart';
 import 'drawables/background/background_drawable.dart';
+import 'drawables/object_drawable.dart';
 import 'settings/settings.dart';
 import '../views/painters/painter.dart';
 
@@ -331,6 +332,41 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
         .endRecording()
         .toImage(size.width.floor(), size.height.floor());
   }
+
+  /// The currently selected object drawable.
+  ObjectDrawable? get selectedObjectDrawable => value.selectedObjectDrawable;
+
+  /// Selects an object drawable from the [value.drawables] drawables.
+  ///
+  /// If the [drawable] is not in [value.drawables] or is the same as
+  /// [selectedObjectDrawable], nothing happens and [notifyListeners] is not called.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  void selectObjectDrawable(ObjectDrawable? drawable){
+    if(drawable == value.selectedObjectDrawable)
+      return;
+    if(drawable != null && !value.drawables.contains(drawable))
+      return;
+    value = value.copyWith(
+      selectedObjectDrawable: drawable,
+    );
+  }
+
+  /// Deselects the object drawable from the [value.drawables] drawables.
+  ///
+  /// If [selectedObjectDrawable] is already `null`, nothing happens
+  /// and [notifyListeners] is not called.
+  ///
+  /// Calling this will notify all the listeners of this [PainterController]
+  /// that they need to update (it calls [notifyListeners]). For this reason,
+  /// this method should only be called between frames, e.g. in response to user
+  /// actions, not during the build, layout, or paint phases.
+  void deselectObjectDrawable(){
+    selectObjectDrawable(null);
+  }
 }
 
 /// The current paint mode, drawables and background values of a [FlutterPainter] widget.
@@ -345,6 +381,9 @@ class PainterControllerValue {
   /// The current background drawable of the widget.
   final BackgroundDrawable? background;
 
+  /// The currently selected object drawable.
+  final ObjectDrawable? selectedObjectDrawable;
+
   /// Creates a new [PainterControllerValue] with the provided [settings] and [background].
   ///
   /// The user can pass a list of initial [drawables] which will be drawn without user interaction.
@@ -352,6 +391,7 @@ class PainterControllerValue {
     required this.settings,
     List<Drawable> drawables = const [],
     this.background,
+    this.selectedObjectDrawable,
   }) : this._drawables = drawables;
 
   /// Getter for the current drawables.
@@ -364,11 +404,13 @@ class PainterControllerValue {
     PainterSettings? settings,
     List<Drawable>? drawables,
     BackgroundDrawable? background = _NoBackgroundPassedBackgroundDrawable.instance,
+    ObjectDrawable? selectedObjectDrawable = _NoObjectPassedBackgroundDrawable.instance,
   }) {
     return PainterControllerValue(
       settings: settings ?? this.settings,
       drawables: drawables ?? this._drawables,
       background: background == _NoBackgroundPassedBackgroundDrawable.instance ? this.background : background,
+      selectedObjectDrawable: selectedObjectDrawable == _NoObjectPassedBackgroundDrawable.instance ? this.selectedObjectDrawable : selectedObjectDrawable,
     );
   }
 
@@ -378,12 +420,13 @@ class PainterControllerValue {
     return other is PainterControllerValue && (
       ListEquality().equals(_drawables, other._drawables) &&
         background == other.background &&
-        settings == other.settings
+        settings == other.settings &&
+        selectedObjectDrawable == other.selectedObjectDrawable
     );
   }
 
   @override
-  int get hashCode => hashValues(hashList(_drawables), background, settings);
+  int get hashCode => hashValues(hashList(_drawables), background, settings, selectedObjectDrawable);
 }
 
 /// Private class that is used internally to represent no
@@ -401,5 +444,34 @@ class _NoBackgroundPassedBackgroundDrawable extends BackgroundDrawable{
   @override
   void draw(ui.Canvas canvas, ui.Size size) {
     throw UnimplementedError("This background drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
+  }
+}
+
+/// Private class that is used internally to represent no
+/// [BackgroundDrawable] argument passed for [PainterControllerValue.copyWith].
+class _NoObjectPassedBackgroundDrawable extends ObjectDrawable{
+
+  /// Single instance.
+  static const _NoObjectPassedBackgroundDrawable instance =
+  _NoObjectPassedBackgroundDrawable._();
+
+  /// Private constructor.
+  const _NoObjectPassedBackgroundDrawable._() : super(
+    position: const Offset(0, 0),
+  );
+
+  @override
+  ObjectDrawable copyWith({bool? hidden, Set<ObjectDrawableAssist>? assists, ui.Offset? position, double? rotation, double? scale, bool? locked}) {
+    throw UnimplementedError("This object drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
+  }
+
+  @override
+  void drawObject(ui.Canvas canvas, ui.Size size) {
+    throw UnimplementedError("This object drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
+  }
+
+  @override
+  ui.Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
+    throw UnimplementedError("This object drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
   }
 }

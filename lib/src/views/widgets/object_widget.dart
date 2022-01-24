@@ -59,7 +59,19 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   /// Keeps track of the selected object drawable.
   ///
   /// This is used to display controls for scale and rotation of the object.
-  int? selectedDrawableIndex;
+  // int? selectedDrawableIndex;
+
+  int? get selectedDrawableIndex{
+    final controller = this.controller;
+    if(controller == null)
+      return null;
+    final selectedObjectDrawable = controller.value.selectedObjectDrawable;
+    if(selectedObjectDrawable == null)
+      return null;
+
+    return controller.value.drawables.indexOf(selectedObjectDrawable);
+  }
+
 
   /// Keeps track of the initial local focal point when scaling starts.
   ///
@@ -109,7 +121,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
           if (drawables.indexOf(event.drawable as ObjectDrawable) ==
               selectedDrawableIndex) {
             setState(() {
-              selectedDrawableIndex = null;
+              // selectedDrawableIndex = null;
+              controller?.deselectObjectDrawable();
             });
           }
         }
@@ -541,7 +554,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   /// Deselects the selected object drawable.
   void onBackgroundTapped() {
     setState(() {
-      selectedDrawableIndex = null;
+      // selectedDrawableIndex = null;
+      controller?.deselectObjectDrawable();
     });
   }
 
@@ -561,7 +575,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     }
 
     setState(() {
-      selectedDrawableIndex = drawables.indexOf(drawable);
+      // selectedDrawableIndex = drawables.indexOf(drawable);
+      controller?.selectObjectDrawable(drawable);
     });
   }
 
@@ -578,7 +593,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     if (index < 0 || drawable.locked) return;
 
     setState(() {
-      selectedDrawableIndex = index;
+      // selectedDrawableIndex = index;
+      controller?.selectObjectDrawable(entry.value);
     });
 
     initialScaleDrawables[index] = drawable;
