@@ -111,6 +111,6 @@ class AlreadyPerformedError extends ControllerActionError{
 /// has not been performed ([ControllerAction._performed] is `false`).
 class NotPerformedError extends ControllerActionError{
   /// Creates a [NotPerformedError].
-  NotPerformedError(): super("This action cann  ot be un-performed because it wasn't performed.");
+  NotPerformedError(): super("This action cannot be un-performed because it wasn't performed.");
 }
 
