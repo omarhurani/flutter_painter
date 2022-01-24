@@ -1,14 +1,20 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_painter/src/controllers/painter_controller.dart';
+import '../painter_controller.dart';
 
 import 'action.dart';
 
+/// An action consisting of multiple actions grouped into one.
 class GroupedAction extends ControllerAction<void, void>{
 
+  /// The list of actions that comprise this action group.
   late final List<ControllerAction> actions;
 
+  /// Creates a [GroupedAction] with the list of [actions].
   GroupedAction(this.actions);
 
+  /// Creates a [GroupedAction] from two actions, [action1] and [action2].
+  ///
+  /// This constructor tries to merge [action1] and [action2] in the most efficient way.
   GroupedAction.from(ControllerAction action1, ControllerAction action2){
     if(action1 is! GroupedAction && action2 is! GroupedAction){
       actions = [action1, action2];
@@ -68,6 +74,9 @@ class GroupedAction extends ControllerAction<void, void>{
     ];
   }
 
+  /// Performs the action.
+  ///
+  /// Performs each action in the group in order.
   @protected
   @override
   void perform$(PainterController controller) {
@@ -75,6 +84,9 @@ class GroupedAction extends ControllerAction<void, void>{
       action.perform(controller);
   }
 
+  /// Un-performs the action.
+  ///
+  /// Un-performs each action in the group in reverse order.
   @protected
   @override
   void unperform$(PainterController controller) {
@@ -82,6 +94,10 @@ class GroupedAction extends ControllerAction<void, void>{
       action.unperform(controller);
   }
 
+  /// Merges [this] action and the [previousAction] into one action.
+  /// Returns the result of the merge.
+  ///
+  /// Similar to [GroupedAction.from], this tries to merge in the most efficient way.
   @protected
   @override
   ControllerAction? merge$(ControllerAction previousAction){
@@ -109,9 +125,6 @@ class GroupedAction extends ControllerAction<void, void>{
         merged,
       ...actions.sublist(1)
     ]);
-
-
-    // return super.merge$(previousAction);
   }
 
   @override

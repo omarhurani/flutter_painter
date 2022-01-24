@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import '../views/widgets/painter_controller_widget.dart';
-import 'action/actions.dart';
+import 'actions/actions.dart';
 import 'drawables/image_drawable.dart';
 import 'events/remove_drawable_event.dart';
 import 'events/events.dart';
