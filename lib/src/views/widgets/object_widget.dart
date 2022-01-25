@@ -56,23 +56,6 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   /// Getter for the border width of the selected object highlighting.
   double get selectedBorderWidth => 1 / transformationScale;
 
-  /// Keeps track of the selected object drawable.
-  ///
-  /// This is used to display controls for scale and rotation of the object.
-  // int? selectedDrawableIndex;
-
-  int? get selectedDrawableIndex{
-    final controller = this.controller;
-    if(controller == null)
-      return null;
-    final selectedObjectDrawable = controller.value.selectedObjectDrawable;
-    if(selectedObjectDrawable == null)
-      return null;
-
-    return controller.value.drawables.indexOf(selectedObjectDrawable);
-  }
-
-
   /// Keeps track of the initial local focal point when scaling starts.
   ///
   /// This is used to offset the movement of the drawable correctly.
@@ -118,8 +101,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
       controllerEventSubscription = PainterController.of(context).events.listen((event) {
         // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object, deselect it.
         if (event is RemoveDrawableEvent && event.drawable is ObjectDrawable) {
-          if (drawables.indexOf(event.drawable as ObjectDrawable) ==
-              selectedDrawableIndex) {
+          if (event.drawable == controller?.selectedObjectDrawable) {
             setState(() {
               // selectedDrawableIndex = null;
               controller?.deselectObjectDrawable();
@@ -158,7 +140,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                   onTap: onBackgroundTapped, child: widget.child)),
           ...drawables.asMap().entries.map((entry) {
             final drawable = entry.value;
-            final selected = entry.key == selectedDrawableIndex;
+            final selected = drawable == controller?.selectedObjectDrawable;
             final size = drawable.getSize(maxWidth: constraints.maxWidth);
             final widget = Padding(
               padding: EdgeInsets.all(objectPadding),
@@ -566,13 +548,11 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     if(drawable.locked)
       return;
 
-    if (selectedDrawableIndex != null) {
-      if (drawables.length > selectedDrawableIndex! &&
-          drawables[selectedDrawableIndex!] == drawable)
-        ObjectDrawableReselectedNotification(drawable).dispatch(context);
-      else
-        SelectedObjectDrawableUpdatedNotification(drawable).dispatch(context);
-    }
+    if (controller?.selectedObjectDrawable == drawable)
+      ObjectDrawableReselectedNotification(drawable).dispatch(context);
+    else
+      SelectedObjectDrawableUpdatedNotification(drawable).dispatch(context);
+
 
     setState(() {
       // selectedDrawableIndex = drawables.indexOf(drawable);
