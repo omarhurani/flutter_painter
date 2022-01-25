@@ -171,6 +171,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                 onDrawableScaleUpdate(entry, details),
                             onScaleEnd: (_) => onDrawableScaleEnd(entry),
                             child: AnimatedSwitcher(
+                              key: ValueKey(drawable),
                               duration: controlsTransitionDuration,
                               child: selected
                                   ? Stack(
