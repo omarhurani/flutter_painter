@@ -158,7 +158,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                   onTap: onBackgroundTapped, child: widget.child)),
           ...drawables.asMap().entries.map((entry) {
             final drawable = entry.value;
-            final selected = entry.key == selectedDrawableIndex;
+            final selected = entry.value == controller?.selectedObjectDrawable; // entry.key == selectedDrawableIndex;
             final size = drawable.getSize(maxWidth: constraints.maxWidth);
             final widget = Padding(
               padding: EdgeInsets.all(objectPadding),
