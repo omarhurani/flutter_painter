@@ -30,8 +30,8 @@ class ClearDrawablesAction extends ControllerAction<void, void>{
     _removedDrawables = List<Drawable>.from(value.drawables);
     controller.value = value.copyWith(
       drawables: const <Drawable>[],
-      selectedObjectDrawable: null,
     );
+    controller.deselectObjectDrawable(isRemoved: true);
   }
 
   /// Un-performs the action.

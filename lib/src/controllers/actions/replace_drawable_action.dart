@@ -45,6 +45,8 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool>{
       drawables: currentDrawables,
       selectedObjectDrawable: isSelectedObject ? newDrawable is ObjectDrawable ? (newDrawable as ObjectDrawable) : selectedObject : null,
     );
+    if(isSelectedObject && newDrawable is! ObjectDrawable)
+      controller.deselectObjectDrawable(isRemoved: true);
     return true;
   }
 
@@ -68,8 +70,10 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool>{
         .setRange(newDrawableIndex, newDrawableIndex + 1, [oldDrawable]);
     controller.value = value.copyWith(
       drawables: currentDrawables,
-      selectedObjectDrawable: isSelectedObject && oldDrawable is ObjectDrawable ? (oldDrawable as ObjectDrawable) : selectedObject,
+      selectedObjectDrawable: isSelectedObject ? oldDrawable is ObjectDrawable ? (oldDrawable as ObjectDrawable) : selectedObject : null,
     );
+    if(isSelectedObject && oldDrawable is! ObjectDrawable)
+      controller.deselectObjectDrawable(isRemoved: true);
     return true;
   }
 

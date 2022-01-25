@@ -92,6 +92,11 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   List<ObjectDrawable> get drawables =>
       PainterController.of(context).value.drawables.whereType<ObjectDrawable>().toList();
 
+  /// A flag on whether to cancel controls animation or not.
+  /// This is used to cancel the animation after the selected object
+  /// drawable is deleted.
+  bool cancelControlsAnimation = false;
+
   @override
   void initState() {
     super.initState();
@@ -99,14 +104,12 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     // Listen to the stream of events from the paint controller
     WidgetsBinding.instance?.addPostFrameCallback((timestamp){
       controllerEventSubscription = PainterController.of(context).events.listen((event) {
-        // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object, deselect it.
-        if (event is RemoveDrawableEvent && event.drawable is ObjectDrawable) {
-          if (event.drawable == controller?.selectedObjectDrawable) {
-            setState(() {
-              // selectedDrawableIndex = null;
-              controller?.deselectObjectDrawable();
-            });
-          }
+        // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object
+        // cancel the animation.
+        if (event is SelectedObjectDrawableRemovedEvent) {
+          setState(() {
+            cancelControlsAnimation = true;
+          });
         }
       });
 
@@ -171,7 +174,6 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                 onDrawableScaleUpdate(entry, details),
                             onScaleEnd: (_) => onDrawableScaleEnd(entry),
                             child: AnimatedSwitcher(
-                              key: ValueKey(drawable),
                               duration: controlsTransitionDuration,
                               child: selected
                                   ? Stack(
@@ -487,6 +489,13 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                   opacity: animation,
                                   child: child,
                                 );
+                              },
+                              layoutBuilder: (child, previousChildren){
+                                if(cancelControlsAnimation){
+                                  cancelControlsAnimation = false;
+                                  return child ?? SizedBox();
+                                }
+                                return AnimatedSwitcher.defaultLayoutBuilder(child, previousChildren);
                               },
                             ),
                           ),
@@ -893,14 +902,14 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     final initialSize = initial.getSize(maxWidth: constraints.maxWidth);
     final initialLength = initialSize.width / 2;
     final double scale = initialLength == 0
-        ? (length * 2).clamp(0.001, double.infinity)
+        ? (length * 2)
         : ((length + initialLength) / initialLength);
     onDrawableScaleUpdate(
         entry,
         ScaleUpdateDetails(
           pointerCount: 1,
           rotation: 0,
-          scale: scale,
+          scale: scale.clamp(ObjectDrawable.min_scale, double.infinity),
           localFocalPoint: entry.value.position,
         ));
   }

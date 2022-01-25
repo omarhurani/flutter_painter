@@ -28,8 +28,8 @@ class MergeDrawablesAction extends ControllerAction<void, void>{
     final groupedDrawable = GroupedDrawable(drawables: currentDrawables);
     controller.value = value.copyWith(
       drawables: [groupedDrawable],
-      selectedObjectDrawable: null,
     );
+    controller.deselectObjectDrawable(isRemoved: true);
   }
 
   /// Un-performs the action.

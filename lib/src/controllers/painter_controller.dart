@@ -4,10 +4,10 @@ import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'events/selected_object_drawable_removed_event.dart';
 import '../views/widgets/painter_controller_widget.dart';
 import 'actions/actions.dart';
 import 'drawables/image_drawable.dart';
-import 'events/remove_drawable_event.dart';
 import 'events/events.dart';
 import 'drawables/background/background_drawable.dart';
 import 'drawables/object_drawable.dart';
@@ -164,8 +164,6 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     final action = RemoveDrawableAction(drawable);
     final value = action.perform(this);
     _addAction(action, newAction);
-    if(value)
-      _eventsSteamController.add(RemoveDrawableEvent(drawable));
     return value;
   }
 
@@ -357,6 +355,10 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
 
   /// Deselects the object drawable from the [value.drawables] drawables.
   ///
+  /// [isRemoved] is whether the deselection happened because the selected
+  /// object drawable was deleted. If so, the controller will send a
+  /// [SelectedObjectDrawableRemovedEvent] to listening widgets.
+  ///
   /// If [selectedObjectDrawable] is already `null`, nothing happens
   /// and [notifyListeners] is not called.
   ///
@@ -364,7 +366,9 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void deselectObjectDrawable(){
+  void deselectObjectDrawable({bool isRemoved = false}){
+    if(selectedObjectDrawable != null && isRemoved)
+      _eventsSteamController.add(SelectedObjectDrawableRemovedEvent());
     selectObjectDrawable(null);
   }
 }
