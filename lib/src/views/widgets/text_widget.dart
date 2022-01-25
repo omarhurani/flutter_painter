@@ -97,7 +97,6 @@ class _TextWidgetState extends State<_TextWidget> {
     PainterController.of(context).addDrawables([drawable]);
 
     if (mounted) {
-      DrawableCreatedNotification(drawable).dispatch(context);
       setState(() {
         selectedDrawable = drawable;
       });
@@ -296,7 +295,8 @@ class EditTextWidgetState extends State<EditTextWidget>
   void onEditingComplete() {
     if (textEditingController.text.trim().isEmpty) {
       widget.controller.removeDrawable(widget.drawable);
-      DrawableDeletedNotification(widget.drawable).dispatch(context);
+      if(!widget.isNew)
+        DrawableDeletedNotification(widget.drawable).dispatch(context);
     } else {
       final drawable = widget.drawable.copyWith(
         text: textEditingController.text.trim(),
@@ -304,11 +304,14 @@ class EditTextWidgetState extends State<EditTextWidget>
         hidden: false,
       );
       updateDrawable(widget.drawable, drawable);
+      if(widget.isNew)
+        DrawableCreatedNotification(drawable).dispatch(context);
     }
     if (mounted && !disposed) {
       setState(() {
         disposed = true;
       });
+
       Navigator.pop(context);
     }
   }

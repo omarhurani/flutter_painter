@@ -43,7 +43,6 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
 
     setState(() {
       PainterController.of(context).addDrawables([shapeDrawable]);
-      DrawableCreatedNotification(shapeDrawable).dispatch(context);
       currentShapeDrawable = shapeDrawable;
     });
   }
@@ -107,6 +106,9 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
       SettingsUpdatedNotification(PainterController.of(context).value.settings)
           .dispatch(context);
     }
+
+    DrawableCreatedNotification(currentShapeDrawable).dispatch(context);
+
     setState(() {
       currentShapeDrawable = null;
     });

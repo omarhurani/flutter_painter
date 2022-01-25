@@ -535,6 +535,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   ///
   /// Deselects the selected object drawable.
   void onBackgroundTapped() {
+
+    SelectedObjectDrawableUpdatedNotification(null).dispatch(context);
+
     setState(() {
       // selectedDrawableIndex = null;
       controller?.deselectObjectDrawable();
