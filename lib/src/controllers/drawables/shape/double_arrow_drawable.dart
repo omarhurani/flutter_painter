@@ -9,7 +9,7 @@ import '../sized1ddrawable.dart';
 import '../../../extensions/paint_copy_extension.dart';
 
 /// A drawable of a arrow on both side shape.
-class DoubleSidedArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
+class DoubleArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
   /// The paint to be used for the line drawable.
   @override
   Paint paint;
@@ -19,8 +19,8 @@ class DoubleSidedArrowDrawable extends Sized1DDrawable implements ShapeDrawable 
   /// If null, the arrow head size will be 3 times the [paint] strokeWidth.
   double? arrowHeadSize;
 
-  /// Creates a new [DoubleSidedArrowDrawable] with the given [length], [paint] and [arrowHeadSize].
-  DoubleSidedArrowDrawable({
+  /// Creates a new [DoubleArrowDrawable] with the given [length], [paint] and [arrowHeadSize].
+  DoubleArrowDrawable({
     Paint? paint,
     this.arrowHeadSize,
     required double length,
@@ -89,7 +89,7 @@ class DoubleSidedArrowDrawable extends Sized1DDrawable implements ShapeDrawable 
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override
-  DoubleSidedArrowDrawable copyWith({
+  DoubleArrowDrawable copyWith({
     bool? hidden,
     Set<ObjectDrawableAssist>? assists,
     Offset? position,
@@ -100,7 +100,7 @@ class DoubleSidedArrowDrawable extends Sized1DDrawable implements ShapeDrawable 
     bool? locked,
     double? arrowHeadSize,
   }) {
-    return DoubleSidedArrowDrawable(
+    return DoubleArrowDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
       position: position ?? this.position,
