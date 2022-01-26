@@ -146,8 +146,14 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     value = value.copyWith(drawables: currentDrawables);
   }
 
-  /// Removes all drawables from the controller value.
+  /// Removes all drawables from the controller value. 
   ///
+   void redoLastDrawable() {
+    final currentDrawables = List<Drawable>.from(value.drawables);
+    if (currentDrawables.isEmpty) return;
+    currentDrawables.redoAt(currentDrawables.length + 1);
+    value = value.copyWith(drawables: currentDrawables);
+  }
   /// Calling this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
