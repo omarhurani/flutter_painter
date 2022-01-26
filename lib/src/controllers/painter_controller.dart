@@ -151,7 +151,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
    void redoLastDrawable() {
     final currentDrawables = List<Drawable>.from(value.drawables);
     if (currentDrawables.isEmpty) return;
-    currentDrawables.redoAt(currentDrawables.length + 1);
+    currentDrawables.removeAt(currentDrawables.length + 1);
     value = value.copyWith(drawables: currentDrawables);
   }
   /// Calling this will notify all the listeners of this [PainterController]
