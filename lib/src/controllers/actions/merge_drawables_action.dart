@@ -8,7 +8,7 @@ import '../painter_controller.dart';
 import 'action.dart';
 
 /// An action of merging all drawables in the [PainterController] into a [GroupedDrawable].
-class MergeDrawablesAction extends ControllerAction<void, void>{
+class MergeDrawablesAction extends ControllerAction<void, void> {
   /// Creates a [MergeDrawablesAction].
   MergeDrawablesAction();
 
@@ -42,12 +42,10 @@ class MergeDrawablesAction extends ControllerAction<void, void>{
     final value = controller.value;
     final currentDrawables = List<Drawable>.from(value.drawables);
     final last = currentDrawables.last;
-    if(last is! GroupedDrawable)
-      return;
+    if (last is! GroupedDrawable) return;
     final drawables = last.drawables;
     currentDrawables.removeLast();
     currentDrawables.addAll(drawables);
     controller.value = value.copyWith(drawables: currentDrawables);
   }
-
 }

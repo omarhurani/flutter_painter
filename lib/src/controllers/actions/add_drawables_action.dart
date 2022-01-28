@@ -6,7 +6,7 @@ import '../painter_controller.dart';
 import 'action.dart';
 
 /// An action of adding a list of drawables to the [PainterController].
-class AddDrawablesAction extends ControllerAction<void, void>{
+class AddDrawablesAction extends ControllerAction<void, void> {
   /// The list of drawables to be added to the controller.
   final List<Drawable> drawables;
 
@@ -35,7 +35,7 @@ class AddDrawablesAction extends ControllerAction<void, void>{
   void unperform$(PainterController controller) {
     final value = controller.value;
     final currentDrawables = List<Drawable>.from(value.drawables);
-    for(final drawable in drawables.reversed){
+    for (final drawable in drawables.reversed) {
       final index = currentDrawables.lastIndexOf(drawable);
       currentDrawables.removeAt(index);
     }

@@ -5,7 +5,6 @@ import 'path_drawable.dart';
 
 /// Free-style Erase Drawable .
 class EraseDrawable extends PathDrawable {
-
   /// Creates a [EraseDrawable] to erase [path].
   ///
   /// The path will be erased with the passed [strokeWidth] if provided.
@@ -13,7 +12,7 @@ class EraseDrawable extends PathDrawable {
     required List<Offset> path,
     double strokeWidth = 1,
     bool hidden = false,
-  }) :  super(path: path, strokeWidth: strokeWidth, hidden: hidden);
+  }) : super(path: path, strokeWidth: strokeWidth, hidden: hidden);
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   EraseDrawable copyWith({

@@ -48,7 +48,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   static Duration get controlsTransitionDuration => Duration(milliseconds: 100);
 
   /// Getter for the size of the controls of the selected object.
-  double get controlsSize => (settings.enlargeControlsResolver() ? 20 : 10) / transformationScale;
+  double get controlsSize =>
+      (settings.enlargeControlsResolver() ? 20 : 10) / transformationScale;
 
   /// Getter for the blur radius of the selected object highlighting.
   double get selectedBlurRadius => 2 / transformationScale;
@@ -89,8 +90,11 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
 
   /// Getter for the list of [ObjectDrawable]s in the controller
   /// to make code more readable.
-  List<ObjectDrawable> get drawables =>
-      PainterController.of(context).value.drawables.whereType<ObjectDrawable>().toList();
+  List<ObjectDrawable> get drawables => PainterController.of(context)
+      .value
+      .drawables
+      .whereType<ObjectDrawable>()
+      .toList();
 
   /// A flag on whether to cancel controls animation or not.
   /// This is used to cancel the animation after the selected object
@@ -102,8 +106,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     super.initState();
 
     // Listen to the stream of events from the paint controller
-    WidgetsBinding.instance?.addPostFrameCallback((timestamp){
-      controllerEventSubscription = PainterController.of(context).events.listen((event) {
+    WidgetsBinding.instance?.addPostFrameCallback((timestamp) {
+      controllerEventSubscription =
+          PainterController.of(context).events.listen((event) {
         // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object
         // cancel the animation.
         if (event is SelectedObjectDrawableRemovedEvent) {
@@ -114,7 +119,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
       });
 
       // Listen to transformation changes of [InteractiveViewer].
-      PainterController.of(context).transformationController.addListener(onTransformUpdated);
+      PainterController.of(context)
+          .transformationController
+          .addListener(onTransformUpdated);
     });
   }
 
@@ -164,7 +171,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                   child: freeStyleSettings.mode != FreeStyleMode.none
                       ? widget
                       : MouseRegion(
-                          cursor: drawable.locked ? MouseCursor.defer : SystemMouseCursors.allScroll,
+                          cursor: drawable.locked
+                              ? MouseCursor.defer
+                              : SystemMouseCursors.allScroll,
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () => tapDrawable(drawable),
@@ -194,29 +203,30 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                 return Container(
                                                   decoration: BoxDecoration(
                                                     border: Border.all(
-                                                      color: Colors.black,
-                                                      width: selectedBorderWidth
-                                                    ),
+                                                        color: Colors.black,
+                                                        width:
+                                                            selectedBorderWidth),
                                                   ),
                                                   child: Container(
                                                     decoration: BoxDecoration(
                                                       border: Border.all(
-                                                        color: Colors.white,
-                                                        width: selectedBorderWidth
-                                                      ),
+                                                          color: Colors.white,
+                                                          width:
+                                                              selectedBorderWidth),
                                                     ),
                                                   ),
                                                 );
                                               return Container(
                                                 decoration: BoxDecoration(
                                                     border: Border.all(
-                                                      color: Colors.white,
-                                                      width: selectedBorderWidth
-                                                    ),
+                                                        color: Colors.white,
+                                                        width:
+                                                            selectedBorderWidth),
                                                     boxShadow: [
                                                       BorderBoxShadow(
                                                         color: Colors.black,
-                                                        blurRadius: selectedBlurRadius,
+                                                        blurRadius:
+                                                            selectedBlurRadius,
                                                       )
                                                     ]),
                                               );
@@ -490,12 +500,13 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                   child: child,
                                 );
                               },
-                              layoutBuilder: (child, previousChildren){
-                                if(cancelControlsAnimation){
+                              layoutBuilder: (child, previousChildren) {
+                                if (cancelControlsAnimation) {
                                   cancelControlsAnimation = false;
                                   return child ?? SizedBox();
                                 }
-                                return AnimatedSwitcher.defaultLayoutBuilder(child, previousChildren);
+                                return AnimatedSwitcher.defaultLayoutBuilder(
+                                    child, previousChildren);
                               },
                             ),
                           ),
@@ -532,7 +543,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   }
 
   /// Getter for the [ObjectSettings] from the controller to make code more readable.
-  ObjectSettings get settings => PainterController.of(context).value.settings.object;
+  ObjectSettings get settings =>
+      PainterController.of(context).value.settings.object;
 
   /// Getter for the [FreeStyleSettings] from the controller to make code more readable.
   ///
@@ -545,7 +557,6 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   ///
   /// Deselects the selected object drawable.
   void onBackgroundTapped() {
-
     SelectedObjectDrawableUpdatedNotification(null).dispatch(context);
 
     setState(() {
@@ -558,14 +569,12 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   ///
   /// Dispatches an [ObjectDrawableNotification] that the object was tapped.
   void tapDrawable(ObjectDrawable drawable) {
-    if(drawable.locked)
-      return;
+    if (drawable.locked) return;
 
     if (controller?.selectedObjectDrawable == drawable)
       ObjectDrawableReselectedNotification(drawable).dispatch(context);
     else
       SelectedObjectDrawableUpdatedNotification(drawable).dispatch(context);
-
 
     setState(() {
       // selectedDrawableIndex = drawables.indexOf(drawable);
@@ -820,7 +829,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   ///
   /// Uses the [GlobalKey] for the painter from [controller].
   Offset get center {
-    final renderBox = PainterController.of(context).painterKey.currentContext
+    final renderBox = PainterController.of(context)
+        .painterKey
+        .currentContext
         ?.findRenderObject() as RenderBox?;
     final center = renderBox == null
         ? Offset.zero
@@ -832,9 +843,11 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   }
 
   /// Replaces a drawable with a new one.
-  void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable, {bool newAction = false}) {
+  void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable,
+      {bool newAction = false}) {
     setState(() {
-      PainterController.of(context).replaceDrawable(oldDrawable, newDrawable, newAction: newAction);
+      PainterController.of(context)
+          .replaceDrawable(oldDrawable, newDrawable, newAction: newAction);
     });
   }
 
@@ -1002,7 +1015,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   /// A callback that is called when a transformation occurs in the [InteractiveViewer] in the widget tree.
   void onTransformUpdated() {
     setState(() {
-      final _m4storage = PainterController.of(context).transformationController.value;
+      final _m4storage =
+          PainterController.of(context).transformationController.value;
       transformationScale = math.sqrt(_m4storage[8] * _m4storage[8] +
           _m4storage[9] * _m4storage[9] +
           _m4storage[10] * _m4storage[10]);

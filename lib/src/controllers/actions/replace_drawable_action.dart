@@ -9,8 +9,7 @@ import 'add_drawables_action.dart';
 import 'insert_drawables_action.dart';
 
 /// An action of replacing a drawable with another in the [PainterController].
-class ReplaceDrawableAction extends ControllerAction<bool, bool>{
-
+class ReplaceDrawableAction extends ControllerAction<bool, bool> {
   /// The drawable to be replaced with [newDrawable].
   final Drawable oldDrawable;
 
@@ -43,9 +42,13 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool>{
         .setRange(oldDrawableIndex, oldDrawableIndex + 1, [newDrawable]);
     controller.value = value.copyWith(
       drawables: currentDrawables,
-      selectedObjectDrawable: isSelectedObject ? newDrawable is ObjectDrawable ? (newDrawable as ObjectDrawable) : selectedObject : null,
+      selectedObjectDrawable: isSelectedObject
+          ? newDrawable is ObjectDrawable
+              ? (newDrawable as ObjectDrawable)
+              : selectedObject
+          : null,
     );
-    if(isSelectedObject && newDrawable is! ObjectDrawable)
+    if (isSelectedObject && newDrawable is! ObjectDrawable)
       controller.deselectObjectDrawable(isRemoved: true);
     return true;
   }
@@ -70,9 +73,13 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool>{
         .setRange(newDrawableIndex, newDrawableIndex + 1, [oldDrawable]);
     controller.value = value.copyWith(
       drawables: currentDrawables,
-      selectedObjectDrawable: isSelectedObject ? oldDrawable is ObjectDrawable ? (oldDrawable as ObjectDrawable) : selectedObject : null,
+      selectedObjectDrawable: isSelectedObject
+          ? oldDrawable is ObjectDrawable
+              ? (oldDrawable as ObjectDrawable)
+              : selectedObject
+          : null,
     );
-    if(isSelectedObject && oldDrawable is! ObjectDrawable)
+    if (isSelectedObject && oldDrawable is! ObjectDrawable)
       controller.deselectObjectDrawable(isRemoved: true);
     return true;
   }
@@ -85,12 +92,21 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool>{
   /// Otherwise, the default behavior is used.
   @protected
   @override
-  ControllerAction? merge$(ControllerAction previousAction){
-    if(previousAction is AddDrawablesAction && previousAction.drawables.last == oldDrawable)
-      return AddDrawablesAction([...previousAction.drawables]..removeLast()..add(newDrawable));
-    if(previousAction is InsertDrawablesAction && previousAction.drawables.last == oldDrawable)
-      return InsertDrawablesAction(previousAction.index, [...previousAction.drawables]..removeLast()..add(newDrawable));
-    if(previousAction is ReplaceDrawableAction && previousAction.newDrawable == oldDrawable)
+  ControllerAction? merge$(ControllerAction previousAction) {
+    if (previousAction is AddDrawablesAction &&
+        previousAction.drawables.last == oldDrawable)
+      return AddDrawablesAction([...previousAction.drawables]
+        ..removeLast()
+        ..add(newDrawable));
+    if (previousAction is InsertDrawablesAction &&
+        previousAction.drawables.last == oldDrawable)
+      return InsertDrawablesAction(
+          previousAction.index,
+          [...previousAction.drawables]
+            ..removeLast()
+            ..add(newDrawable));
+    if (previousAction is ReplaceDrawableAction &&
+        previousAction.newDrawable == oldDrawable)
       return ReplaceDrawableAction(previousAction.oldDrawable, newDrawable);
     return super.merge$(previousAction);
   }

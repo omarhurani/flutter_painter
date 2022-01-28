@@ -22,7 +22,8 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (settings.mode == FreeStyleMode.none || shapeSettings.factory != null) return widget.child;
+    if (settings.mode == FreeStyleMode.none || shapeSettings.factory != null)
+      return widget.child;
 
     return RawGestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -42,20 +43,21 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
   }
 
   /// Getter for [FreeStyleSettings] from `widget.controller.value` to make code more readable.
-  FreeStyleSettings get settings => PainterController.of(context).value.settings.freeStyle;
+  FreeStyleSettings get settings =>
+      PainterController.of(context).value.settings.freeStyle;
 
   /// Getter for [ShapeSettings] from `widget.controller.value` to make code more readable.
-  ShapeSettings get shapeSettings => PainterController.of(context).value.settings.shape;
+  ShapeSettings get shapeSettings =>
+      PainterController.of(context).value.settings.shape;
 
   /// Callback when the user holds their pointer(s) down onto the widget.
   void _handleHorizontalDragDown(Offset globalPosition) {
-
     // If the user is already drawing, don't create a new drawing
     if (this.drawable != null) return;
 
     // Create a new free-style drawable representing the current drawing
     final PathDrawable drawable;
-    if(settings.mode == FreeStyleMode.draw){
+    if (settings.mode == FreeStyleMode.draw) {
       drawable = FreeStyleDrawable(
         path: [_globalToLocal(globalPosition)],
         color: settings.color,
@@ -64,9 +66,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
       // Add the drawable to the controller's drawables
       PainterController.of(context).addDrawables([drawable]);
-    }
-
-    else if(settings.mode == FreeStyleMode.erase){
+    } else if (settings.mode == FreeStyleMode.erase) {
       drawable = EraseDrawable(
         path: [_globalToLocal(globalPosition)],
         strokeWidth: settings.strokeWidth,
@@ -75,8 +75,8 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
       // Add the drawable to the controller's drawables
       PainterController.of(context).addDrawables([drawable], newAction: false);
-    }
-    else return;
+    } else
+      return;
 
     // Set the drawable as the current drawable
     this.drawable = drawable;
@@ -94,7 +94,8 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
         ..add(_globalToLocal(globalPosition)),
     );
     // Replace the current drawable with the copy with the added point
-    PainterController.of(context).replaceDrawable(drawable, newDrawable, newAction: false);
+    PainterController.of(context)
+        .replaceDrawable(drawable, newDrawable, newAction: false);
     // Update the current drawable to be the new copy
     this.drawable = newDrawable;
   }

@@ -70,7 +70,8 @@ class FlutterPainter extends StatelessWidget {
       this.onDrawableDeleted,
       this.onSelectedObjectDrawableChanged,
       this.onPainterSettingsChanged})
-      : _builder = _defaultBuilder, super(key: key);
+      : _builder = _defaultBuilder,
+        super(key: key);
 
   /// Creates a [FlutterPainter] with the given [controller], [builder] and optional callbacks.
   ///
@@ -84,9 +85,8 @@ class FlutterPainter extends StatelessWidget {
       this.onDrawableDeleted,
       this.onSelectedObjectDrawableChanged,
       this.onPainterSettingsChanged})
-      : _builder = builder, super(key: key);
-
-
+      : _builder = builder,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -95,20 +95,23 @@ class FlutterPainter extends StatelessWidget {
       child: ValueListenableBuilder<PainterControllerValue>(
           valueListenable: controller,
           builder: (context, value, child) {
-            return _builder(context, _FlutterPainterWidget(
-              key: controller.painterKey,
-              controller: controller,
-              onDrawableCreated: onDrawableCreated,
-              onDrawableDeleted: onDrawableDeleted,
-              onPainterSettingsChanged: onPainterSettingsChanged,
-              onSelectedObjectDrawableChanged: onSelectedObjectDrawableChanged,
-            ));
+            return _builder(
+                context,
+                _FlutterPainterWidget(
+                  key: controller.painterKey,
+                  controller: controller,
+                  onDrawableCreated: onDrawableCreated,
+                  onDrawableDeleted: onDrawableDeleted,
+                  onPainterSettingsChanged: onPainterSettingsChanged,
+                  onSelectedObjectDrawableChanged:
+                      onSelectedObjectDrawableChanged,
+                ));
           }),
     );
   }
 
   /// The default builder that is used when the default [FlutterPainter] constructor is used.
-  static Widget _defaultBuilder(BuildContext context, Widget painter){
+  static Widget _defaultBuilder(BuildContext context, Widget painter) {
     return painter;
   }
 }
@@ -131,12 +134,14 @@ class _FlutterPainterWidget extends StatelessWidget {
   final ValueChanged<PainterSettings>? onPainterSettingsChanged;
 
   /// Creates a [_FlutterPainterWidget] with the given [controller] and optional callbacks.
-  const _FlutterPainterWidget({Key? key,
-    required this.controller,
-    this.onDrawableCreated,
-    this.onDrawableDeleted,
-    this.onSelectedObjectDrawableChanged,
-    this.onPainterSettingsChanged}) : super(key: key);
+  const _FlutterPainterWidget(
+      {Key? key,
+      required this.controller,
+      this.onDrawableCreated,
+      this.onDrawableDeleted,
+      this.onSelectedObjectDrawableChanged,
+      this.onPainterSettingsChanged})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -150,33 +155,37 @@ class _FlutterPainterWidget extends StatelessWidget {
                 onNotification: onNotification,
                 child: InteractiveViewer(
                   transformationController: controller.transformationController,
-                  minScale: controller.settings.scale.enabled ? controller.settings.scale.minScale : 1,
-                  maxScale: controller.settings.scale.enabled ? controller.settings.scale.maxScale : 1,
-                  panEnabled: controller.settings.scale.enabled && (controller.freeStyleSettings.mode == FreeStyleMode.none),
+                  minScale: controller.settings.scale.enabled
+                      ? controller.settings.scale.minScale
+                      : 1,
+                  maxScale: controller.settings.scale.enabled
+                      ? controller.settings.scale.maxScale
+                      : 1,
+                  panEnabled: controller.settings.scale.enabled &&
+                      (controller.freeStyleSettings.mode == FreeStyleMode.none),
                   scaleEnabled: controller.settings.scale.enabled,
                   child: _FreeStyleWidget(
-                    // controller: controller,
+                      // controller: controller,
                       child: _TextWidget(
+                    // controller: controller,
+                    child: _ShapeWidget(
+                      // controller: controller,
+                      child: _ObjectWidget(
                         // controller: controller,
-                        child: _ShapeWidget(
-                          // controller: controller,
-                          child: _ObjectWidget(
-                            // controller: controller,
-                            interactionEnabled: true,
-                            child: CustomPaint(
-                              painter: Painter(
-                                drawables: controller.value.drawables,
-                                background: controller.value.background,
-                              ),
-                            ),
+                        interactionEnabled: true,
+                        child: CustomPaint(
+                          painter: Painter(
+                            drawables: controller.value.drawables,
+                            background: controller.value.background,
                           ),
                         ),
-                      )),
+                      ),
+                    ),
+                  )),
                 ),
-              );}
-        ));
+              );
+            }));
   }
-
 
   /// Handles all notifications that might be dispatched from children.
   bool onNotification(FlutterPainterNotification notification) {

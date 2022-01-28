@@ -40,7 +40,8 @@ class ObjectSettings {
   ///
   /// If you need more custom control, you can for example use the cursor state from a [MouseRegion]
   /// to determine if the user is using a mouse or not (for example, if someone is using an iPad with a mouse and keyboard).
-  final ObjectShowScaleRotationControlsResolver showScaleRotationControlsResolver;
+  final ObjectShowScaleRotationControlsResolver
+      showScaleRotationControlsResolver;
 
   /// Creates a [TextSettings] with the given [layoutAssist].
   const ObjectSettings({
@@ -57,9 +58,10 @@ class ObjectSettings {
   }) {
     return ObjectSettings(
       layoutAssist: layoutAssist ?? this.layoutAssist,
-      enlargeControlsResolver: enlargeControlsResolver ?? this.enlargeControlsResolver,
-      showScaleRotationControlsResolver:
-          showScaleRotationControlsResolver ?? this.showScaleRotationControlsResolver,
+      enlargeControlsResolver:
+          enlargeControlsResolver ?? this.enlargeControlsResolver,
+      showScaleRotationControlsResolver: showScaleRotationControlsResolver ??
+          this.showScaleRotationControlsResolver,
     );
   }
 

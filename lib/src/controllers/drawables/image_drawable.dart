@@ -44,21 +44,21 @@ class ImageDrawable extends ObjectDrawable {
     double rotationAngle = 0,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
     Map<ObjectDrawableAssist, Paint> assistPaints =
-    const <ObjectDrawableAssist, Paint>{},
+        const <ObjectDrawableAssist, Paint>{},
     bool locked = false,
     bool hidden = false,
     required Image image,
     bool flipped = false,
   }) : this(
-    position: position,
-    rotationAngle: rotationAngle,
-    scale: _calculateScaleFittedToSize(image, size),
-    assists: assists,
-    assistPaints: assistPaints,
-    image: image,
-    flipped: flipped,
-    hidden: hidden,
-    locked: locked);
+            position: position,
+            rotationAngle: rotationAngle,
+            scale: _calculateScaleFittedToSize(image, size),
+            assists: assists,
+            assistPaints: assistPaints,
+            image: image,
+            flipped: flipped,
+            hidden: hidden,
+            locked: locked);
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override
@@ -86,23 +86,20 @@ class ImageDrawable extends ObjectDrawable {
   /// Draws the image on the provided [canvas] of size [size].
   @override
   void drawObject(Canvas canvas, Size size) {
-
-    final scaledSize = Offset(image.width.toDouble(), image.height.toDouble()) * scale;
+    final scaledSize =
+        Offset(image.width.toDouble(), image.height.toDouble()) * scale;
     final position = this.position.scale(flipped ? -1 : 1, 1);
 
-    if(flipped)
-      canvas.scale(-1, 1);
+    if (flipped) canvas.scale(-1, 1);
 
     // Draw the image onto the canvas.
     canvas.drawImageRect(
         image,
         Rect.fromPoints(Offset.zero,
             Offset(image.width.toDouble(), image.height.toDouble())),
-        Rect.fromPoints(position - scaledSize/2, position + scaledSize/2),
+        Rect.fromPoints(position - scaledSize / 2, position + scaledSize / 2),
         Paint());
-
   }
-
 
   /// Calculates the size of the rendered object.
   @override
@@ -131,8 +128,8 @@ class ImageDrawable extends ObjectDrawable {
   //     scale,
   //     image);
 
-  static double _calculateScaleFittedToSize(Image image, Size size){
-    if(image.width >= image.height)
+  static double _calculateScaleFittedToSize(Image image, Size size) {
+    if (image.width >= image.height)
       return size.width / image.width;
     else
       return size.height / image.height;

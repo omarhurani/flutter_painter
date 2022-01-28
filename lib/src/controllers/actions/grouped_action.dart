@@ -4,8 +4,7 @@ import '../painter_controller.dart';
 import 'action.dart';
 
 /// An action consisting of multiple actions grouped into one.
-class GroupedAction extends ControllerAction<void, void>{
-
+class GroupedAction extends ControllerAction<void, void> {
   /// The list of actions that comprise this action group.
   late final List<ControllerAction> actions;
 
@@ -15,61 +14,55 @@ class GroupedAction extends ControllerAction<void, void>{
   /// Creates a [GroupedAction] from two actions, [action1] and [action2].
   ///
   /// This constructor tries to merge [action1] and [action2] in the most efficient way.
-  GroupedAction.from(ControllerAction action1, ControllerAction action2){
-    if(action1 is! GroupedAction && action2 is! GroupedAction){
+  GroupedAction.from(ControllerAction action1, ControllerAction action2) {
+    if (action1 is! GroupedAction && action2 is! GroupedAction) {
       actions = [action1, action2];
       return;
     }
 
     final List<ControllerAction> previousActions, currentActions;
     final ControllerAction? previousAction, currentAction;
-    if(action1 is GroupedAction){
-      if(action1.actions.isEmpty){
+    if (action1 is GroupedAction) {
+      if (action1.actions.isEmpty) {
         previousActions = [];
         previousAction = null;
-      }
-      else{
-        previousActions = action1.actions.sublist(0, action1.actions.length-1);
+      } else {
+        previousActions =
+            action1.actions.sublist(0, action1.actions.length - 1);
         previousAction = action1.actions.last;
       }
-    }
-    else{
+    } else {
       previousActions = [];
       previousAction = action1;
     }
 
-    if(action2 is GroupedAction){
-      if(action2.actions.isEmpty){
+    if (action2 is GroupedAction) {
+      if (action2.actions.isEmpty) {
         currentActions = [];
         currentAction = null;
-      }
-      else{
+      } else {
         currentActions = action2.actions.sublist(1);
         currentAction = action2.actions.first;
       }
-    }
-    else{
+    } else {
       currentActions = [];
       currentAction = action2;
     }
 
     final ControllerAction? merged;
-    if(previousAction != null && currentAction != null)
+    if (previousAction != null && currentAction != null)
       merged = currentAction.merge(previousAction);
-    else if(previousAction != null)
+    else if (previousAction != null)
       merged = previousAction;
-    else if(currentAction != null)
+    else if (currentAction != null)
       merged = currentAction;
     else
       merged = null;
 
     actions = [
       ...previousActions,
-      if(merged != null)
-        if(merged is GroupedAction)
-          ...merged.actions
-        else
-          merged,
+      if (merged != null)
+        if (merged is GroupedAction) ...merged.actions else merged,
       ...currentActions
     ];
   }
@@ -80,8 +73,7 @@ class GroupedAction extends ControllerAction<void, void>{
   @protected
   @override
   void perform$(PainterController controller) {
-    for(final action in actions)
-      action.perform(controller);
+    for (final action in actions) action.perform(controller);
   }
 
   /// Un-performs the action.
@@ -90,8 +82,7 @@ class GroupedAction extends ControllerAction<void, void>{
   @protected
   @override
   void unperform$(PainterController controller) {
-    for(final action in actions.reversed)
-      action.unperform(controller);
+    for (final action in actions.reversed) action.unperform(controller);
   }
 
   /// Merges [this] action and the [previousAction] into one action.
@@ -100,28 +91,25 @@ class GroupedAction extends ControllerAction<void, void>{
   /// Similar to [GroupedAction.from], this tries to merge in the most efficient way.
   @protected
   @override
-  ControllerAction? merge$(ControllerAction previousAction){
-    if(actions.isEmpty)
-      return previousAction;
+  ControllerAction? merge$(ControllerAction previousAction) {
+    if (actions.isEmpty) return previousAction;
     final toMerge;
     final beforeMerge;
-    if(previousAction is GroupedAction){
+    if (previousAction is GroupedAction) {
       final previousActions = previousAction.actions;
-      if(previousActions.isEmpty)
-        return this;
+      if (previousActions.isEmpty) return this;
       beforeMerge = [...previousActions].removeLast();
       toMerge = previousActions.last;
-    }
-    else {
+    } else {
       beforeMerge = [];
       toMerge = previousAction;
     }
     final merged = actions.first.merge(toMerge);
     return GroupedAction([
       ...beforeMerge,
-      if(merged is GroupedAction)
+      if (merged is GroupedAction)
         ...merged.actions
-      else if(merged != null)
+      else if (merged != null)
         merged,
       ...actions.sublist(1)
     ]);

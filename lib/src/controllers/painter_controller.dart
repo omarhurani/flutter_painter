@@ -83,7 +83,8 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
 
   /// Queues used to track the actions performed on drawables in the controller.
   /// This is used to [undo] and [redo] actions.
-  Queue<ControllerAction> performedActions = DoubleLinkedQueue(), unperformedActions = DoubleLinkedQueue();
+  Queue<ControllerAction> performedActions = DoubleLinkedQueue(),
+      unperformedActions = DoubleLinkedQueue();
 
   /// Uses the [PainterControllerWidget] inherited widget to fetch the [PainterController] instance in this context.
   /// This is used internally in the library to fetch the controller at different widgets.
@@ -117,7 +118,8 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void insertDrawables(int index, Iterable<Drawable> drawables, {bool newAction = true}) {
+  void insertDrawables(int index, Iterable<Drawable> drawables,
+      {bool newAction = true}) {
     final action = InsertDrawablesAction(index, drawables.toList());
     action.perform(this);
     _addAction(action, newAction);
@@ -138,11 +140,11 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if the return value is `false`.
-  bool replaceDrawable(Drawable oldDrawable, Drawable newDrawable, {bool newAction = true}) {
+  bool replaceDrawable(Drawable oldDrawable, Drawable newDrawable,
+      {bool newAction = true}) {
     final action = ReplaceDrawableAction(oldDrawable, newDrawable);
     final value = action.perform(this);
-    if(value)
-      _addAction(action, newAction);
+    if (value) _addAction(action, newAction);
     return value;
   }
 
@@ -207,16 +209,15 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void groupDrawables({bool newAction = true}){
+  void groupDrawables({bool newAction = true}) {
     final action = MergeDrawablesAction();
     action.perform(this);
     _addAction(action, newAction);
   }
 
-  void _addAction(ControllerAction action, bool newAction){
+  void _addAction(ControllerAction action, bool newAction) {
     performedActions.add(action);
-    if(!newAction)
-      _mergeAction();
+    if (!newAction) _mergeAction();
     unperformedActions.clear();
   }
 
@@ -234,9 +235,8 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void undo(){
-    if(!canUndo)
-      return;
+  void undo() {
+    if (!canUndo) return;
     final action = performedActions.removeLast();
     action.unperform(this);
     unperformedActions.add(action);
@@ -250,24 +250,21 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void redo(){
-    if(!canRedo)
-      return;
+  void redo() {
+    if (!canRedo) return;
     final action = unperformedActions.removeLast();
     action.perform(this);
     performedActions.add(action);
   }
 
   /// Merges a newly added action with the previous action.
-  void _mergeAction(){
-    if(performedActions.length < 2)
-      return;
+  void _mergeAction() {
+    if (performedActions.length < 2) return;
     final second = performedActions.removeLast();
     final first = performedActions.removeLast();
     final groupedAction = second.merge(first);
 
-    if(groupedAction != null)
-      performedActions.add(groupedAction);
+    if (groupedAction != null) performedActions.add(groupedAction);
   }
 
   /// Dispatches a [AddTextPainterEvent] on `events` stream.
@@ -291,27 +288,27 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   ///   });
   /// }
   /// ```
-  void addImage(ui.Image image, [Size? size]){
+  void addImage(ui.Image image, [Size? size]) {
     // Calculate the center of the painter
-    final renderBox = painterKey.currentContext
-        ?.findRenderObject() as RenderBox?;
+    final renderBox =
+        painterKey.currentContext?.findRenderObject() as RenderBox?;
     final center = renderBox == null
         ? Offset.zero
         : Offset(
-      renderBox.size.width / 2,
-      renderBox.size.height / 2,
-    );
+            renderBox.size.width / 2,
+            renderBox.size.height / 2,
+          );
 
     final ImageDrawable drawable;
 
-    if(size == null)
+    if (size == null)
       drawable = ImageDrawable(image: image, position: center);
     else
-      drawable = ImageDrawable.fittedToSize(image: image, position: center, size: size);
+      drawable = ImageDrawable.fittedToSize(
+          image: image, position: center, size: size);
 
     addDrawables([drawable]);
   }
-
 
   /// Renders the background and all other drawables to a [ui.Image] object.
   ///
@@ -334,26 +331,24 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// The currently selected object drawable.
   ObjectDrawable? get selectedObjectDrawable => value.selectedObjectDrawable;
 
-  /// Selects an object drawable from the [value.drawables] drawables.
+  /// Selects an object drawable from the list of drawables.
   ///
-  /// If the [drawable] is not in [value.drawables] or is the same as
+  /// If the [drawable] is not in the list of drawables or is the same as
   /// [selectedObjectDrawable], nothing happens and [notifyListeners] is not called.
   ///
   /// Calling this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void selectObjectDrawable(ObjectDrawable? drawable){
-    if(drawable == value.selectedObjectDrawable)
-      return;
-    if(drawable != null && !value.drawables.contains(drawable))
-      return;
+  void selectObjectDrawable(ObjectDrawable? drawable) {
+    if (drawable == value.selectedObjectDrawable) return;
+    if (drawable != null && !value.drawables.contains(drawable)) return;
     value = value.copyWith(
       selectedObjectDrawable: drawable,
     );
   }
 
-  /// Deselects the object drawable from the [value.drawables] drawables.
+  /// Deselects the object drawable from the drawables.
   ///
   /// [isRemoved] is whether the deselection happened because the selected
   /// object drawable was deleted. If so, the controller will send a
@@ -366,8 +361,8 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void deselectObjectDrawable({bool isRemoved = false}){
-    if(selectedObjectDrawable != null && isRemoved)
+  void deselectObjectDrawable({bool isRemoved = false}) {
+    if (selectedObjectDrawable != null && isRemoved)
       _eventsSteamController.add(SelectedObjectDrawableRemovedEvent());
     selectObjectDrawable(null);
   }
@@ -407,39 +402,45 @@ class PainterControllerValue {
   PainterControllerValue copyWith({
     PainterSettings? settings,
     List<Drawable>? drawables,
-    BackgroundDrawable? background = _NoBackgroundPassedBackgroundDrawable.instance,
-    ObjectDrawable? selectedObjectDrawable = _NoObjectPassedBackgroundDrawable.instance,
+    BackgroundDrawable? background =
+        _NoBackgroundPassedBackgroundDrawable.instance,
+    ObjectDrawable? selectedObjectDrawable =
+        _NoObjectPassedBackgroundDrawable.instance,
   }) {
     return PainterControllerValue(
       settings: settings ?? this.settings,
       drawables: drawables ?? this._drawables,
-      background: background == _NoBackgroundPassedBackgroundDrawable.instance ? this.background : background,
-      selectedObjectDrawable: selectedObjectDrawable == _NoObjectPassedBackgroundDrawable.instance ? this.selectedObjectDrawable : selectedObjectDrawable,
+      background: background == _NoBackgroundPassedBackgroundDrawable.instance
+          ? this.background
+          : background,
+      selectedObjectDrawable:
+          selectedObjectDrawable == _NoObjectPassedBackgroundDrawable.instance
+              ? this.selectedObjectDrawable
+              : selectedObjectDrawable,
     );
   }
 
   /// Checks if two [PainterControllerValue] objects are equal or not.
   @override
   bool operator ==(Object other) {
-    return other is PainterControllerValue && (
-      ListEquality().equals(_drawables, other._drawables) &&
-        background == other.background &&
-        settings == other.settings &&
-        selectedObjectDrawable == other.selectedObjectDrawable
-    );
+    return other is PainterControllerValue &&
+        (ListEquality().equals(_drawables, other._drawables) &&
+            background == other.background &&
+            settings == other.settings &&
+            selectedObjectDrawable == other.selectedObjectDrawable);
   }
 
   @override
-  int get hashCode => hashValues(hashList(_drawables), background, settings, selectedObjectDrawable);
+  int get hashCode => hashValues(
+      hashList(_drawables), background, settings, selectedObjectDrawable);
 }
 
 /// Private class that is used internally to represent no
 /// [BackgroundDrawable] argument passed for [PainterControllerValue.copyWith].
-class _NoBackgroundPassedBackgroundDrawable extends BackgroundDrawable{
-
+class _NoBackgroundPassedBackgroundDrawable extends BackgroundDrawable {
   /// Single instance.
   static const _NoBackgroundPassedBackgroundDrawable instance =
-    _NoBackgroundPassedBackgroundDrawable._();
+      _NoBackgroundPassedBackgroundDrawable._();
 
   /// Private constructor.
   const _NoBackgroundPassedBackgroundDrawable._() : super();
@@ -447,35 +448,45 @@ class _NoBackgroundPassedBackgroundDrawable extends BackgroundDrawable{
   /// Unimplemented implementation of the draw method.
   @override
   void draw(ui.Canvas canvas, ui.Size size) {
-    throw UnimplementedError("This background drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
+    throw UnimplementedError(
+        "This background drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
   }
 }
 
 /// Private class that is used internally to represent no
 /// [BackgroundDrawable] argument passed for [PainterControllerValue.copyWith].
-class _NoObjectPassedBackgroundDrawable extends ObjectDrawable{
-
+class _NoObjectPassedBackgroundDrawable extends ObjectDrawable {
   /// Single instance.
   static const _NoObjectPassedBackgroundDrawable instance =
-  _NoObjectPassedBackgroundDrawable._();
+      _NoObjectPassedBackgroundDrawable._();
 
   /// Private constructor.
-  const _NoObjectPassedBackgroundDrawable._() : super(
-    position: const Offset(0, 0),
-  );
+  const _NoObjectPassedBackgroundDrawable._()
+      : super(
+          position: const Offset(0, 0),
+        );
 
   @override
-  ObjectDrawable copyWith({bool? hidden, Set<ObjectDrawableAssist>? assists, ui.Offset? position, double? rotation, double? scale, bool? locked}) {
-    throw UnimplementedError("This object drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
+  ObjectDrawable copyWith(
+      {bool? hidden,
+      Set<ObjectDrawableAssist>? assists,
+      ui.Offset? position,
+      double? rotation,
+      double? scale,
+      bool? locked}) {
+    throw UnimplementedError(
+        "This object drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
   }
 
   @override
   void drawObject(ui.Canvas canvas, ui.Size size) {
-    throw UnimplementedError("This object drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
+    throw UnimplementedError(
+        "This object drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
   }
 
   @override
   ui.Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
-    throw UnimplementedError("This object drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
+    throw UnimplementedError(
+        "This object drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
   }
 }

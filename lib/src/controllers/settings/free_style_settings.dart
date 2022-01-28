@@ -13,7 +13,7 @@ class FreeStyleSettings {
   final double strokeWidth;
 
   /// Creates a [FreeStyleSettings] with the given [color]
-  /// and [strokeWidth] and [enabled] values.
+  /// and [strokeWidth] and [mode] values.
   const FreeStyleSettings({
     this.mode = FreeStyleMode.none,
     this.color = Colors.black,
@@ -32,7 +32,7 @@ class FreeStyleSettings {
 }
 
 /// Enum representing different states that free-style painting can be.
-enum FreeStyleMode{
+enum FreeStyleMode {
   /// Free-style painting is disabled.
   none,
 

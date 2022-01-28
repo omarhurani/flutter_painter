@@ -20,7 +20,8 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
   ShapeDrawable? currentShapeDrawable;
 
   /// Getter for shape settings to simplify code.
-  ShapeSettings get settings => PainterController.of(context).value.settings.shape;
+  ShapeSettings get settings =>
+      PainterController.of(context).value.settings.shape;
 
   @override
   Widget build(BuildContext context) {
@@ -99,10 +100,11 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
       updateDrawable(sized2DDrawable as ShapeDrawable, newDrawable);
     }
     if (settings.drawOnce) {
-      PainterController.of(context).settings = PainterController.of(context).settings.copyWith(
-          shape: settings.copyWith(
-        factory: null,
-      ));
+      PainterController.of(context).settings =
+          PainterController.of(context).settings.copyWith(
+                  shape: settings.copyWith(
+                factory: null,
+              ));
       SettingsUpdatedNotification(PainterController.of(context).value.settings)
           .dispatch(context);
     }
@@ -117,7 +119,8 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
   /// Replaces a drawable with a new one.
   void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable) {
     setState(() {
-      PainterController.of(context).replaceDrawable(oldDrawable, newDrawable, newAction: false);
+      PainterController.of(context)
+          .replaceDrawable(oldDrawable, newDrawable, newAction: false);
     });
   }
 }

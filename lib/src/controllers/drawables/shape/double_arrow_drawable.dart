@@ -76,8 +76,8 @@ class DoubleArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
     path.lineTo(position.dx + pathDx + arrowHeadSize, position.dy);
 
     path.moveTo(position.dx - pathDx - arrowHeadSize, position.dy);
-    path.lineTo(position.dx - pathDx , position.dy - (arrowHeadSize / 2));
-    path.lineTo(position.dx - pathDx , position.dy + (arrowHeadSize / 2));
+    path.lineTo(position.dx - pathDx, position.dy - (arrowHeadSize / 2));
+    path.lineTo(position.dx - pathDx, position.dy + (arrowHeadSize / 2));
     path.lineTo(position.dx - pathDx - arrowHeadSize, position.dy);
 
     final headPaint = paint.copyWith(

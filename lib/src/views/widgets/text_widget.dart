@@ -30,12 +30,12 @@ class _TextWidgetState extends State<_TextWidget> {
 
     // Listen to the stream of events from the paint controller
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      controllerEventSubscription = PainterController.of(context).events.listen((event) {
+      controllerEventSubscription =
+          PainterController.of(context).events.listen((event) {
         // When an [AddTextPainterEvent] event is received, create a new text drawable
         if (event is AddTextPainterEvent) createDrawable();
       });
     });
-
   }
 
   @override
@@ -54,7 +54,8 @@ class _TextWidgetState extends State<_TextWidget> {
   }
 
   /// Getter for [TextSettings] from `widget.controller.value` to make code more readable.
-  TextSettings get settings => PainterController.of(context).value.settings.text;
+  TextSettings get settings =>
+      PainterController.of(context).value.settings.text;
 
   /// Handles any [ObjectDrawableReselectedNotification] that might be dispatched in the widget tree.
   ///
@@ -78,7 +79,9 @@ class _TextWidgetState extends State<_TextWidget> {
     if (selectedDrawable != null) return;
 
     // Calculate the center of the painter
-    final renderBox = PainterController.of(context).painterKey.currentContext
+    final renderBox = PainterController.of(context)
+        .painterKey
+        .currentContext
         ?.findRenderObject() as RenderBox?;
     final center = renderBox == null
         ? Offset.zero
@@ -111,7 +114,8 @@ class _TextWidgetState extends State<_TextWidget> {
   }
 
   /// Opens an editor to edit the text of [drawable].
-  Future<void> openTextEditor(TextDrawable drawable, [bool isNew = false]) async {
+  Future<void> openTextEditor(TextDrawable drawable,
+      [bool isNew = false]) async {
     await Navigator.push(
         context,
         PageRouteBuilder(
@@ -120,7 +124,10 @@ class _TextWidgetState extends State<_TextWidget> {
             opaque: false,
             pageBuilder: (context, animation, secondaryAnimation) =>
                 EditTextWidget(
-                    controller: PainterController.of(context), drawable: drawable, isNew: isNew,),
+                  controller: PainterController.of(context),
+                  drawable: drawable,
+                  isNew: isNew,
+                ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) =>
                     FadeTransition(
@@ -295,7 +302,7 @@ class EditTextWidgetState extends State<EditTextWidget>
   void onEditingComplete() {
     if (textEditingController.text.trim().isEmpty) {
       widget.controller.removeDrawable(widget.drawable);
-      if(!widget.isNew)
+      if (!widget.isNew)
         DrawableDeletedNotification(widget.drawable).dispatch(context);
     } else {
       final drawable = widget.drawable.copyWith(
@@ -304,8 +311,7 @@ class EditTextWidgetState extends State<EditTextWidget>
         hidden: false,
       );
       updateDrawable(widget.drawable, drawable);
-      if(widget.isNew)
-        DrawableCreatedNotification(drawable).dispatch(context);
+      if (widget.isNew) DrawableCreatedNotification(drawable).dispatch(context);
     }
     if (mounted && !disposed) {
       setState(() {
@@ -318,7 +324,8 @@ class EditTextWidgetState extends State<EditTextWidget>
 
   /// Updates the drawable in the painter controller.
   void updateDrawable(TextDrawable oldDrawable, TextDrawable newDrawable) {
-    widget.controller.replaceDrawable(oldDrawable, newDrawable, newAction: !widget.isNew);
+    widget.controller
+        .replaceDrawable(oldDrawable, newDrawable, newAction: !widget.isNew);
   }
 
   /// Builds a null widget for the [TextField] counter.

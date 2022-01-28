@@ -57,7 +57,8 @@ abstract class ObjectDrawable extends Drawable {
     this.assistPaints = const <ObjectDrawableAssist, Paint>{},
     this.locked = false,
     bool hidden = false,
-  }) : scale = scale < min_scale ? min_scale : scale, super(hidden: hidden);
+  })  : scale = scale < min_scale ? min_scale : scale,
+        super(hidden: hidden);
 
   /// Draws any assist lines that the object has on [canvas] with [size].
   void drawAssists(Canvas canvas, Size size) {

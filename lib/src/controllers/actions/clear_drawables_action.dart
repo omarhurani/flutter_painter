@@ -6,8 +6,7 @@ import '../painter_controller.dart';
 import 'action.dart';
 
 /// An action of clearing all drawables in the [PainterController].
-class ClearDrawablesAction extends ControllerAction<void, void>{
-
+class ClearDrawablesAction extends ControllerAction<void, void> {
   /// A list of all the removed drawables.
   ///
   /// This list is initially `null`, and is updated once the action is performed.
@@ -42,8 +41,7 @@ class ClearDrawablesAction extends ControllerAction<void, void>{
   @override
   void unperform$(PainterController controller) {
     final removedDrawables = _removedDrawables;
-    if(removedDrawables == null)
-      return;
+    if (removedDrawables == null) return;
     final value = controller.value;
     controller.value = value.copyWith(drawables: removedDrawables);
     _removedDrawables = null;
@@ -56,7 +54,7 @@ class ClearDrawablesAction extends ControllerAction<void, void>{
   /// when all drawables are cleared.
   @protected
   @override
-  ControllerAction? merge$(ControllerAction previousAction){
+  ControllerAction? merge$(ControllerAction previousAction) {
     return this;
   }
 }

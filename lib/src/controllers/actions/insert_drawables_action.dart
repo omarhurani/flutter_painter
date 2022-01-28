@@ -7,7 +7,7 @@ import 'action.dart';
 
 /// An action of inserting a list of drawables to the [PainterController] at
 /// a specific index.
-class InsertDrawablesAction extends ControllerAction<void, void>{
+class InsertDrawablesAction extends ControllerAction<void, void> {
   /// The list of drawables to be inserted into the controller.
   final List<Drawable> drawables;
 
@@ -38,8 +38,7 @@ class InsertDrawablesAction extends ControllerAction<void, void>{
   void unperform$(PainterController controller) {
     final value = controller.value;
     final currentDrawables = List<Drawable>.from(value.drawables);
-    currentDrawables.removeRange(index, index+drawables.length);
+    currentDrawables.removeRange(index, index + drawables.length);
     controller.value = value.copyWith(drawables: currentDrawables);
   }
-
 }

@@ -8,9 +8,9 @@ import 'grouped_action.dart';
 ///
 /// [T] is the return type of the [perform] method.
 /// [E] is the return type of the [unperform] method.
-abstract class ControllerAction<T, E>{
+abstract class ControllerAction<T, E> {
   /// Default constructor for [ControllerAction].
-  ControllerAction(): _performed = false;
+  ControllerAction() : _performed = false;
 
   /// Whether the action was performed or not.
   ///
@@ -22,9 +22,8 @@ abstract class ControllerAction<T, E>{
   /// already been performed. If so, throws an [AlreadyPerformedError].
   ///
   /// Returns any extra results from performing the action.
-  T perform(PainterController controller){
-    if(_performed)
-      throw AlreadyPerformedError();
+  T perform(PainterController controller) {
+    if (_performed) throw AlreadyPerformedError();
     final value = perform$(controller);
     _performed = true;
     return value;
@@ -34,9 +33,8 @@ abstract class ControllerAction<T, E>{
   /// not been performed. If so, throws an [NotPerformedError].
   ///
   /// Returns any extra results from performing the action.
-  E unperform(PainterController controller){
-    if(!_performed)
-      throw NotPerformedError();
+  E unperform(PainterController controller) {
+    if (!_performed) throw NotPerformedError();
     final value = unperform$(controller);
     _performed = false;
     return value;
@@ -65,9 +63,8 @@ abstract class ControllerAction<T, E>{
   ///
   /// Both [this] and [previousAction] must be performed before merging.
   /// If not, throws a [NotPerformedError].
-  ControllerAction? merge(ControllerAction previousAction){
-    if(!_performed || !previousAction._performed)
-      throw NotPerformedError();
+  ControllerAction? merge(ControllerAction previousAction) {
+    if (!_performed || !previousAction._performed) throw NotPerformedError();
     return merge$(previousAction)?.._performed = true;
   }
 
@@ -79,13 +76,13 @@ abstract class ControllerAction<T, E>{
   ///
   /// By default, it creates a [GroupedAction] from the two actions.
   @protected
-  ControllerAction? merge$(ControllerAction previousAction){
+  ControllerAction? merge$(ControllerAction previousAction) {
     return GroupedAction.from(previousAction, this);
   }
 }
 
 /// An error that might occur while performing or un-performing [ControllerAction]s.
-abstract class ControllerActionError extends Error{
+abstract class ControllerActionError extends Error {
   /// The message of the error.
   String? message;
 
@@ -94,23 +91,25 @@ abstract class ControllerActionError extends Error{
 
   @override
   String toString() {
-    if(message == null)
-      return super.toString();
+    if (message == null) return super.toString();
     return "ControllerActionException${': $message'}";
   }
 }
 
 /// An error that occurs when [ControllerAction.perform] is called on an action that
 /// has already been performed ([ControllerAction._performed] is `true`).
-class AlreadyPerformedError extends ControllerActionError{
+class AlreadyPerformedError extends ControllerActionError {
   /// Creates a [AlreadyPerformedError].
-  AlreadyPerformedError(): super("This action cannot be performed or merged because it already has been performed.");
+  AlreadyPerformedError()
+      : super(
+            "This action cannot be performed or merged because it already has been performed.");
 }
 
 /// An error that occurs when [ControllerAction.unperform] is called on an action that
 /// has not been performed ([ControllerAction._performed] is `false`).
-class NotPerformedError extends ControllerActionError{
+class NotPerformedError extends ControllerActionError {
   /// Creates a [NotPerformedError].
-  NotPerformedError(): super("This action cannot be un-performed because it wasn't performed.");
+  NotPerformedError()
+      : super(
+            "This action cannot be un-performed because it wasn't performed.");
 }
-

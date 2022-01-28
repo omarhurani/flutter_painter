@@ -8,8 +8,7 @@ import 'add_drawables_action.dart';
 import 'insert_drawables_action.dart';
 
 /// An action of removing a drawable from the [PainterController].
-class RemoveDrawableAction extends ControllerAction<bool, bool>{
-
+class RemoveDrawableAction extends ControllerAction<bool, bool> {
   /// The drawable to be removed.
   final Drawable drawable;
 
@@ -37,8 +36,7 @@ class RemoveDrawableAction extends ControllerAction<bool, bool>{
     final value = controller.value;
     final currentDrawables = List<Drawable>.from(value.drawables);
     final index = currentDrawables.indexOf(drawable);
-    if (index < 0)
-      return false;
+    if (index < 0) return false;
     final selectedObject = controller.value.selectedObjectDrawable;
     final isSelectedObject = currentDrawables[index] == selectedObject;
     currentDrawables.removeAt(index);
@@ -46,8 +44,7 @@ class RemoveDrawableAction extends ControllerAction<bool, bool>{
     controller.value = value.copyWith(
       drawables: currentDrawables,
     );
-    if(isSelectedObject)
-      controller.deselectObjectDrawable(isRemoved: true);
+    if (isSelectedObject) controller.deselectObjectDrawable(isRemoved: true);
     return true;
   }
 
@@ -61,8 +58,7 @@ class RemoveDrawableAction extends ControllerAction<bool, bool>{
   @override
   bool unperform$(PainterController controller) {
     final removedIndex = _removedIndex;
-    if(removedIndex == null)
-      return false;
+    if (removedIndex == null) return false;
     final value = controller.value;
     final currentDrawables = List<Drawable>.from(value.drawables);
     currentDrawables.insert(removedIndex, drawable);
@@ -78,11 +74,13 @@ class RemoveDrawableAction extends ControllerAction<bool, bool>{
   /// cancels their effects, so `null` is returned. Otherwise, the default behavior is used.
   @protected
   @override
-  ControllerAction? merge$(ControllerAction previousAction){
-    if(previousAction is AddDrawablesAction && previousAction.drawables.length == 1 && previousAction.drawables.first == drawable)
-      return null;
-    if(previousAction is InsertDrawablesAction && previousAction.drawables.length == 1 && previousAction.drawables.first == drawable)
-      return null;
+  ControllerAction? merge$(ControllerAction previousAction) {
+    if (previousAction is AddDrawablesAction &&
+        previousAction.drawables.length == 1 &&
+        previousAction.drawables.first == drawable) return null;
+    if (previousAction is InsertDrawablesAction &&
+        previousAction.drawables.length == 1 &&
+        previousAction.drawables.first == drawable) return null;
     return super.merge$(previousAction);
   }
 }
