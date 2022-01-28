@@ -126,7 +126,7 @@ For example, this is how you would modify the stroke width of free-style drawing
 
 ```dart
 void setStrokeWidth(double value){
-  controller.freeStyleStroke = value;
+  controller.freeStyleStrokeWidth = value;
 }
 ```
 
