@@ -9,6 +9,9 @@ class ImageDrawable extends ObjectDrawable {
   /// The image to be drawn.
   final Image image;
 
+  /// Whether the image is flipped or not.
+  final bool flipped;
+
   /// Creates an [ImageDrawable] with the given [image].
   ImageDrawable({
     required Offset position,
@@ -20,6 +23,7 @@ class ImageDrawable extends ObjectDrawable {
     bool locked = false,
     bool hidden = false,
     required this.image,
+    this.flipped = false,
   }) : super(
             position: position,
             rotationAngle: rotationAngle,
@@ -43,13 +47,16 @@ class ImageDrawable extends ObjectDrawable {
     const <ObjectDrawableAssist, Paint>{},
     bool locked = false,
     bool hidden = false,
-    required this.image,
-  }) : super(
+    required Image image,
+    bool flipped = false,
+  }) : this(
     position: position,
     rotationAngle: rotationAngle,
     scale: _calculateScaleFittedToSize(image, size),
     assists: assists,
     assistPaints: assistPaints,
+    image: image,
+    flipped: flipped,
     hidden: hidden,
     locked: locked);
 
@@ -62,6 +69,7 @@ class ImageDrawable extends ObjectDrawable {
       double? rotation,
       double? scale,
       Image? image,
+      bool? flipped,
       bool? locked}) {
     return ImageDrawable(
       hidden: hidden ?? this.hidden,
@@ -70,6 +78,7 @@ class ImageDrawable extends ObjectDrawable {
       rotationAngle: rotation ?? this.rotationAngle,
       scale: scale ?? this.scale,
       image: image ?? this.image,
+      flipped: flipped ?? this.flipped,
       locked: locked ?? this.locked,
     );
   }
@@ -77,7 +86,13 @@ class ImageDrawable extends ObjectDrawable {
   /// Draws the image on the provided [canvas] of size [size].
   @override
   void drawObject(Canvas canvas, Size size) {
+
     final scaledSize = Offset(image.width.toDouble(), image.height.toDouble()) * scale;
+    final position = this.position.scale(flipped ? -1 : 1, 1);
+
+    if(flipped)
+      canvas.scale(-1, 1);
+
     // Draw the image onto the canvas.
     canvas.drawImageRect(
         image,
@@ -85,7 +100,9 @@ class ImageDrawable extends ObjectDrawable {
             Offset(image.width.toDouble(), image.height.toDouble())),
         Rect.fromPoints(position - scaledSize/2, position + scaledSize/2),
         Paint());
+
   }
+
 
   /// Calculates the size of the rendered object.
   @override
