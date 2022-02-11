@@ -28,4 +28,3 @@ jobs:
 
       - name: Test app
         run: flutter test
-
