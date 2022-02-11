@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../controllers/drawables/background/background_drawable.dart';
-import '../../controllers/drawables/drawable.dart';
-
 import 'package:collection/collection.dart';
+import 'package:flutter_painter/flutter_painter.dart';
 
 /// Painter that paints the drawables.
 class Painter extends CustomPainter {
@@ -19,9 +17,9 @@ class Painter extends CustomPainter {
   final Size? scale;
 
   /// Creates a [Painter] that paints the [drawables] onto a background [background].
-  Painter({
-    this.background,
+  const Painter({
     required this.drawables,
+    this.background,
     this.scale,
   });
 
@@ -32,7 +30,7 @@ class Painter extends CustomPainter {
     final _scale = scale;
 
     // Draw the background if it was provided
-    if (background != null && !background!.hidden)
+    if (background != null && background!.isNotHidden)
       background!.draw(canvas, size);
 
     // If a scale size is being used, save the canvas (with the background), scale it
@@ -47,7 +45,8 @@ class Painter extends CustomPainter {
     canvas.saveLayer(Rect.largest, Paint());
 
     // Draw all the drawables
-    for (final drawable in drawables.where((drawable) => !drawable.hidden)) {
+    for (final drawable
+        in drawables.where((drawable) => drawable.isNotHidden)) {
       drawable.draw(canvas, size);
     }
 
