@@ -48,7 +48,7 @@ class Painter extends CustomPainter {
 
     // Draw all the drawables
     for (final drawable in drawables.where((drawable) => !drawable.hidden)) {
-      drawable.draw(canvas, size);
+      drawable.draw(canvas, _scale ?? size);
     }
 
     canvas.restore();
