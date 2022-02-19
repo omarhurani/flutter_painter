@@ -32,8 +32,9 @@ class Painter extends CustomPainter {
     final _scale = scale;
 
     // Draw the background if it was provided
-    if (background != null && !background!.hidden)
+    if (background != null && !background!.hidden) {
       background!.draw(canvas, size);
+    }
 
     // If a scale size is being used, save the canvas (with the background), scale it
     // and then proceed to drawing the drawables
@@ -65,7 +66,7 @@ class Painter extends CustomPainter {
     if (oldDelegate is! Painter) return true;
 
     // If the background changed, or any of the drawables changed, a repaint is needed
-    return oldDelegate.background != this.background ||
-        !ListEquality().equals(oldDelegate.drawables, drawables);
+    return oldDelegate.background != background ||
+        !const ListEquality().equals(oldDelegate.drawables, drawables);
   }
 }

@@ -22,8 +22,9 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (settings.mode == FreeStyleMode.none || shapeSettings.factory != null)
+    if (settings.mode == FreeStyleMode.none || shapeSettings.factory != null) {
       return widget.child;
+    }
 
     return RawGestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -75,8 +76,9 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
       // Add the drawable to the controller's drawables
       PainterController.of(context).addDrawables([drawable], newAction: false);
-    } else
+    } else {
       return;
+    }
 
     // Set the drawable as the current drawable
     this.drawable = drawable;

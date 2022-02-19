@@ -32,7 +32,7 @@ class DoubleArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
         const <ObjectDrawableAssist, Paint>{},
     bool locked = false,
     bool hidden = false,
-  })  : this.paint = paint ?? ShapeDrawable.defaultPaint,
+  })  : paint = paint ?? ShapeDrawable.defaultPaint,
         super(
             length: length,
             position: position,
@@ -44,7 +44,7 @@ class DoubleArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
             hidden: hidden);
 
   /// The actual arrow head size used in drawing.
-  double get _arrowHeadSize => this.arrowHeadSize ?? paint.strokeWidth * 3;
+  double get _arrowHeadSize => arrowHeadSize ?? paint.strokeWidth * 3;
 
   /// Getter for padding of drawable.
   ///
@@ -104,7 +104,7 @@ class DoubleArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
       position: position ?? this.position,
-      rotationAngle: rotation ?? this.rotationAngle,
+      rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,
       length: length ?? this.length,
       paint: paint ?? this.paint,

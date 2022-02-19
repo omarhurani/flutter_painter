@@ -75,7 +75,7 @@ class ImageDrawable extends ObjectDrawable {
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
       position: position ?? this.position,
-      rotationAngle: rotation ?? this.rotationAngle,
+      rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,
       image: image ?? this.image,
       flipped: flipped ?? this.flipped,
@@ -129,9 +129,10 @@ class ImageDrawable extends ObjectDrawable {
   //     image);
 
   static double _calculateScaleFittedToSize(Image image, Size size) {
-    if (image.width >= image.height)
+    if (image.width >= image.height) {
       return size.width / image.width;
-    else
+    } else {
       return size.height / image.height;
+    }
   }
 }

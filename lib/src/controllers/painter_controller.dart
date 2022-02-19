@@ -269,7 +269,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
 
   /// Dispatches a [AddTextPainterEvent] on `events` stream.
   void addText() {
-    _eventsSteamController.add(AddTextPainterEvent());
+    _eventsSteamController.add(const AddTextPainterEvent());
   }
 
   /// Adds an [ImageDrawable] to the center of the painter.
@@ -301,11 +301,12 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
 
     final ImageDrawable drawable;
 
-    if (size == null)
+    if (size == null) {
       drawable = ImageDrawable(image: image, position: center);
-    else
+    } else {
       drawable = ImageDrawable.fittedToSize(
           image: image, position: center, size: size);
+    }
 
     addDrawables([drawable]);
   }
@@ -362,8 +363,9 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
   void deselectObjectDrawable({bool isRemoved = false}) {
-    if (selectedObjectDrawable != null && isRemoved)
-      _eventsSteamController.add(SelectedObjectDrawableRemovedEvent());
+    if (selectedObjectDrawable != null && isRemoved) {
+      _eventsSteamController.add(const SelectedObjectDrawableRemovedEvent());
+    }
     selectObjectDrawable(null);
   }
 }
@@ -391,7 +393,7 @@ class PainterControllerValue {
     List<Drawable> drawables = const [],
     this.background,
     this.selectedObjectDrawable,
-  }) : this._drawables = drawables;
+  }) : _drawables = drawables;
 
   /// Getter for the current drawables.
   ///
@@ -409,7 +411,7 @@ class PainterControllerValue {
   }) {
     return PainterControllerValue(
       settings: settings ?? this.settings,
-      drawables: drawables ?? this._drawables,
+      drawables: drawables ?? _drawables,
       background: background == _NoBackgroundPassedBackgroundDrawable.instance
           ? this.background
           : background,
@@ -424,7 +426,7 @@ class PainterControllerValue {
   @override
   bool operator ==(Object other) {
     return other is PainterControllerValue &&
-        (ListEquality().equals(_drawables, other._drawables) &&
+        (const ListEquality().equals(_drawables, other._drawables) &&
             background == other.background &&
             settings == other.settings &&
             selectedObjectDrawable == other.selectedObjectDrawable);

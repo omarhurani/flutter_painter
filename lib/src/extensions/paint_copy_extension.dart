@@ -38,8 +38,9 @@ extension PaintCopy on Paint {
       ..strokeWidth = strokeWidth ?? this.strokeWidth
       ..style = style ?? this.style;
 
-    if (!usingHtmlRenderer)
+    if (!usingHtmlRenderer) {
       paint.strokeMiterLimit = strokeMiterLimit ?? this.strokeMiterLimit;
+    }
 
     return paint;
   }

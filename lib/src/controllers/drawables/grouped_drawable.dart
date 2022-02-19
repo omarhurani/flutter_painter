@@ -16,7 +16,9 @@ class GroupedDrawable extends Drawable {
   /// Draw all the drawables in the group on [canvas] of [size].
   @override
   void draw(Canvas canvas, Size size) {
-    for (final drawable in drawables) drawable.draw(canvas, size);
+    for (final drawable in drawables) {
+      drawable.draw(canvas, size);
+    }
   }
 
   /// Compares two [GroupedDrawable]s for equality.

@@ -18,7 +18,7 @@ class PainterControllerWidget extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(PainterControllerWidget old) {
-    return controller != old.controller;
+  bool updateShouldNotify(PainterControllerWidget oldWidget) {
+    return controller != oldWidget.controller;
   }
 }

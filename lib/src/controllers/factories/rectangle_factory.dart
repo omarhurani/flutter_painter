@@ -17,12 +17,13 @@ class RectangleFactory extends ShapeFactory<RectangleDrawable> {
   @override
   RectangleDrawable create(Offset position, [Paint? paint]) {
     final borderRadius = this.borderRadius;
-    if (borderRadius != null)
+    if (borderRadius != null) {
       return RectangleDrawable(
           size: Size.zero,
           position: position,
           borderRadius: borderRadius,
           paint: paint);
+    }
     return RectangleDrawable(size: Size.zero, position: position, paint: paint);
   }
 }

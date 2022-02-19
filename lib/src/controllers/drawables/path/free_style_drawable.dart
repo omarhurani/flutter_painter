@@ -27,6 +27,7 @@ class FreeStyleDrawable extends PathDrawable {
         super(path: path, strokeWidth: strokeWidth, hidden: hidden);
 
   /// Creates a copy of this but with the given fields replaced with the new values.
+  @override
   FreeStyleDrawable copyWith({
     bool? hidden,
     List<Offset>? path,

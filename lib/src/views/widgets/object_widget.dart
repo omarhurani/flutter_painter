@@ -45,7 +45,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   double get objectPadding => 25 / transformationScale;
 
   /// Getter for the duration of fade-in and out animations for the object controls.
-  static Duration get controlsTransitionDuration => Duration(milliseconds: 100);
+  static Duration get controlsTransitionDuration =>
+      const Duration(milliseconds: 100);
 
   /// Getter for the size of the controls of the selected object.
   double get controlsSize =>
@@ -71,19 +72,16 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   /// Keeps track of widgets that have assist lines assigned to them.
   ///
   /// This is used to provide haptic feedback when the assist line appears.
-  Map<ObjectDrawableAssist, Set<int>> assistDrawables = Map.fromIterable(
-      ObjectDrawableAssist.values,
-      key: (e) => e,
-      value: (e) => <int>{});
+  Map<ObjectDrawableAssist, Set<int>> assistDrawables = {
+    for (var e in ObjectDrawableAssist.values) e: <int>{}
+  };
 
   /// Keeps track of which controls are being used.
   ///
   /// Used to highlight the controls when they are in use.
-  Map<int, bool> controlsAreActive = Map.fromIterable(
-    List.generate(8, (index) => index),
-    key: (e) => e,
-    value: (e) => false,
-  );
+  Map<int, bool> controlsAreActive = {
+    for (var e in List.generate(8, (index) => index)) e: false
+  };
 
   /// Subscription to the events coming from the controller.
   StreamSubscription<PainterEvent>? controllerEventSubscription;
@@ -154,7 +152,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
             final size = drawable.getSize(maxWidth: constraints.maxWidth);
             final widget = Padding(
               padding: EdgeInsets.all(objectPadding),
-              child: Container(
+              child: SizedBox(
                 width: size.width,
                 height: size.height,
               ),
@@ -199,7 +197,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                               (controlsSize / 2),
                                           child: Builder(
                                             builder: (context) {
-                                              if (usingHtmlRenderer)
+                                              if (usingHtmlRenderer) {
                                                 return Container(
                                                   decoration: BoxDecoration(
                                                     border: Border.all(
@@ -216,6 +214,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     ),
                                                   ),
                                                 );
+                                              }
                                               return Container(
                                                 decoration: BoxDecoration(
                                                     border: Border.all(
@@ -503,7 +502,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                               layoutBuilder: (child, previousChildren) {
                                 if (cancelControlsAnimation) {
                                   cancelControlsAnimation = false;
-                                  return child ?? SizedBox();
+                                  return child ?? const SizedBox();
                                 }
                                 return AnimatedSwitcher.defaultLayoutBuilder(
                                     child, previousChildren);
@@ -571,10 +570,11 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   void tapDrawable(ObjectDrawable drawable) {
     if (drawable.locked) return;
 
-    if (controller?.selectedObjectDrawable == drawable)
+    if (controller?.selectedObjectDrawable == drawable) {
       ObjectDrawableReselectedNotification(drawable).dispatch(context);
-    else
+    } else {
       SelectedObjectDrawableUpdatedNotification(drawable).dispatch(context);
+    }
 
     setState(() {
       // selectedDrawableIndex = drawables.indexOf(drawable);
@@ -633,7 +633,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     // Clean up
     drawableInitialLocalFocalPoints.remove(index);
     initialScaleDrawables.remove(index);
-    for (final assistSet in assistDrawables.values) assistSet.remove(index);
+    for (final assistSet in assistDrawables.values) {
+      assistSet.remove(index);
+    }
 
     // Remove any assist lines the object has
     final newDrawable = drawable.copyWith(assists: {});
@@ -922,7 +924,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
         ScaleUpdateDetails(
           pointerCount: 1,
           rotation: 0,
-          scale: scale.clamp(ObjectDrawable.min_scale, double.infinity),
+          scale: scale.clamp(ObjectDrawable.minScale, double.infinity),
           localFocalPoint: entry.value.position,
         ));
   }

@@ -32,8 +32,9 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool> {
   bool perform$(PainterController controller) {
     final value = controller.value;
     final oldDrawableIndex = value.drawables.indexOf(oldDrawable);
-    if (oldDrawableIndex < 0) // not found
+    if (oldDrawableIndex < 0) {
       return false;
+    }
 
     final currentDrawables = List<Drawable>.from(value.drawables);
     final selectedObject = controller.value.selectedObjectDrawable;
@@ -48,8 +49,9 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool> {
               : selectedObject
           : null,
     );
-    if (isSelectedObject && newDrawable is! ObjectDrawable)
+    if (isSelectedObject && newDrawable is! ObjectDrawable) {
       controller.deselectObjectDrawable(isRemoved: true);
+    }
     return true;
   }
 
@@ -63,8 +65,9 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool> {
   bool unperform$(PainterController controller) {
     final value = controller.value;
     final newDrawableIndex = value.drawables.indexOf(newDrawable);
-    if (newDrawableIndex < 0) // not found
+    if (newDrawableIndex < 0) {
       return false;
+    }
 
     final currentDrawables = List<Drawable>.from(value.drawables);
     final selectedObject = controller.value.selectedObjectDrawable;
@@ -79,8 +82,9 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool> {
               : selectedObject
           : null,
     );
-    if (isSelectedObject && oldDrawable is! ObjectDrawable)
+    if (isSelectedObject && oldDrawable is! ObjectDrawable) {
       controller.deselectObjectDrawable(isRemoved: true);
+    }
     return true;
   }
 
@@ -94,20 +98,23 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool> {
   @override
   ControllerAction? merge$(ControllerAction previousAction) {
     if (previousAction is AddDrawablesAction &&
-        previousAction.drawables.last == oldDrawable)
+        previousAction.drawables.last == oldDrawable) {
       return AddDrawablesAction([...previousAction.drawables]
         ..removeLast()
         ..add(newDrawable));
+    }
     if (previousAction is InsertDrawablesAction &&
-        previousAction.drawables.last == oldDrawable)
+        previousAction.drawables.last == oldDrawable) {
       return InsertDrawablesAction(
           previousAction.index,
           [...previousAction.drawables]
             ..removeLast()
             ..add(newDrawable));
+    }
     if (previousAction is ReplaceDrawableAction &&
-        previousAction.newDrawable == oldDrawable)
+        previousAction.newDrawable == oldDrawable) {
       return ReplaceDrawableAction(previousAction.oldDrawable, newDrawable);
+    }
     return super.merge$(previousAction);
   }
 }

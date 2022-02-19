@@ -76,7 +76,7 @@ class TextDrawable extends ObjectDrawable {
     return TextDrawable(
       text: text ?? this.text,
       position: position ?? this.position,
-      rotation: rotation ?? this.rotationAngle,
+      rotation: rotation ?? rotationAngle,
       scale: scale ?? this.scale,
       style: style ?? this.style,
       direction: direction ?? this.direction,

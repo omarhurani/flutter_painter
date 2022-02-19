@@ -106,10 +106,11 @@ class _TextWidgetState extends State<_TextWidget> {
     }
 
     openTextEditor(drawable, true).then((value) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           selectedDrawable = null;
         });
+      }
     });
   }
 
@@ -119,8 +120,8 @@ class _TextWidgetState extends State<_TextWidget> {
     await Navigator.push(
         context,
         PageRouteBuilder(
-            transitionDuration: Duration(milliseconds: 300),
-            reverseTransitionDuration: Duration(milliseconds: 300),
+            transitionDuration: const Duration(milliseconds: 300),
+            reverseTransitionDuration: const Duration(milliseconds: 300),
             opaque: false,
             pageBuilder: (context, animation, secondaryAnimation) =>
                 EditTextWidget(
@@ -245,7 +246,7 @@ class EditTextWidgetState extends State<EditTextWidget>
                   .clamp(0, screenHeight)),
           child: Center(
             child: TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
                 isDense: true,
@@ -302,8 +303,9 @@ class EditTextWidgetState extends State<EditTextWidget>
   void onEditingComplete() {
     if (textEditingController.text.trim().isEmpty) {
       widget.controller.removeDrawable(widget.drawable);
-      if (!widget.isNew)
+      if (!widget.isNew) {
         DrawableDeletedNotification(widget.drawable).dispatch(context);
+      }
     } else {
       final drawable = widget.drawable.copyWith(
         text: textEditingController.text.trim(),

@@ -25,7 +25,7 @@ abstract class ShapeDrawable extends ObjectDrawable {
         const <ObjectDrawableAssist, Paint>{},
     bool locked = false,
     bool hidden = false,
-  })  : this.paint = paint != null ? paint : defaultPaint,
+  })  : paint = paint ?? defaultPaint,
         super(
             position: position,
             rotationAngle: rotationAngle,

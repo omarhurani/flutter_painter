@@ -18,7 +18,12 @@ abstract class ObjectDrawable extends Drawable {
     ..color = Colors.pink;
 
   /// The smallest value for the scale of an object drawable.
-  static const double min_scale = 0.001;
+  static const double minScale = 0.001;
+
+  @Deprecated(
+      "min_scale is deprecated to conform with flutter_lints, use minScale instead")
+  // ignore: non_constant_identifier_names
+  double get min_scale => minScale;
 
   /// The location of the object to be painted.
   final Offset position;
@@ -57,7 +62,7 @@ abstract class ObjectDrawable extends Drawable {
     this.assistPaints = const <ObjectDrawableAssist, Paint>{},
     this.locked = false,
     bool hidden = false,
-  })  : scale = scale < min_scale ? min_scale : scale,
+  })  : scale = scale < minScale ? minScale : scale,
         super(hidden: hidden);
 
   /// Draws any assist lines that the object has on [canvas] with [size].
@@ -90,17 +95,19 @@ abstract class ObjectDrawable extends Drawable {
     //
     // This assist line passes through the center point of the object
     // and extends horizontally (with a constant dy value)
-    if (assists.contains(ObjectDrawableAssist.horizontal))
+    if (assists.contains(ObjectDrawableAssist.horizontal)) {
       canvas.drawLine(Offset(0, position.dy), Offset(size.width, position.dy),
           assistPaints[ObjectDrawableAssist.horizontal] ?? defaultAssistPaint);
+    }
 
     // Draw the vertical assist line
     //
     // This assist line passes through the center point of the object
     // and extends vertically (with a constant dx value)
-    if (assists.contains(ObjectDrawableAssist.vertical))
+    if (assists.contains(ObjectDrawableAssist.vertical)) {
       canvas.drawLine(Offset(position.dx, 0), Offset(position.dx, size.height),
           assistPaints[ObjectDrawableAssist.horizontal] ?? defaultAssistPaint);
+    }
   }
 
   /// Draws the object on the provided [canvas] of size [size].
@@ -172,23 +179,27 @@ abstract class ObjectDrawable extends Drawable {
 
     // Calculate if there is an intersection with the top edge
     double coordinate = point.dx - (point.dy / angleTan);
-    if (coordinate >= 0 && coordinate <= size.width)
+    if (coordinate >= 0 && coordinate <= size.width) {
       intersections.add(Offset(coordinate, 0));
+    }
 
     // Calculate if there is an intersection with the bottom edge
     coordinate = (size.height - point.dy) / angleTan + point.dx;
-    if (coordinate >= 0 && coordinate <= size.width)
+    if (coordinate >= 0 && coordinate <= size.width) {
       intersections.add(Offset(coordinate, size.height));
+    }
 
     // Calculate if there is an intersection with the right edge
     coordinate = point.dy - angleTan * point.dx;
-    if (coordinate >= 0 && coordinate <= size.height)
+    if (coordinate >= 0 && coordinate <= size.height) {
       intersections.add(Offset(0, coordinate));
+    }
 
     // Calculate if there is an intersection with the left edge
     coordinate = angleTan * (size.width - point.dx) + point.dy;
-    if (coordinate >= 0 && coordinate <= size.height)
+    if (coordinate >= 0 && coordinate <= size.height) {
       intersections.add(Offset(size.width, coordinate));
+    }
 
     // Interactions should always have 2 results
     return intersections;

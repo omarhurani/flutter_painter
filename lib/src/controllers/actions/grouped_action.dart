@@ -50,14 +50,15 @@ class GroupedAction extends ControllerAction<void, void> {
     }
 
     final ControllerAction? merged;
-    if (previousAction != null && currentAction != null)
+    if (previousAction != null && currentAction != null) {
       merged = currentAction.merge(previousAction);
-    else if (previousAction != null)
+    } else if (previousAction != null) {
       merged = previousAction;
-    else if (currentAction != null)
+    } else if (currentAction != null) {
       merged = currentAction;
-    else
+    } else {
       merged = null;
+    }
 
     actions = [
       ...previousActions,
@@ -73,7 +74,9 @@ class GroupedAction extends ControllerAction<void, void> {
   @protected
   @override
   void perform$(PainterController controller) {
-    for (final action in actions) action.perform(controller);
+    for (final action in actions) {
+      action.perform(controller);
+    }
   }
 
   /// Un-performs the action.
@@ -82,7 +85,9 @@ class GroupedAction extends ControllerAction<void, void> {
   @protected
   @override
   void unperform$(PainterController controller) {
-    for (final action in actions.reversed) action.unperform(controller);
+    for (final action in actions.reversed) {
+      action.unperform(controller);
+    }
   }
 
   /// Merges [this] action and the [previousAction] into one action.
@@ -93,12 +98,12 @@ class GroupedAction extends ControllerAction<void, void> {
   @override
   ControllerAction? merge$(ControllerAction previousAction) {
     if (actions.isEmpty) return previousAction;
-    final toMerge;
-    final beforeMerge;
+    ControllerAction toMerge;
+    List<ControllerAction> beforeMerge;
     if (previousAction is GroupedAction) {
       final previousActions = previousAction.actions;
       if (previousActions.isEmpty) return this;
-      beforeMerge = [...previousActions].removeLast();
+      beforeMerge = [...previousActions]..removeLast();
       toMerge = previousActions.last;
     } else {
       beforeMerge = [];
