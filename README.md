@@ -27,7 +27,7 @@ The example is hosted [here](https://flutter-painter.web.app) if you want to try
 
 A video recording showing the example running:
 
-<img src="https://github.com/omarhurani/flutter_painter/blob/1.0.0/example/flutter_painter_example.gif?raw=true" alt="Flutter Painter Video Demo" height=800px/>
+<img src="https://github.com/omarhurani/flutter_painter/blob/1.0.1/example/flutter_painter_example.gif?raw=true" alt="Flutter Painter Video Demo" height=800px/>
 
 ## Usage
 First, you'll need a `PainterController` object. The `PainterController` controls the different drawables, the background you're drawing on and provides the `FlutterPainter` widget with the settings it needs. Then, in your UI, use the `FlutterPainter` widget with the controller assigned to it.
@@ -236,10 +236,7 @@ If you're trying to use the extensions and they're showing as undefined, make su
 ### Flutter Web
 The `html` renderer for Flutter Web is not supported, and using it will cause unexpected behavior and errors (also includes the `auto` renderer which chooses the renderer depending on the device). If you're using it for Flutter Web, make sure to use `--web-renderer canvaskit` as an argument for your `run`/`build` commands. If you need to use `auto` or `html` for any reason (such as better performance), consider using another package.
 
-### Testing
-As you might notice, the `test` directory is left unmodified. This is because I am not familiar with testing in Flutter.
-
-> If anybody is willing to help out the [Flutter Web](#flutter-web) issue or with [testing](#testing) it would be highly appreciated (either contact me through [my GitHub](https://github.com/omarhurani) or contribute and post a pull request).
+> If anybody is willing to help out the [Flutter Web](#flutter-web) issue or with testing it would be highly appreciated (either contact me through [my GitHub](https://github.com/omarhurani) or contribute and post a pull request).
 
 
 ## Support Me
