@@ -11,6 +11,10 @@ abstract class Drawable {
   /// Draws the drawable on the provided [canvas] of size [size].
   void draw(Canvas canvas, Size size);
 
+  bool get isHidden => hidden;
+
+  bool get isNotHidden => !hidden;
+
   /// Checks equality between two [Drawable]s.
   // @override
   // bool operator ==(Object other) {
