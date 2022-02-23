@@ -22,9 +22,8 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-#      TODO Would be nice to resolve analyze issues and enable this later
-#      - name: Analyze
-#        run: flutter analyze
+      - name: Analyze
+        run: flutter analyze
 
       - name: Test app
         run: flutter test
