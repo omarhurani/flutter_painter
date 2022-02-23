@@ -1,3 +1,9 @@
+## [1.0.1]
+* Fix a bug where `TextDrawable`s would incorrectly render on the final image ([Issue #19](https://github.com/omarhurani/flutter_painter/issues/19)).
+* Add Flutter linting using [flutter_lints](https://pub.dev/packages/flutter_lints) ([Issue #20](https://github.com/omarhurani/flutter_painter/issues/20)).
+* Add some basic tests (thanks to [d3xt3r2909](https://github.com/omarhurani/flutter_painter/pull/21)).
+* Add basic GitHub actions (thanks to [d3xt3r2909](https://github.com/omarhurani/flutter_painter/pull/21)).
+
 ## [1.0.0]
 * Add `ImageDrawable`; now you can add any images you want onto the painter. They can be flipped. ([Issue #8](https://github.com/omarhurani/flutter_painter/issues/8)).
 * Add `DoubleArrowDrawable`, which is the same as `ArrowDrawable` but with an arrow head on both sides (thanks to [AuronChoo](https://github.com/omarhurani/flutter_painter/pull/17)).
