@@ -8,13 +8,13 @@ import 'shape_drawable.dart';
 import '../sized2ddrawable.dart';
 
 /// A drawable of an oval.
-class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
+class PolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
   /// The paint to be used for the line drawable.
   @override
   Paint paint;
 
-  /// Creates a new [OvalDrawable] with the given [size] and [paint].
-  OvalDrawable({
+  /// Creates a new [PolygonDrawable] with the given [size] and [paint].
+  PolygonDrawable({
     Paint? paint,
     required Size size,
     required Offset position,
@@ -47,18 +47,12 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
   @override
   void drawObject(Canvas canvas, Size size) {
     final drawingSize = this.size * scale;
-    canvas.drawCircle(position, drawingSize.width / 2, paint);
-    // canvas.drawOval(
-    //     Rect.fromCenter(
-    //         center: position,
-    //         width: drawingSize.width,
-    //         height: drawingSize.height),
-    //     paint);
+    canvas.drawCircle(position, 5, paint);
   }
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override
-  OvalDrawable copyWith({
+  PolygonDrawable copyWith({
     bool? hidden,
     Set<ObjectDrawableAssist>? assists,
     Offset? position,
@@ -68,7 +62,7 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
     Paint? paint,
     bool? locked,
   }) {
-    return OvalDrawable(
+    return PolygonDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
       position: position ?? this.position,
@@ -84,13 +78,13 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
   @override
   Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
     final size = super.getSize();
-    return Size(size.width, size.width);
+    return Size(10, 10);
   }
 
-  /// Compares two [OvalDrawable]s for equality.
+  /// Compares two [PolygonDrawable]s for equality.
   // @override
   // bool operator ==(Object other) {
-  //   return other is OvalDrawable &&
+  //   return other is PolygonDrawable &&
   //       super == other &&
   //       other.paint == paint &&
   //       other.size == size;
