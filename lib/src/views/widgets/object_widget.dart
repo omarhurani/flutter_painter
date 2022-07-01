@@ -104,7 +104,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     super.initState();
 
     // Listen to the stream of events from the paint controller
-    WidgetsBinding.instance?.addPostFrameCallback((timestamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timestamp) {
       controllerEventSubscription =
           PainterController.of(context).events.listen((event) {
         // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object
