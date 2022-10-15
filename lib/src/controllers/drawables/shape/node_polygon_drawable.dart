@@ -27,6 +27,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
         const <ObjectDrawableAssist, Paint>{},
     bool locked = false,
     bool hidden = false,
+    this.shiftOffset,
   })  : paint = paint ?? ShapeDrawable.defaultPaint,
         super(
           size: size,
@@ -40,6 +41,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
         );
 
   final List<Offset> vertices;
+  final Offset? shiftOffset;
 
   /// Getter for padding of drawable.
   ///
@@ -52,23 +54,14 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
   @override
   void drawObject(Canvas canvas, Size size) {
     if (vertices.isEmpty) return;
-    final path = Path()..moveTo(vertices.first.dx, vertices.first.dy);
-    for (int i = 0; i < vertices.length; i++) {
-      final end = i + 1 == vertices.length ? vertices.first : vertices[i + 1];
-      path.lineTo(end.dx, end.dy);
-      // if (showHandlers) {
-      //   final start = vertices.elementAt(i);
-      //   final dx = start.dx;
-      //   final dy = start.dy;
-      //   canvas.drawCircle(
-      //     Offset(dx, dy),
-      //     handlersSize,
-      //     Paint()..color = handlersColor,
-      //   );
-      // }
-    }
-    path.close();
-    canvas.drawPath(path, paint);
+    final path = Path()
+      ..moveTo(vertices.first.dx, vertices.first.dy)
+      ..addPolygon(vertices, true);
+    final shiftedPath = shiftOffset == null ? path : path.shift(shiftOffset!);
+    final scalingMatrix4 = Float64List.fromList(
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 / scale]);
+    final scaledPath = shiftedPath.transform(scalingMatrix4);
+    canvas.drawPath(scaledPath, paint);
   }
 
   NodePolygonDrawable updateWith({
@@ -82,23 +75,25 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     Paint? paint,
     bool? locked,
     Size? size,
+    Offset? shiftOffset,
   }) {
-    final newDrawable = copyWith(
-      vertices: (vertex != null ? [...this.vertices, vertex] : vertices) ??
-          this.vertices,
-    );
-    final newSize = size ?? newDrawable.getSize();
-    final newPosition = position ?? newDrawable.centroid(paint?.strokeWidth);
-    return NodePolygonDrawable(
-      vertices: newDrawable.vertices,
-      position: newPosition,
-      size: newSize,
+    final drawable = copyWith(
       paint: paint ?? this.paint,
+      vertices: vertex != null
+          ? [...this.vertices, vertex]
+          : vertices ?? this.vertices,
+    );
+    return NodePolygonDrawable(
+      position: position ?? drawable.centroid(drawable.paint.strokeWidth),
+      size: size ?? drawable.getSize(),
+      vertices: drawable.vertices,
+      paint: drawable.paint,
       scale: scale ?? this.scale,
       locked: locked ?? this.locked,
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
       rotationAngle: rotation ?? rotationAngle,
+      shiftOffset: shiftOffset ?? this.shiftOffset,
     );
   }
 
@@ -114,18 +109,20 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     Paint? paint,
     bool? locked,
     List<Offset>? vertices,
-    Offset? vertex,
   }) {
+    final newPosition = centroid(paint?.strokeWidth);
+    final shift = (position ?? Offset.zero) - newPosition;
     return NodePolygonDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
-      position: position ?? this.position,
+      position: position != null ? newPosition + shift : this.position,
       rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,
       size: size ?? this.size,
       paint: paint ?? this.paint,
       locked: locked ?? this.locked,
       vertices: vertices ?? this.vertices,
+      shiftOffset: position != null ? shift / (scale ?? 1) : this.position,
     );
   }
 
@@ -136,13 +133,13 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
       final superSize = super.getSize();
       return Size(superSize.width, superSize.height);
     } else {
-      return Size(width, height);
+      return Size(width * scale, height * scale);
     }
   }
 
   Offset centroid([double? padding]) {
-    final dxs = vertices.map((vertex) => vertex.dx).sum;
-    final dys = vertices.map((vertex) => vertex.dy).sum;
+    final dxs = vertices.map((vertex) => vertex.dx * scale).sum;
+    final dys = vertices.map((vertex) => vertex.dy * scale).sum;
     final dx = dxs / vertices.length;
     final dy = dys / vertices.length;
 
