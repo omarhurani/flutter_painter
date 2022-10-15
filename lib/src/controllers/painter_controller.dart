@@ -4,17 +4,17 @@ import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'events/selected_object_drawable_removed_event.dart';
+
+import '../views/painters/painter.dart';
 import '../views/widgets/painter_controller_widget.dart';
 import 'actions/actions.dart';
-import 'drawables/image_drawable.dart';
-import 'events/events.dart';
 import 'drawables/background/background_drawable.dart';
-import 'drawables/object_drawable.dart';
-import 'settings/settings.dart';
-import '../views/painters/painter.dart';
-
 import 'drawables/drawable.dart';
+import 'drawables/image_drawable.dart';
+import 'drawables/object_drawable.dart';
+import 'events/events.dart';
+import 'events/selected_object_drawable_removed_event.dart';
+import 'settings/settings.dart';
 
 /// Controller used to control a [FlutterPainter] widget.
 ///
@@ -25,6 +25,11 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   ///
   /// This will dispatch events that represent actions, such as adding a new text drawable.
   final StreamController<PainterEvent> _eventsSteamController;
+
+  /// A controller for an event stream which widgets will listen to.
+  ///
+  /// This will dispatch events that represent undo and redo actions.
+  final StreamController<UndoRedoEvent> _undoRedoSteamController;
 
   /// This key will be used by the [FlutterPainter] widget assigned this controller.
   ///
@@ -64,6 +69,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// Create a [PainterController] from a [PainterControllerValue].
   PainterController.fromValue(PainterControllerValue value)
       : _eventsSteamController = StreamController<PainterEvent>.broadcast(),
+        _undoRedoSteamController = StreamController<UndoRedoEvent>.broadcast(),
         painterKey = GlobalKey(),
         transformationController = TransformationController(),
         super(value);
@@ -73,6 +79,12 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// This stream is for children widgets of [FlutterPainter] to listen to external events.
   /// For example, adding a new text drawable.
   Stream<PainterEvent> get events => _eventsSteamController.stream;
+
+  /// The stream of [UndoRedoEvent]s dispatched from this controller.
+  ///
+  /// This stream is for children widgets of [FlutterPainter] to listen to
+  /// undo and redo events.
+  Stream<UndoRedoEvent> get undoRedoEvents => _undoRedoSteamController.stream;
 
   /// Setting this will notify all the listeners of this [PainterController]
   /// that they need to update (it calls [notifyListeners]). For this reason,
@@ -240,6 +252,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     final action = performedActions.removeLast();
     action.unperform(this);
     unperformedActions.add(action);
+    _undoRedoSteamController.add(UndoRedoEvent.undo(action));
   }
 
   /// Redoes the last [undo]ne action. The redo operation can be [undo]ne.
@@ -255,6 +268,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     final action = unperformedActions.removeLast();
     action.perform(this);
     performedActions.add(action);
+    _undoRedoSteamController.add(UndoRedoEvent.redo(action));
   }
 
   /// Merges a newly added action with the previous action.
