@@ -26,21 +26,33 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
       return widget.child;
     }
 
-    return RawGestureDetector(
-      behavior: HitTestBehavior.opaque,
-      gestures: {
-        _DragGestureDetector:
-            GestureRecognizerFactoryWithHandlers<_DragGestureDetector>(
-          () => _DragGestureDetector(
-            onHorizontalDragDown: _handleHorizontalDragDown,
-            onHorizontalDragUpdate: _handleHorizontalDragUpdate,
-            onHorizontalDragUp: _handleHorizontalDragUp,
+    return settings.mode.whenOrNull<Widget?>(
+          polygonalDraw: () => Stack(
+            children: [
+              widget.child,
+              Positioned.fill(
+                child: PolygonDrawWidget(
+                  controller: PainterController.of(context),
+                ),
+              ),
+            ],
           ),
-          (_) {},
-        ),
-      },
-      child: widget.child,
-    );
+        ) ??
+        RawGestureDetector(
+          behavior: HitTestBehavior.opaque,
+          gestures: {
+            _DragGestureDetector:
+                GestureRecognizerFactoryWithHandlers<_DragGestureDetector>(
+              () => _DragGestureDetector(
+                onHorizontalDragDown: _handleHorizontalDragDown,
+                onHorizontalDragUpdate: _handleHorizontalDragUpdate,
+                onHorizontalDragUp: _handleHorizontalDragUp,
+              ),
+              (_) {},
+            ),
+          },
+          child: widget.child,
+        );
   }
 
   /// Getter for [FreeStyleSettings] from `widget.controller.value` to make code more readable.

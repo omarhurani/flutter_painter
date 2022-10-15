@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import '../../controllers/drawables/shape/shape_drawables.dart';
 import '../../controllers/events/selected_object_drawable_removed_event.dart';
 import '../../controllers/helpers/renderer_check/renderer_check.dart';
 import '../../controllers/drawables/drawable.dart';
@@ -23,6 +24,7 @@ import '../../controllers/helpers/border_box_shadow.dart';
 import '../../extensions/painter_controller_helper_extension.dart';
 import 'painter_controller_widget.dart';
 import 'dart:math' as math;
+import 'polygon_draw_widget.dart';
 
 part 'free_style_widget.dart';
 part 'text_widget.dart';
