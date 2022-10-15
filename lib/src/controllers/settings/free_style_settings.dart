@@ -41,4 +41,30 @@ enum FreeStyleMode {
 
   /// Free-style painting is enabled in erasing mode; used to erase drawings.
   erase,
+
+  /// Free-style painting is enabled in polygonal drawing mode;
+  /// used to draw polygonal shapes.
+  polygonalDraw
+}
+
+extension FreeStyleModeExtension on FreeStyleMode {
+  T? whenOrNull<T extends Object?>({
+    T Function()? none,
+    T Function()? draw,
+    T Function()? erase,
+    T Function()? polygonalDraw,
+  }) {
+    switch (this) {
+      case FreeStyleMode.none:
+        return none?.call();
+      case FreeStyleMode.draw:
+        return draw?.call();
+      case FreeStyleMode.erase:
+        return erase?.call();
+      case FreeStyleMode.polygonalDraw:
+        return polygonalDraw?.call();
+      default:
+        return null;
+    }
+  }
 }
