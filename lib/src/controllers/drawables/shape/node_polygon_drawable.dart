@@ -28,6 +28,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     bool locked = false,
     bool hidden = false,
     this.shiftOffset,
+    this.polygonCloseDistance,
   })  : paint = paint ?? ShapeDrawable.defaultPaint,
         super(
           size: size,
@@ -40,6 +41,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
           hidden: hidden,
         );
 
+  final double? polygonCloseDistance;
   final List<Offset> vertices;
   final Offset? shiftOffset;
 
@@ -76,6 +78,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     bool? locked,
     Size? size,
     Offset? shiftOffset,
+    double? polygonCloseDistance,
   }) {
     final drawable = copyWith(
       paint: paint ?? this.paint,
@@ -94,6 +97,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
       assists: assists ?? this.assists,
       rotationAngle: rotation ?? rotationAngle,
       shiftOffset: shiftOffset ?? this.shiftOffset,
+      polygonCloseDistance: polygonCloseDistance ?? this.polygonCloseDistance,
     );
   }
 
@@ -109,6 +113,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     Paint? paint,
     bool? locked,
     List<Offset>? vertices,
+    double? polygonCloseDistance,
   }) {
     final newPosition = centroid(paint?.strokeWidth);
     final shift = (position ?? Offset.zero) - newPosition;
@@ -123,6 +128,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
       locked: locked ?? this.locked,
       vertices: vertices ?? this.vertices,
       shiftOffset: position != null ? shift / (scale ?? 1) : this.position,
+      polygonCloseDistance: polygonCloseDistance ?? this.polygonCloseDistance,
     );
   }
 
@@ -144,7 +150,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     final dy = dys / vertices.length;
 
     if (padding == null) return Offset(dx, dy);
-    return Offset(dx - (padding / 2), dy + (padding / 2));
+    return Offset(dx + (padding / 2), dy + (padding / 2));
   }
 
   double get height {

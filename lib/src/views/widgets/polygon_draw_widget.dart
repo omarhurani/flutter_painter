@@ -28,6 +28,12 @@ class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
   /// The current drawable being drawn.
   NodePolygonDrawable? drawable;
   late final StreamSubscription subscription;
+  late final paint = Paint()
+    ..strokeWidth = settings.strokeWidth
+    ..color = settings.color
+    ..strokeCap = StrokeCap.round
+    ..style =
+        settings.isPolygonFilled ? PaintingStyle.fill : PaintingStyle.stroke;
 
   @override
   void initState() {
@@ -68,7 +74,8 @@ class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
           controller.replaceDrawable(drawable!, newDrawable!, newAction: true);
           drawable = newDrawable;
         } else {
-          drawable = const NodePolygonFactory().create(tap.localPosition);
+          drawable = NodePolygonFactory(settings.polygonCloseDistance)
+              .create(tap.localPosition, paint);
           controller.addDrawables([drawable!], newAction: true);
         }
       });
