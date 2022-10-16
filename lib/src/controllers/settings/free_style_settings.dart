@@ -12,16 +12,16 @@ class FreeStyleSettings {
   /// The stroke width the path will be drawn with.
   final double strokeWidth;
 
-  final double? polygonCloseDistance;
+  final double? polygonCloseRadius;
   final bool isPolygonFilled;
 
   /// Creates a [FreeStyleSettings] with the given [color]
-  /// and [strokeWidth], [polygonCloseDistance] and [mode] values.
+  /// and [strokeWidth], [polygonCloseRadius] and [mode] values.
   const FreeStyleSettings({
     this.mode = FreeStyleMode.none,
     this.color = Colors.black,
     this.strokeWidth = 1,
-    this.polygonCloseDistance,
+    this.polygonCloseRadius,
     this.isPolygonFilled = false,
   });
 
@@ -31,14 +31,14 @@ class FreeStyleSettings {
     Color? color,
     double? strokeWidth,
     bool? isPolygonFilled,
-    double? polygonCloseDistance,
+    double? polygonCloseRadius,
   }) {
     return FreeStyleSettings(
       mode: mode ?? this.mode,
       color: color ?? this.color,
       strokeWidth: strokeWidth ?? this.strokeWidth,
       isPolygonFilled: isPolygonFilled ?? this.isPolygonFilled,
-      polygonCloseDistance: polygonCloseDistance ?? this.polygonCloseDistance,
+      polygonCloseRadius: polygonCloseRadius ?? this.polygonCloseRadius,
     );
   }
 }

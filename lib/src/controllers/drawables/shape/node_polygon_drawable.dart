@@ -28,7 +28,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     bool locked = false,
     bool hidden = false,
     Offset? shiftOffset,
-    this.polygonCloseDistance,
+    this.polygonCloseRadius,
   })  : paint = paint ?? ShapeDrawable.defaultPaint,
         _shiftOffset = shiftOffset,
         super(
@@ -42,7 +42,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
           hidden: hidden,
         );
 
-  final double? polygonCloseDistance;
+  final double? polygonCloseRadius;
   final List<Offset> vertices;
   final Offset? _shiftOffset;
 
@@ -73,11 +73,11 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
   }
 
   bool _shouldBeClosed(Offset? vertex) {
-    if (polygonCloseDistance == null) return false;
+    if (polygonCloseRadius == null) return false;
     if (vertex == null || vertices.isEmpty) return false;
     final distance = (vertices.first - vertex).distance;
 
-    return distance <= (polygonCloseDistance ?? 0);
+    return distance <= (polygonCloseRadius ?? 0);
   }
 
   NodePolygonDrawable updateWith({
@@ -92,7 +92,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     bool? locked,
     Size? size,
     Offset? shiftOffset,
-    double? polygonCloseDistance,
+    double? polygonCloseRadius,
   }) {
     final newVertex = _shouldBeClosed(vertex) ? this.vertices.first : vertex;
     final drawable = copyWith(
@@ -112,7 +112,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
       assists: assists ?? this.assists,
       rotationAngle: rotation ?? rotationAngle,
       shiftOffset: shiftOffset ?? _shiftOffset,
-      polygonCloseDistance: polygonCloseDistance ?? this.polygonCloseDistance,
+      polygonCloseRadius: polygonCloseRadius ?? this.polygonCloseRadius,
     );
   }
 
@@ -128,7 +128,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     Paint? paint,
     bool? locked,
     List<Offset>? vertices,
-    double? polygonCloseDistance,
+    double? polygonCloseRadius,
   }) {
     final isPanEnd = position == null && (assists?.isEmpty ?? false);
     final newPosition = centroid(paint?.strokeWidth ?? this.paint.strokeWidth);
@@ -137,7 +137,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
       position: position != null ? newPosition + shift : this.position,
-      polygonCloseDistance: polygonCloseDistance ?? this.polygonCloseDistance,
+      polygonCloseRadius: polygonCloseRadius ?? this.polygonCloseRadius,
       rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,
       size: size ?? this.size,

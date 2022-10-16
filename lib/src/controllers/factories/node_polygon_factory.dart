@@ -5,9 +5,9 @@ import 'shape_factory.dart';
 
 /// A [NodePolygonDrawable] factory.
 class NodePolygonFactory extends ShapeFactory<NodePolygonDrawable> {
-  const NodePolygonFactory([this.polygonCloseDistance]);
+  const NodePolygonFactory([this.polygonCloseRadius]);
 
-  final double? polygonCloseDistance;
+  final double? polygonCloseRadius;
 
   /// Creates and returns a [NodePolygonDrawable] of zero size and the passed [position] and [paint].
   @override
@@ -17,7 +17,7 @@ class NodePolygonFactory extends ShapeFactory<NodePolygonDrawable> {
       position: position,
       vertices: [position],
       paint: paint,
-      polygonCloseDistance: polygonCloseDistance,
+      polygonCloseRadius: polygonCloseRadius,
     );
   }
 }

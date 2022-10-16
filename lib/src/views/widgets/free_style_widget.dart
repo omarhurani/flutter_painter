@@ -33,6 +33,8 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
               Positioned.fill(
                 child: PolygonDrawWidget(
                   controller: PainterController.of(context),
+                  radius: settings.polygonCloseRadius,
+                  color: settings.color,
                 ),
               ),
             ],
