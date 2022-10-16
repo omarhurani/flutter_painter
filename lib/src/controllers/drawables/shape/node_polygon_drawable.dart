@@ -27,9 +27,10 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
         const <ObjectDrawableAssist, Paint>{},
     bool locked = false,
     bool hidden = false,
-    this.shiftOffset,
+    Offset? shiftOffset,
     this.polygonCloseDistance,
   })  : paint = paint ?? ShapeDrawable.defaultPaint,
+        _shiftOffset = shiftOffset,
         super(
           size: size,
           position: position,
@@ -43,7 +44,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
 
   final double? polygonCloseDistance;
   final List<Offset> vertices;
-  final Offset? shiftOffset;
+  final Offset? _shiftOffset;
 
   /// Getter for padding of drawable.
   ///
@@ -59,7 +60,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     final path = Path()
       ..moveTo(vertices.first.dx, vertices.first.dy)
       ..addPolygon(vertices, true);
-    final shiftedPath = shiftOffset == null ? path : path.shift(shiftOffset!);
+    final shiftedPath = _shiftOffset == null ? path : path.shift(_shiftOffset!);
     final scalingMatrix4 = Float64List.fromList(
         [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 / scale]);
     final scaledPath = shiftedPath.transform(scalingMatrix4);
@@ -96,7 +97,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
       rotationAngle: rotation ?? rotationAngle,
-      shiftOffset: shiftOffset ?? this.shiftOffset,
+      shiftOffset: shiftOffset ?? _shiftOffset,
       polygonCloseDistance: polygonCloseDistance ?? this.polygonCloseDistance,
     );
   }
@@ -129,7 +130,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
       locked: locked ?? this.locked,
       vertices: vertices ?? this.vertices,
       shiftOffset: isPanEnd
-          ? shiftOffset
+          ? _shiftOffset
           : position != null
               ? shift / (scale ?? 1)
               : this.position,
@@ -181,7 +182,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     final isSame = other.scale == scale &&
         other.position == position &&
         other.size == size &&
-        other.shiftOffset == shiftOffset &&
+        other._shiftOffset == _shiftOffset &&
         other.assists.length == assists.length &&
         (const ListEquality().equals(vertices, other.vertices)) &&
         other.paint == paint;
