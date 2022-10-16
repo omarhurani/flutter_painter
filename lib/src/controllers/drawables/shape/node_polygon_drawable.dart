@@ -59,12 +59,25 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     if (vertices.isEmpty) return;
     final path = Path()
       ..moveTo(vertices.first.dx, vertices.first.dy)
-      ..addPolygon(vertices, true);
+      ..addPolygon(vertices, isClosed);
     final shiftedPath = _shiftOffset == null ? path : path.shift(_shiftOffset!);
     final scalingMatrix4 = Float64List.fromList(
         [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 / scale]);
     final scaledPath = shiftedPath.transform(scalingMatrix4);
     canvas.drawPath(scaledPath, paint);
+  }
+
+  bool get isClosed {
+    if (vertices.isEmpty) return false;
+    return vertices.first == vertices.last;
+  }
+
+  bool _shouldBeClosed(Offset? vertex) {
+    if (polygonCloseDistance == null) return false;
+    if (vertex == null || vertices.isEmpty) return false;
+    final distance = (vertices.first - vertex).distance;
+
+    return distance <= (polygonCloseDistance ?? 0);
   }
 
   NodePolygonDrawable updateWith({
@@ -81,10 +94,11 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     Offset? shiftOffset,
     double? polygonCloseDistance,
   }) {
+    final newVertex = _shouldBeClosed(vertex) ? this.vertices.first : vertex;
     final drawable = copyWith(
       paint: paint ?? this.paint,
-      vertices: vertex != null
-          ? [...this.vertices, vertex]
+      vertices: newVertex != null
+          ? [...this.vertices, newVertex]
           : vertices ?? this.vertices,
     );
     return NodePolygonDrawable(
@@ -117,12 +131,13 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     double? polygonCloseDistance,
   }) {
     final isPanEnd = position == null && (assists?.isEmpty ?? false);
-    final newPosition = centroid(paint?.strokeWidth);
+    final newPosition = centroid(paint?.strokeWidth ?? this.paint.strokeWidth);
     final shift = (position ?? Offset.zero) - newPosition;
     return NodePolygonDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
       position: position != null ? newPosition + shift : this.position,
+      polygonCloseDistance: polygonCloseDistance ?? this.polygonCloseDistance,
       rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,
       size: size ?? this.size,
@@ -134,7 +149,6 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
           : position != null
               ? shift / (scale ?? 1)
               : this.position,
-      polygonCloseDistance: polygonCloseDistance ?? this.polygonCloseDistance,
     );
   }
 
@@ -150,10 +164,12 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
   }
 
   Offset centroid([double? padding]) {
-    final dxs = vertices.map((vertex) => vertex.dx * scale).sum;
-    final dys = vertices.map((vertex) => vertex.dy * scale).sum;
-    final dx = dxs / vertices.length;
-    final dy = dys / vertices.length;
+    final verticesList = List.of(vertices);
+    if (isClosed) verticesList.removeLast();
+    final dxSum = verticesList.map((vertex) => vertex.dx * scale).sum;
+    final dySum = verticesList.map((vertex) => vertex.dy * scale).sum;
+    final dx = dxSum / verticesList.length;
+    final dy = dySum / verticesList.length;
 
     if (padding == null) return Offset(dx, dy);
     return Offset(dx + (padding / 2), dy + (padding / 2));
@@ -192,18 +208,18 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
 
   @override
   String toString() => '''NodePolygonDrawable(
-  vertices: $vertices,
-  size: $size,
-  hidden: $hidden,
-  locked: $locked,
-  assists: $assists,
-  assistPaints: ${assistPaints.entries},
-  position: $position,
-  rotationAngle: $rotationAngle,
-  scale: $scale,
-  paint: $paint,
-  )
-  ''';
+vertices: $vertices,
+size: $size,
+hidden: $hidden,
+locked: $locked,
+assists: $assists,
+assistPaints: ${assistPaints.entries},
+position: $position,
+rotationAngle: $rotationAngle,
+scale: $scale,
+paint: $paint,
+shiftOffset: $_shiftOffset,
+)''';
 
   @override
   int get hashCode => hashValues(
