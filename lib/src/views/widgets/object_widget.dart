@@ -969,9 +969,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
             (isReversed ? -1 : 1));
     final initialLength = vertical ? initial.size.height : initial.size.width;
 
-    final totalLength = (length / initial.scale + initialLength)
-        .clamp(0, double.infinity)
-        .toDouble();
+    final totalLength =
+        (length / initial.scale + initialLength).clamp(0.0, double.infinity);
 
     // final double scale = initialLength == 0 ?
     //   (length*2).clamp(0.001, double.infinity) :
