@@ -17,17 +17,9 @@ class PolygonDrawWidget extends StatefulWidget {
   /// Child widget.
   final PainterController controller;
 
-  final double? radius;
-
-  final Color? color;
-
   /// Creates a [PolygonDrawWidget] with the given [controller], [child] widget.
-  const PolygonDrawWidget({
-    required this.controller,
-    this.radius,
-    this.color,
-    Key? key,
-  }) : super(key: key);
+  const PolygonDrawWidget({required this.controller, Key? key})
+      : super(key: key);
 
   @override
   State<PolygonDrawWidget> createState() => _PolygonDrawWidgetState();
@@ -37,6 +29,7 @@ class PolygonDrawWidget extends StatefulWidget {
 class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
   /// The current drawable being drawn.
   NodePolygonDrawable? drawable;
+
   late final StreamSubscription subscription;
   late final paint = Paint()
     ..strokeWidth = settings.strokeWidth
@@ -45,10 +38,10 @@ class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
     ..style =
         settings.isPolygonFilled ? PaintingStyle.fill : PaintingStyle.stroke;
   late final outlinePaint = Paint()
-    ..strokeWidth = min(paint.strokeWidth, 1)
     ..color = settings.color
-    ..strokeCap = StrokeCap.round
-    ..style = PaintingStyle.stroke;
+    ..strokeCap = paint.strokeCap
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = min(paint.strokeWidth, 1);
 
   bool get hasVertices => drawable?.vertices.isNotEmpty ?? false;
 
@@ -66,11 +59,11 @@ class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
 
   void undoRedoListener(UndoRedoEvent event) {
     final vertices = [...?drawable?.vertices].whereType<Offset>().toList();
-    if (!hasVertices) return;
+    if (vertices.isEmpty) return;
     if (event.isUndo) {
       vertices.removeLast();
       final updatedDrawable =
-          hasVertices ? drawable?.updateWith(vertices: vertices) : null;
+          vertices.isEmpty ? null : drawable?.updateWith(vertices: vertices);
       setState(() => drawable = updatedDrawable);
     } else {
       if (event.action is! ReplaceDrawableAction) return;
@@ -101,17 +94,18 @@ class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
   Widget build(BuildContext context) => GestureDetector(
         onTapDown: onTapDown,
         child: ColoredBox(
-          color: widget.color?.withOpacity(0.05) ?? Colors.transparent,
+          color: settings.backgroundColor ?? Colors.transparent,
           child: hasVertices
               ? Stack(
                   children: [
-                    if (widget.radius != null)
+                    if (radius != null &&
+                        (!drawable!.isClosed || drawable!.vertices.length == 1))
                       Positioned(
-                        left: drawable!.vertices.first.dx - widget.radius!,
-                        top: drawable!.vertices.first.dy - widget.radius!,
+                        left: drawable!.vertices.first.dx - radius!,
+                        top: drawable!.vertices.first.dy - radius!,
                         child: CircleAvatar(
-                          radius: widget.radius,
-                          backgroundColor: widget.color?.withOpacity(0.2),
+                          radius: radius,
+                          backgroundColor: settings.color.withOpacity(0.2),
                         ),
                       ),
                     if (paint.style == PaintingStyle.fill)
@@ -131,9 +125,8 @@ class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
   /// Getter for [FreeStyleSettings] from `widget.controller.value` to make code more readable.
   FreeStyleSettings get settings => controller.value.settings.freeStyle;
 
-  /// Getter for [ShapeSettings] from `widget.controller.value` to make code more readable.
-  ShapeSettings get shapeSettings => controller.value.settings.shape;
-
   /// Getter for [PainterController] from constructor.
   PainterController get controller => widget.controller;
+
+  double? get radius => settings.polygonCloseRadius;
 }

@@ -77,7 +77,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     if (vertex == null || vertices.isEmpty) return false;
     final distance = (vertices.first - vertex).distance;
 
-    return distance <= (polygonCloseRadius ?? 0);
+    return distance <= polygonCloseRadius!;
   }
 
   NodePolygonDrawable updateWith({
@@ -163,6 +163,10 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     }
   }
 
+  /// Geometric center of a [NodePolygonDrawable], which might not be very
+  /// accurate (since polygon can has a lot [vertices]), but should be pretty
+  /// fast to calculate in the runtime.
+  /// https://en.wikipedia.org/wiki/Centroid#Of_a_polygon
   Offset centroid([double? padding]) {
     final verticesList = List.of(vertices);
     if (isClosed) verticesList.removeLast();

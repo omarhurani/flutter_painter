@@ -14,6 +14,7 @@ class FreeStyleSettings {
 
   final double? polygonCloseRadius;
   final bool isPolygonFilled;
+  final Color? backgroundColor;
 
   /// Creates a [FreeStyleSettings] with the given [color]
   /// and [strokeWidth], [polygonCloseRadius] and [mode] values.
@@ -21,6 +22,7 @@ class FreeStyleSettings {
     this.mode = FreeStyleMode.none,
     this.color = Colors.black,
     this.strokeWidth = 1,
+    this.backgroundColor,
     this.polygonCloseRadius,
     this.isPolygonFilled = false,
   });
@@ -31,6 +33,7 @@ class FreeStyleSettings {
     Color? color,
     double? strokeWidth,
     bool? isPolygonFilled,
+    Color? backgroundColor,
     double? polygonCloseRadius,
   }) {
     return FreeStyleSettings(
@@ -38,6 +41,7 @@ class FreeStyleSettings {
       color: color ?? this.color,
       strokeWidth: strokeWidth ?? this.strokeWidth,
       isPolygonFilled: isPolygonFilled ?? this.isPolygonFilled,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
       polygonCloseRadius: polygonCloseRadius ?? this.polygonCloseRadius,
     );
   }
