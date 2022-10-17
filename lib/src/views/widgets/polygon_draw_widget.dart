@@ -14,10 +14,10 @@ import '../painters/painter.dart';
 /// Flutter widget to detect user input and request drawing
 /// [FreeStyleDrawable]s as polygons.
 class PolygonDrawWidget extends StatefulWidget {
-  /// Child widget.
+  /// Parent's [PainterController].
   final PainterController controller;
 
-  /// Creates a [PolygonDrawWidget] with the given [controller], [child] widget.
+  /// Creates a [PolygonDrawWidget] with the given [controller].
   const PolygonDrawWidget({required this.controller, Key? key})
       : super(key: key);
 
@@ -30,13 +30,18 @@ class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
   /// The current drawable being drawn.
   NodePolygonDrawable? drawable;
 
+  /// Subscriptions for listening to undo/redo events.
   late final StreamSubscription subscription;
+
+  /// Default [Paint] from the stored [FreeStyleSettings].
   late final paint = Paint()
     ..strokeWidth = settings.strokeWidth
     ..color = settings.color
     ..strokeCap = StrokeCap.round
     ..style =
         settings.isPolygonFilled ? PaintingStyle.fill : PaintingStyle.stroke;
+
+  /// Helper paint [Paint] for filled polygons.
   late final outlinePaint = Paint()
     ..color = settings.color
     ..strokeCap = paint.strokeCap
@@ -48,15 +53,22 @@ class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
   @override
   void initState() {
     super.initState();
+
+    /// Assign of the undo/redo events listening.
     subscription = controller.undoRedoEvents.listen(undoRedoListener);
   }
 
   @override
   void dispose() {
+    /// Cancellation of the undo/redo events listening.
     subscription.cancel();
     super.dispose();
   }
 
+  /// The listener which removes the last point from the [drawable.vertices]
+  /// (in the [FreeStyleMode.polygonalDraw] mode) if it detects that an undo
+  /// event has been called. On the other hand, it returns the vertex that was
+  /// restored to the [drawable.vertices] list if it meets the conditions.
   void undoRedoListener(UndoRedoEvent event) {
     final vertices = [...?drawable?.vertices].whereType<Offset>().toList();
     if (vertices.isEmpty) return;
@@ -78,6 +90,7 @@ class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
     }
   }
 
+  /// Adds vertices to the [drawable.vertices] list, saves them for undo/redo.
   void onTapDown(TapDownDetails tap) => setState(() {
         if (drawable != null) {
           final newDrawable = drawable?.updateWith(vertex: tap.localPosition);

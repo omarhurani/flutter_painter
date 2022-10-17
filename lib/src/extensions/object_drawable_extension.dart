@@ -2,7 +2,10 @@ import '../../flutter_painter.dart';
 import '../controllers/drawables/sized1ddrawable.dart';
 import '../controllers/drawables/sized2ddrawable.dart';
 
+/// Extensions on the [ObjectDrawableExtension] class.
 extension ObjectDrawableExtension on ObjectDrawable {
+  /// Convention pattern matching for comparison of different
+  /// [ObjectDrawable] types with a null fallback.
   T? whenOrNull<T extends Object?>({
     T Function()? arrowDrawable,
     T Function()? doubleArrowDrawable,

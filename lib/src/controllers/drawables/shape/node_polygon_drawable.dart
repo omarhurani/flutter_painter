@@ -8,13 +8,13 @@ import '../object_drawable.dart';
 import '../sized2ddrawable.dart';
 import 'shape_drawable.dart';
 
-/// A drawable of a rectangle with a radius.
+/// A drawable of a polygon made with nodes (vertices) from user input.
 class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
-  /// The paint to be used for the line drawable.
+  /// The paint to be used for the polygon drawable.
   @override
   Paint paint;
 
-  /// Creates a new [NodePolygonDrawable] with the given [size], [paint] and [borderRadius].
+  /// Creates a new [NodePolygonDrawable] with the given [size], [paint] and [vertices].
   NodePolygonDrawable({
     required this.vertices,
     required Size size,
@@ -42,8 +42,14 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
           hidden: hidden,
         );
 
+  /// {@macro polygon_close_radius}
   final double? polygonCloseRadius;
+
+  /// List of vertices (coordinates) from which the polygon will be constructed.
   final List<Offset> vertices;
+
+  /// Helper field allowing to work with the object as a geometric
+  /// shape (move, rotate, resize). Only used internally.
   final Offset? _shiftOffset;
 
   /// Getter for padding of drawable.
@@ -53,25 +59,33 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
   @override
   EdgeInsets get padding => EdgeInsets.all(paint.strokeWidth / 2);
 
-  /// Draws the arrow on the provided [canvas] of size [size].
+  /// Draws the polygon on the provided [canvas] of size [size].
   @override
   void drawObject(Canvas canvas, Size size) {
-    if (vertices.isEmpty) return;
-    final path = Path()
+    if (vertices.isEmpty) return; // Nothing to draw.
+    final path = Path() // Draw a polygon on specific position.
       ..moveTo(vertices.first.dx, vertices.first.dy)
       ..addPolygon(vertices, isClosed);
+
+    /// Moves the polygon if it was manually moved/rotated.
     final shiftedPath = _shiftOffset == null ? path : path.shift(_shiftOffset!);
+
+    /// Scales the polygon if it was manually scaled.
     final scalingMatrix4 = Float64List.fromList(
         [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 / scale]);
     final scaledPath = shiftedPath.transform(scalingMatrix4);
     canvas.drawPath(scaledPath, paint);
   }
 
+  /// Determines if it is a closed polygon
+  /// (i.e. if the first vertex is the same as the last vertex).
   bool get isClosed {
     if (vertices.isEmpty) return false;
     return vertices.first == vertices.last;
   }
 
+  /// A helper method that allows to assign a vertex of the polygon
+  /// to the first one, if it is within the specified [polygonCloseRadius].
   bool _shouldBeClosed(Offset? vertex) {
     if (polygonCloseRadius == null) return false;
     if (vertex == null || vertices.isEmpty) return false;
@@ -80,6 +94,8 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     return distance <= polygonCloseRadius!;
   }
 
+  /// It is mainly used in the PolygonDrawWidget for the initial calculation of
+  /// the new position (of [this] polygon when the new vertex has been added).
   NodePolygonDrawable updateWith({
     List<Offset>? vertices,
     Offset? vertex,
@@ -116,7 +132,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     );
   }
 
-  /// Creates a copy of this but with the given fields replaced with the new values.
+  /// Creates a copy of [this] but with the given fields replaced with the new values.
   @override
   NodePolygonDrawable copyWith({
     bool? hidden,
@@ -179,6 +195,8 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     return Offset(dx + (padding / 2), dy + (padding / 2));
   }
 
+  /// Height of the polygon. It calculates the distance between the highest
+  /// vertex and the lowest vertex (their 'Y' coordinate).
   double get height {
     final dys = vertices.map((vertex) => vertex.dy);
     final maximum = dys.reduce(max);
@@ -187,6 +205,8 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     return maximum - minimum;
   }
 
+  /// Width of the polygon. It calculates the distance between two
+  /// horizontal edge points (their 'X' coordinate).
   double get width {
     final dxs = vertices.map((vertex) => vertex.dx);
     final maximum = dxs.reduce(max);

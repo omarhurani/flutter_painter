@@ -26,7 +26,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// This will dispatch events that represent actions, such as adding a new text drawable.
   final StreamController<PainterEvent> _eventsSteamController;
 
-  /// A controller for an event stream which widgets will listen to.
+  /// A controller for an undo/redo event stream which widgets will listen to.
   ///
   /// This will dispatch events that represent undo and redo actions.
   final StreamController<UndoRedoEvent> _undoRedoSteamController;

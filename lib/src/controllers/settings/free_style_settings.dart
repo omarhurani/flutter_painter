@@ -12,8 +12,23 @@ class FreeStyleSettings {
   /// The stroke width the path will be drawn with.
   final double strokeWidth;
 
+  /// {@template polygon_close_radius}
+  /// The radius within which a touch/tap will be considered as a touch/tap
+  /// on the first vertex. This will usually close the path.
+  /// {@endtemplate}
+  ///
+  /// {@template is_polygon_filled_sense}
+  /// Makes only sense to use together with [isPolygonFilled] flag set to true.
+  /// {@endtemplate}
   final double? polygonCloseRadius;
+
+  /// Allows you to fill polygons with the selected [color].
+  /// If set to false, it will only shape polygons using their outlines.
   final bool isPolygonFilled;
+
+  /// Background color on which the polygons will be created.
+  /// Default to null ([Colors.transparent] fallback).
+  /// {@macro is_polygon_filled_sense}
   final Color? backgroundColor;
 
   /// Creates a [FreeStyleSettings] with the given [color]
@@ -63,7 +78,10 @@ enum FreeStyleMode {
   polygonalDraw
 }
 
+/// Extensions on the [FreeStyleMode] class.
 extension FreeStyleModeExtension on FreeStyleMode {
+  /// Convention pattern matching for comparison of different
+  /// [FreeStyleMode] modes with a null fallback.
   T? whenOrNull<T extends Object?>({
     T Function()? none,
     T Function()? draw,
