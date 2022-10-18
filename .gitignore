@@ -9,6 +9,9 @@
 .history
 .svn/
 
+# Flutter Version Management
+.fvm/
+
 # IntelliJ related
 *.iml
 *.ipr

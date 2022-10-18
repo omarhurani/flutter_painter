@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data' show Float64List;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';

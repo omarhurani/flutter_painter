@@ -357,7 +357,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                             ),
                                           ),
                                         ],
-                                        if (entry.value is Sized2DDrawable) ...[
+                                        if (entry.value is Sized2DDrawable &&
+                                            entry.value
+                                                is! NodePolygonDrawable) ...[
                                           Positioned(
                                             top: objectPadding - (controlsSize),
                                             left: (size.width / 2) +
@@ -489,7 +491,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                               ),
                                             ),
                                           ),
-                                        ]
+                                        ],
                                       ],
                                     )
                                   : widget,
