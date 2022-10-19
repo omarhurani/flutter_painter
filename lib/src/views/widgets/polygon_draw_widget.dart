@@ -141,5 +141,6 @@ class _PolygonDrawWidgetState extends State<PolygonDrawWidget> {
   /// Getter for [PainterController] from constructor.
   PainterController get controller => widget.controller;
 
+  /// Getter for [polygonCloseRadius] from [FreeStyleSettings].
   double? get radius => settings.polygonCloseRadius;
 }

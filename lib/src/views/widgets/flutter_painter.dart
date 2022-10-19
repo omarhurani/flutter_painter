@@ -205,6 +205,7 @@ class _FlutterPainterWidget extends StatelessWidget {
   }
 }
 
+/// https://docs.flutter.dev/development/tools/sdk/release-notes/release-notes-3.0.0#your-code
 /// This allows a value of type T or T?
 /// to be treated as a value of type T?.
 ///
