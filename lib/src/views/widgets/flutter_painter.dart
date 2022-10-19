@@ -1,35 +1,36 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import '../../controllers/drawables/shape/shape_drawables.dart';
-import '../../controllers/events/selected_object_drawable_removed_event.dart';
-import '../../controllers/helpers/renderer_check/renderer_check.dart';
+
 import '../../controllers/drawables/drawable.dart';
-import '../../controllers/notifications/notifications.dart';
-import '../../controllers/drawables/sized1ddrawable.dart';
-import '../../controllers/drawables/shape/shape_drawable.dart';
-import '../../controllers/drawables/sized2ddrawable.dart';
 import '../../controllers/drawables/object_drawable.dart';
-import '../../controllers/events/events.dart';
-import '../../controllers/drawables/text_drawable.dart';
 import '../../controllers/drawables/path/path_drawables.dart';
-import '../../controllers/settings/settings.dart';
-import '../painters/painter.dart';
-import '../../controllers/painter_controller.dart';
+import '../../controllers/drawables/shape/shape_drawable.dart';
+import '../../controllers/drawables/shape/shape_drawables.dart';
+import '../../controllers/drawables/sized1ddrawable.dart';
+import '../../controllers/drawables/sized2ddrawable.dart';
+import '../../controllers/drawables/text_drawable.dart';
+import '../../controllers/events/events.dart';
+import '../../controllers/events/selected_object_drawable_removed_event.dart';
 import '../../controllers/helpers/border_box_shadow.dart';
+import '../../controllers/helpers/renderer_check/renderer_check.dart';
+import '../../controllers/notifications/notifications.dart';
+import '../../controllers/painter_controller.dart';
+import '../../controllers/settings/settings.dart';
 import '../../extensions/painter_controller_helper_extension.dart';
+import '../painters/painter.dart';
 import 'painter_controller_widget.dart';
-import 'dart:math' as math;
 import 'polygon_draw_widget.dart';
 
 part 'free_style_widget.dart';
-part 'text_widget.dart';
 part 'object_widget.dart';
 part 'shape_widget.dart';
+part 'text_widget.dart';
 
 typedef DrawableCreatedCallback = Function(Drawable drawable);
 
@@ -203,3 +204,11 @@ class _FlutterPainterWidget extends StatelessWidget {
     return true;
   }
 }
+
+/// This allows a value of type T or T?
+/// to be treated as a value of type T?.
+///
+/// We use this so that APIs that have become
+/// non-nullable can still be used with `!` and `?`
+/// to support older versions of the API as well.
+T? _ambiguate<T>(T? value) => value;
