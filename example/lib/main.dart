@@ -1,12 +1,11 @@
 import 'dart:typed_data';
 import 'dart:ui';
+import 'dart:ui' as ui;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
-
-import 'dart:ui' as ui;
-
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 void main() => runApp(const MyApp());
@@ -86,6 +85,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
             freeStyle: const FreeStyleSettings(
               color: red,
               strokeWidth: 5,
+              backgroundColor: Colors.white12,
+              polygonCloseRadius: kMinInteractiveDimensionCupertino / 2,
             ),
             shape: ShapeSettings(
               paint: shapePaint,
@@ -232,8 +233,11 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                   ),
                                 ],
                               ),
-                              if (controller.freeStyleMode ==
-                                  FreeStyleMode.draw)
+                              if (controller.freeStyleMode.whenOrNull(
+                                    polygonalDraw: () => true,
+                                    draw: () => true,
+                                  ) ??
+                                  false)
                                 Row(
                                   children: [
                                     const Expanded(
@@ -412,6 +416,20 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                 ),
                 onPressed: toggleFreeStyleDraw,
               ),
+              // Polygon drawing
+              RotatedBox(
+                quarterTurns: 1,
+                child: IconButton(
+                  icon: Icon(
+                    PhosphorIcons.lineSegments,
+                    color:
+                        controller.freeStyleMode == FreeStyleMode.polygonalDraw
+                            ? Theme.of(context).accentColor
+                            : null,
+                  ),
+                  onPressed: () => toggleFreeStyleDraw(isPolygonDraw: true),
+                ),
+              ),
               // Add text
               IconButton(
                 icon: Icon(
@@ -502,10 +520,11 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     controller.redo();
   }
 
-  void toggleFreeStyleDraw() {
-    controller.freeStyleMode = controller.freeStyleMode != FreeStyleMode.draw
-        ? FreeStyleMode.draw
-        : FreeStyleMode.none;
+  void toggleFreeStyleDraw({bool isPolygonDraw = false}) {
+    final drawMode =
+        isPolygonDraw ? FreeStyleMode.polygonalDraw : FreeStyleMode.draw;
+    controller.freeStyleMode =
+        controller.freeStyleMode != drawMode ? drawMode : FreeStyleMode.none;
   }
 
   void toggleFreeStyleErase() {
