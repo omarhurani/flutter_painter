@@ -119,7 +119,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
           : vertices ?? this.vertices,
     );
     return NodePolygonDrawable(
-      position: position ?? drawable.centroid(drawable.paint.strokeWidth),
+      position: position ?? drawable.centroid,
       size: size ?? drawable.getSize(),
       vertices: drawable.vertices,
       paint: drawable.paint,
@@ -148,7 +148,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     double? polygonCloseRadius,
   }) {
     final isPanEnd = position == null && (assists?.isEmpty ?? false);
-    final newPosition = centroid(paint?.strokeWidth ?? this.paint.strokeWidth);
+    final newPosition = centroid;
     final shift = (position ?? Offset.zero) - newPosition;
     return NodePolygonDrawable(
       hidden: hidden ?? this.hidden,
@@ -184,7 +184,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
   /// accurate (since polygon can has a lot [vertices]), but should be pretty
   /// fast to calculate in the runtime.
   /// https://en.wikipedia.org/wiki/Centroid#Of_a_polygon
-  Offset centroid([double? padding]) {
+  Offset get centroid {
     final verticesList = List.of(vertices);
     if (isClosed) verticesList.removeLast();
     final dxSum = verticesList.map((vertex) => vertex.dx * scale).sum;
@@ -192,8 +192,7 @@ class NodePolygonDrawable extends Sized2DDrawable implements ShapeDrawable {
     final dx = dxSum / verticesList.length;
     final dy = dySum / verticesList.length;
 
-    if (padding == null) return Offset(dx, dy);
-    return Offset(dx + (padding / 2), dy + (padding / 2));
+    return Offset(dx, dy);
   }
 
   /// Height of the polygon. It calculates the distance between the highest
