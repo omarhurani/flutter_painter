@@ -20,8 +20,7 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
   ShapeDrawable? currentShapeDrawable;
 
   /// Getter for shape settings to simplify code.
-  ShapeSettings get settings =>
-      PainterController.of(context).value.settings.shape;
+  ShapeSettings get settings => PainterController.of(context).value.settings.shape;
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +38,7 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
     final factory = settings.factory;
     if (factory == null || details.pointerCount > 1) return;
 
-    final shapeDrawable =
-        factory.create(details.localFocalPoint, settings.paint);
+    final shapeDrawable = factory.create(details.localFocalPoint, settings.paint);
 
     setState(() {
       PainterController.of(context).addDrawables([shapeDrawable]);
@@ -56,11 +54,9 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
     if (shapeDrawable is Sized1DDrawable) {
       final sized1DDrawable = (shapeDrawable as Sized1DDrawable);
       final length = sized1DDrawable.length;
-      final startingPosition = shapeDrawable.position -
-          Offset.fromDirection(sized1DDrawable.rotationAngle, length / 2);
+      final startingPosition = shapeDrawable.position - Offset.fromDirection(sized1DDrawable.rotationAngle, length / 2);
       final newLine = (details.localFocalPoint - startingPosition);
-      final newPosition = startingPosition +
-          Offset.fromDirection(newLine.direction, newLine.distance / 2);
+      final newPosition = startingPosition + Offset.fromDirection(newLine.direction, newLine.distance / 2);
       final newDrawable = sized1DDrawable.copyWith(
         position: newPosition,
         length: newLine.distance.abs(),
@@ -71,13 +67,11 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
     } else if (shapeDrawable is Sized2DDrawable) {
       final sized2DDrawable = (shapeDrawable as Sized2DDrawable);
       final size = sized2DDrawable.size;
-      final startingPosition =
-          shapeDrawable.position - Offset(size.width / 2, size.height / 2);
+      final startingPosition = shapeDrawable.position - Offset(size.width / 2, size.height / 2);
 
-      final newSize = Size((details.localFocalPoint.dx - startingPosition.dx),
-          (details.localFocalPoint.dy - startingPosition.dy));
-      final newPosition =
-          startingPosition + Offset(newSize.width / 2, newSize.height / 2);
+      final newSize =
+          Size((details.localFocalPoint.dx - startingPosition.dx), (details.localFocalPoint.dy - startingPosition.dy));
+      final newPosition = startingPosition + Offset(newSize.width / 2, newSize.height / 2);
       final newDrawable = sized2DDrawable.copyWith(
         position: newPosition,
         size: newSize,
@@ -100,13 +94,11 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
       updateDrawable(sized2DDrawable as ShapeDrawable, newDrawable);
     }
     if (settings.drawOnce) {
-      PainterController.of(context).settings =
-          PainterController.of(context).settings.copyWith(
-                  shape: settings.copyWith(
-                factory: null,
-              ));
-      SettingsUpdatedNotification(PainterController.of(context).value.settings)
-          .dispatch(context);
+      PainterController.of(context).settings = PainterController.of(context).settings.copyWith(
+              shape: settings.copyWith(
+            factory: null,
+          ));
+      SettingsUpdatedNotification(PainterController.of(context).value.settings).dispatch(context);
     }
 
     DrawableCreatedNotification(currentShapeDrawable).dispatch(context);
@@ -119,8 +111,7 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
   /// Replaces a drawable with a new one.
   void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable) {
     setState(() {
-      PainterController.of(context)
-          .replaceDrawable(oldDrawable, newDrawable, newAction: false);
+      PainterController.of(context).replaceDrawable(oldDrawable, newDrawable, newAction: false);
     });
   }
 }

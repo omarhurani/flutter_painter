@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
-import '../object_drawable.dart';
-import 'shape_drawable.dart';
-import '../sized1ddrawable.dart';
 import '../../../extensions/paint_copy_extension.dart';
+import '../object_drawable.dart';
+import '../sized1ddrawable.dart';
+import 'shape_drawable.dart';
 
 /// A drawable of a arrow on both side shape.
 class DoubleArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
@@ -28,8 +28,7 @@ class DoubleArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
     double rotationAngle = 0,
     double scale = 1,
     Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints =
-        const <ObjectDrawableAssist, Paint>{},
+    Map<ObjectDrawableAssist, Paint> assistPaints = const <ObjectDrawableAssist, Paint>{},
     bool locked = false,
     bool hidden = false,
   })  : paint = paint ?? ShapeDrawable.defaultPaint,
@@ -51,18 +50,17 @@ class DoubleArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
   /// Add padding equal to the stroke width of the line and the size of the arrow head.
   @protected
   @override
-  EdgeInsets get padding => EdgeInsets.symmetric(
-      horizontal: paint.strokeWidth / 2,
-      vertical: paint.strokeWidth / 2 + (_arrowHeadSize / 2));
+  EdgeInsets get padding =>
+      EdgeInsets.symmetric(horizontal: paint.strokeWidth / 2, vertical: paint.strokeWidth / 2 + (_arrowHeadSize / 2));
 
   /// Draws the arrow on the provided [canvas] of size [size].
   @override
   void drawObject(Canvas canvas, Size size) {
     final arrowHeadSize = _arrowHeadSize;
 
-    final dx = length / 2 * scale - arrowHeadSize;
+    final dx = length / 2 * scale;
 
-    final start = position.translate(-length / 2 * scale + arrowHeadSize, 0);
+    final start = position.translate(-dx, 0);
     final end = position.translate(dx, 0);
 
     if ((end - start).dx > 0) canvas.drawLine(start, end, paint);
