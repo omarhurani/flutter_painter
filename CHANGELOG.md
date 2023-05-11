@@ -1,3 +1,9 @@
+## [1.1.0]
+
+* Update internal dependencies
+* Update minimum Dart version to 3.0
+* Update minimum Flutter version to 3.10
+
 ## [1.0.1]
 * Fix a bug where `TextDrawable`s would incorrectly render on the final image ([Issue #19](https://github.com/omarhurani/flutter_painter/issues/19)).
 * Add Flutter linting using [flutter_lints](https://pub.dev/packages/flutter_lints) ([Issue #20](https://github.com/omarhurani/flutter_painter/issues/20)).

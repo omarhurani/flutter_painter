@@ -1,8 +1,5 @@
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import '../controllers/factories/shape_factory.dart';
-
-import '../controllers/settings/shape_settings.dart';
 
 import '../controllers/painter_controller.dart';
 import '../controllers/settings/settings.dart';

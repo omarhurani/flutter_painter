@@ -104,7 +104,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     super.initState();
 
     // Listen to the stream of events from the paint controller
-    WidgetsBinding.instance?.addPostFrameCallback((timestamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timestamp) {
       controllerEventSubscription =
           PainterController.of(context).events.listen((event) {
         // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object
@@ -1017,11 +1017,11 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   /// A callback that is called when a transformation occurs in the [InteractiveViewer] in the widget tree.
   void onTransformUpdated() {
     setState(() {
-      final _m4storage =
+      final m4storage =
           PainterController.of(context).transformationController.value;
-      transformationScale = math.sqrt(_m4storage[8] * _m4storage[8] +
-          _m4storage[9] * _m4storage[9] +
-          _m4storage[10] * _m4storage[10]);
+      transformationScale = math.sqrt(m4storage[8] * m4storage[8] +
+          m4storage[9] * m4storage[9] +
+          m4storage[10] * m4storage[10]);
     });
   }
 }
@@ -1034,18 +1034,6 @@ class _ObjectControlBox extends StatelessWidget {
   /// Whether the box is being used or not.
   final bool active;
 
-  /// Color of control when it is not active.
-  /// Defaults to [Colors.white].
-  final Color inactiveColor;
-
-  /// Color of control when it is active.
-  /// If null is provided, the theme's accent color is used. If there is no theme, [Colors.blue] is used.
-  final Color? activeColor;
-
-  /// Color of the shadow surrounding the control.
-  /// Defaults to [Colors.black].
-  final Color shadowColor;
-
   /// Creates an [_ObjectControlBox] with the given [shape] and [active].
   ///
   /// By default, it will be a [BoxShape.rectangle] shape and not active.
@@ -1053,26 +1041,17 @@ class _ObjectControlBox extends StatelessWidget {
     Key? key,
     this.shape = BoxShape.rectangle,
     this.active = false,
-    this.inactiveColor = Colors.white,
-    this.activeColor,
-    this.shadowColor = Colors.black,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    ThemeData? theme = Theme.of(context);
-    if (theme == ThemeData.fallback()) theme = null;
-    final activeColor = this.activeColor ?? theme?.accentColor ?? Colors.blue;
     return AnimatedContainer(
       duration: _ObjectWidgetState.controlsTransitionDuration,
       decoration: BoxDecoration(
-        color: active ? activeColor : inactiveColor,
+        color: active ? Theme.of(context).colorScheme.secondary : Colors.white,
         shape: shape,
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor,
-            blurRadius: 2,
-          )
+        boxShadow: const <BoxShadow>[
+          BoxShadow(blurRadius: 2),
         ],
       ),
     );

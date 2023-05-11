@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/rendering.dart';
 
 import '../drawables/shape/rectangle_drawable.dart';
