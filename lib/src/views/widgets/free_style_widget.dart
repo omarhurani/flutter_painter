@@ -35,6 +35,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
             onHorizontalDragDown: _handleHorizontalDragDown,
             onHorizontalDragUpdate: _handleHorizontalDragUpdate,
             onHorizontalDragUp: _handleHorizontalDragUp,
+            onHorizontalDragCancel: _handleHorizontalDragCancel,
           ),
           (_) {},
         ),
@@ -82,6 +83,9 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
     // Set the drawable as the current drawable
     this.drawable = drawable;
+
+    // notify that we now start drawing
+    DrawableIsDrawingStateChangedNotification(true).dispatch(context);
   }
 
   /// Callback when the user moves, rotates or scales the pointer(s).
@@ -105,9 +109,22 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
   /// Callback when the user removes all pointers from the widget.
   void _handleHorizontalDragUp() {
     DrawableCreatedNotification(drawable).dispatch(context);
+    // notify that we now start drawing
+    DrawableIsDrawingStateChangedNotification(false).dispatch(context);
 
     /// Reset the current drawable for the user to draw a new one next time
     drawable = null;
+  }
+
+  /// Callback when the pointer event was falsely directed to us.
+  /// E.g. when the wrist was layed on the pad, but then a pen is recognized.
+  /// => the painting input of the wrist is invalid!
+  void _handleHorizontalDragCancel() {
+    if (drawable != null && drawable is PathDrawable) {
+      PainterController.of(context).removeDrawable(drawable!);
+    }
+    drawable = null;
+    DrawableIsDrawingStateChangedNotification(false).dispatch(context);
   }
 
   Offset _globalToLocal(Offset globalPosition) {
@@ -123,11 +140,13 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
     required this.onHorizontalDragDown,
     required this.onHorizontalDragUpdate,
     required this.onHorizontalDragUp,
+    required this.onHorizontalDragCancel,
   });
 
   final ValueSetter<Offset> onHorizontalDragDown;
   final ValueSetter<Offset> onHorizontalDragUpdate;
   final VoidCallback onHorizontalDragUp;
+  final VoidCallback onHorizontalDragCancel;
 
   bool _isTrackingGesture = false;
 
@@ -150,6 +169,10 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
       onHorizontalDragUpdate(event.position);
     } else if (event is PointerUpEvent) {
       onHorizontalDragUp();
+      stopTrackingPointer(event.pointer);
+      _isTrackingGesture = false;
+    } else if (event is PointerCancelEvent) {
+      onHorizontalDragCancel();
       stopTrackingPointer(event.pointer);
       _isTrackingGesture = false;
     }
