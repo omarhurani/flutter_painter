@@ -83,6 +83,9 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
     // Set the drawable as the current drawable
     this.drawable = drawable;
+
+    // notify that we now start drawing
+    DrawableIsDrawingStateChangedNotification(true).dispatch(context);
   }
 
   /// Callback when the user moves, rotates or scales the pointer(s).
@@ -106,6 +109,8 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
   /// Callback when the user removes all pointers from the widget.
   void _handleHorizontalDragUp() {
     DrawableCreatedNotification(drawable).dispatch(context);
+    // notify that we now start drawing
+    DrawableIsDrawingStateChangedNotification(false).dispatch(context);
 
     /// Reset the current drawable for the user to draw a new one next time
     drawable = null;
@@ -119,6 +124,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
       PainterController.of(context).removeDrawable(drawable!);
     }
     drawable = null;
+    DrawableIsDrawingStateChangedNotification(false).dispatch(context);
   }
 
   Offset _globalToLocal(Offset globalPosition) {
