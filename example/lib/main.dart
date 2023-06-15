@@ -1,12 +1,8 @@
-import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
-
-import 'dart:ui' as ui;
-
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 void main() => runApp(const MyApp());
@@ -19,8 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Flutter Painter Example",
-      theme: ThemeData(
-          primaryColor: Colors.brown, accentColor: Colors.amberAccent),
+      theme: ThemeData(primaryColor: Colors.brown),
       home: const FlutterPainterExample(),
     );
   }
@@ -80,8 +75,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         settings: PainterSettings(
             text: TextSettings(
               focusNode: textFocusNode,
-              textStyle: const TextStyle(
-                  fontWeight: FontWeight.bold, color: red, fontSize: 18),
+              textStyle: const TextStyle(fontWeight: FontWeight.bold, color: red, fontSize: 18),
             ),
             freeStyle: const FreeStyleSettings(
               color: red,
@@ -105,8 +99,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   /// to use it as a background
   void initBackground() async {
     // Extension getter (.image) to get [ui.Image] from [ImageProvider]
-    final image =
-        await const NetworkImage('https://picsum.photos/1920/1080/').image;
+    final image = await const NetworkImage('https://picsum.photos/1920/1080/').image;
 
     setState(() {
       backgroundImage = image;
@@ -136,9 +129,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                       icon: const Icon(
                         PhosphorIcons.trash,
                       ),
-                      onPressed: controller.selectedObjectDrawable == null
-                          ? null
-                          : removeSelectedDrawable,
+                      onPressed: controller.selectedObjectDrawable == null ? null : removeSelectedDrawable,
                     ),
                     // Delete the selected drawable
                     IconButton(
@@ -181,12 +172,9 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
               // Enforces constraints
               Positioned.fill(
                 child: Center(
-                  child: AspectRatio(
-                    aspectRatio:
-                        backgroundImage!.width / backgroundImage!.height,
-                    child: FlutterPainter(
-                      controller: controller,
-                    ),
+                  child: FlutterPainter(
+                    aspectRatio: backgroundImage!.width / backgroundImage!.height,
+                    controller: controller,
                   ),
                 ),
               ),
@@ -206,22 +194,19 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         decoration: const BoxDecoration(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(20)),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                           color: Colors.white54,
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (controller.freeStyleMode !=
-                                FreeStyleMode.none) ...[
+                            if (controller.freeStyleMode != FreeStyleMode.none) ...[
                               const Divider(),
                               const Text("Free Style Settings"),
                               // Control free style stroke width
                               Row(
                                 children: [
-                                  const Expanded(
-                                      flex: 1, child: Text("Stroke Width")),
+                                  const Expanded(flex: 1, child: Text("Stroke Width")),
                                   Expanded(
                                     flex: 3,
                                     child: Slider.adaptive(
@@ -232,23 +217,18 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                   ),
                                 ],
                               ),
-                              if (controller.freeStyleMode ==
-                                  FreeStyleMode.draw)
+                              if (controller.freeStyleMode == FreeStyleMode.draw)
                                 Row(
                                   children: [
-                                    const Expanded(
-                                        flex: 1, child: Text("Color")),
+                                    const Expanded(flex: 1, child: Text("Color")),
                                     // Control free style color hue
                                     Expanded(
                                       flex: 3,
                                       child: Slider.adaptive(
                                           min: 0,
                                           max: 359.99,
-                                          value: HSVColor.fromColor(
-                                                  controller.freeStyleColor)
-                                              .hue,
-                                          activeColor:
-                                              controller.freeStyleColor,
+                                          value: HSVColor.fromColor(controller.freeStyleColor).hue,
+                                          activeColor: controller.freeStyleColor,
                                           onChanged: setFreeStyleColor),
                                     ),
                                   ],
@@ -260,15 +240,13 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                               // Control text font size
                               Row(
                                 children: [
-                                  const Expanded(
-                                      flex: 1, child: Text("Font Size")),
+                                  const Expanded(flex: 1, child: Text("Font Size")),
                                   Expanded(
                                     flex: 3,
                                     child: Slider.adaptive(
                                         min: 8,
                                         max: 96,
-                                        value:
-                                            controller.textStyle.fontSize ?? 14,
+                                        value: controller.textStyle.fontSize ?? 14,
                                         onChanged: setTextFontSize),
                                   ),
                                 ],
@@ -283,10 +261,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                     child: Slider.adaptive(
                                         min: 0,
                                         max: 359.99,
-                                        value: HSVColor.fromColor(
-                                                controller.textStyle.color ??
-                                                    red)
-                                            .hue,
+                                        value: HSVColor.fromColor(controller.textStyle.color ?? red).hue,
                                         activeColor: controller.textStyle.color,
                                         onChanged: setTextColor),
                                   ),
@@ -300,21 +275,15 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                               // Control text color hue
                               Row(
                                 children: [
-                                  const Expanded(
-                                      flex: 1, child: Text("Stroke Width")),
+                                  const Expanded(flex: 1, child: Text("Stroke Width")),
                                   Expanded(
                                     flex: 3,
                                     child: Slider.adaptive(
                                         min: 2,
                                         max: 25,
-                                        value: controller
-                                                .shapePaint?.strokeWidth ??
-                                            shapePaint.strokeWidth,
+                                        value: controller.shapePaint?.strokeWidth ?? shapePaint.strokeWidth,
                                         onChanged: (value) =>
-                                            setShapeFactoryPaint(
-                                                (controller.shapePaint ??
-                                                        shapePaint)
-                                                    .copyWith(
+                                            setShapeFactoryPaint((controller.shapePaint ?? shapePaint).copyWith(
                                               strokeWidth: value,
                                             ))),
                                   ),
@@ -330,22 +299,11 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                     child: Slider.adaptive(
                                         min: 0,
                                         max: 359.99,
-                                        value: HSVColor.fromColor(
-                                                (controller.shapePaint ??
-                                                        shapePaint)
-                                                    .color)
-                                            .hue,
-                                        activeColor: (controller.shapePaint ??
-                                                shapePaint)
-                                            .color,
+                                        value: HSVColor.fromColor((controller.shapePaint ?? shapePaint).color).hue,
+                                        activeColor: (controller.shapePaint ?? shapePaint).color,
                                         onChanged: (hue) =>
-                                            setShapeFactoryPaint(
-                                                (controller.shapePaint ??
-                                                        shapePaint)
-                                                    .copyWith(
-                                              color: HSVColor.fromAHSV(
-                                                      1, hue, 1, 1)
-                                                  .toColor(),
+                                            setShapeFactoryPaint((controller.shapePaint ?? shapePaint).copyWith(
+                                              color: HSVColor.fromAHSV(1, hue, 1, 1).toColor(),
                                             ))),
                                   ),
                                 ],
@@ -353,24 +311,15 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 
                               Row(
                                 children: [
-                                  const Expanded(
-                                      flex: 1, child: Text("Fill shape")),
+                                  const Expanded(flex: 1, child: Text("Fill shape")),
                                   Expanded(
                                     flex: 3,
                                     child: Center(
                                       child: Switch(
-                                          value: (controller.shapePaint ??
-                                                      shapePaint)
-                                                  .style ==
-                                              PaintingStyle.fill,
+                                          value: (controller.shapePaint ?? shapePaint).style == PaintingStyle.fill,
                                           onChanged: (value) =>
-                                              setShapeFactoryPaint(
-                                                  (controller.shapePaint ??
-                                                          shapePaint)
-                                                      .copyWith(
-                                                style: value
-                                                    ? PaintingStyle.fill
-                                                    : PaintingStyle.stroke,
+                                              setShapeFactoryPaint((controller.shapePaint ?? shapePaint).copyWith(
+                                                style: value ? PaintingStyle.fill : PaintingStyle.stroke,
                                               ))),
                                     ),
                                   ),
@@ -396,9 +345,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
               IconButton(
                 icon: Icon(
                   PhosphorIcons.eraser,
-                  color: controller.freeStyleMode == FreeStyleMode.erase
-                      ? Theme.of(context).accentColor
-                      : null,
+                  color:
+                      controller.freeStyleMode == FreeStyleMode.erase ? Theme.of(context).colorScheme.secondary : null,
                 ),
                 onPressed: toggleFreeStyleErase,
               ),
@@ -406,9 +354,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
               IconButton(
                 icon: Icon(
                   PhosphorIcons.scribbleLoop,
-                  color: controller.freeStyleMode == FreeStyleMode.draw
-                      ? Theme.of(context).accentColor
-                      : null,
+                  color:
+                      controller.freeStyleMode == FreeStyleMode.draw ? Theme.of(context).colorScheme.secondary : null,
                 ),
                 onPressed: toggleFreeStyleDraw,
               ),
@@ -416,9 +363,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
               IconButton(
                 icon: Icon(
                   PhosphorIcons.textT,
-                  color: textFocusNode.hasFocus
-                      ? Theme.of(context).accentColor
-                      : null,
+                  color: textFocusNode.hasFocus ? Theme.of(context).colorScheme.secondary : null,
                 ),
                 onPressed: addText,
               ),
@@ -459,9 +404,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                     padding: const EdgeInsets.all(8.0),
                     child: Icon(
                       getShapeIcon(controller.shapeFactory),
-                      color: controller.shapeFactory != null
-                          ? Theme.of(context).accentColor
-                          : null,
+                      color: controller.shapeFactory != null ? Theme.of(context).colorScheme.secondary : null,
                     ),
                   ),
                 )
@@ -469,7 +412,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                 IconButton(
                   icon: Icon(
                     getShapeIcon(controller.shapeFactory),
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                   onPressed: () => selectShape(null),
                 ),
@@ -503,15 +446,12 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   }
 
   void toggleFreeStyleDraw() {
-    controller.freeStyleMode = controller.freeStyleMode != FreeStyleMode.draw
-        ? FreeStyleMode.draw
-        : FreeStyleMode.none;
+    controller.freeStyleMode = controller.freeStyleMode != FreeStyleMode.draw ? FreeStyleMode.draw : FreeStyleMode.none;
   }
 
   void toggleFreeStyleErase() {
-    controller.freeStyleMode = controller.freeStyleMode != FreeStyleMode.erase
-        ? FreeStyleMode.erase
-        : FreeStyleMode.none;
+    controller.freeStyleMode =
+        controller.freeStyleMode != FreeStyleMode.erase ? FreeStyleMode.erase : FreeStyleMode.none;
   }
 
   void addText() {
@@ -528,8 +468,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
               imagesLinks: imageLinks,
             ));
     if (imageLink == null) return;
-    controller.addImage(
-        await NetworkImage(imageLink).image, const Size(100, 100));
+    controller.addImage(await NetworkImage(imageLink).image, const Size(100, 100));
   }
 
   void setFreeStyleStrokeWidth(double value) {
@@ -543,9 +482,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   void setTextFontSize(double size) {
     // Set state is just to update the current UI, the [FlutterPainter] UI updates without it
     setState(() {
-      controller.textSettings = controller.textSettings.copyWith(
-          textStyle:
-              controller.textSettings.textStyle.copyWith(fontSize: size));
+      controller.textSettings =
+          controller.textSettings.copyWith(textStyle: controller.textSettings.textStyle.copyWith(fontSize: size));
     });
   }
 
@@ -557,8 +495,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   }
 
   void setTextColor(double hue) {
-    controller.textStyle = controller.textStyle
-        .copyWith(color: HSVColor.fromAHSV(1, hue, 1, 1).toColor());
+    controller.textStyle = controller.textStyle.copyWith(color: HSVColor.fromAHSV(1, hue, 1, 1).toColor());
   }
 
   void selectShape(ShapeFactory? factory) {
@@ -567,14 +504,12 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 
   void renderAndDisplayImage() {
     if (backgroundImage == null) return;
-    final backgroundImageSize = Size(
-        backgroundImage!.width.toDouble(), backgroundImage!.height.toDouble());
+    final backgroundImageSize = Size(backgroundImage!.width.toDouble(), backgroundImage!.height.toDouble());
 
     // Render the image
     // Returns a [ui.Image] object, convert to to byte data and then to Uint8List
-    final imageFuture = controller
-        .renderImage(backgroundImageSize)
-        .then<Uint8List?>((ui.Image image) => image.pngBytes);
+    final imageFuture =
+        controller.renderImage(backgroundImageSize).then<Uint8List?>((ui.Image image) => image.pngBytes);
 
     // From here, you can write the PNG image data a file or do whatever you want with it
     // For example:
@@ -585,9 +520,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     // I am going to display it using Image.memory
 
     // Show a dialog with the image
-    showDialog(
-        context: context,
-        builder: (context) => RenderedImageDialog(imageFuture: imageFuture));
+    showDialog(context: context, builder: (context) => RenderedImageDialog(imageFuture: imageFuture));
   }
 
   void removeSelectedDrawable() {
@@ -599,16 +532,14 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     final imageDrawable = controller.selectedObjectDrawable;
     if (imageDrawable is! ImageDrawable) return;
 
-    controller.replaceDrawable(
-        imageDrawable, imageDrawable.copyWith(flipped: !imageDrawable.flipped));
+    controller.replaceDrawable(imageDrawable, imageDrawable.copyWith(flipped: !imageDrawable.flipped));
   }
 }
 
 class RenderedImageDialog extends StatelessWidget {
   final Future<Uint8List?> imageFuture;
 
-  const RenderedImageDialog({Key? key, required this.imageFuture})
-      : super(key: key);
+  const RenderedImageDialog({Key? key, required this.imageFuture}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -626,8 +557,7 @@ class RenderedImageDialog extends StatelessWidget {
           if (!snapshot.hasData || snapshot.data == null) {
             return const SizedBox();
           }
-          return InteractiveViewer(
-              maxScale: 10, child: Image.memory(snapshot.data!));
+          return InteractiveViewer(maxScale: 10, child: Image.memory(snapshot.data!));
         },
       ),
     );
@@ -637,8 +567,7 @@ class RenderedImageDialog extends StatelessWidget {
 class SelectStickerImageDialog extends StatelessWidget {
   final List<String> imagesLinks;
 
-  const SelectStickerImageDialog({Key? key, this.imagesLinks = const []})
-      : super(key: key);
+  const SelectStickerImageDialog({Key? key, this.imagesLinks = const []}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

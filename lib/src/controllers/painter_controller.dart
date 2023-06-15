@@ -4,17 +4,17 @@ import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'events/selected_object_drawable_removed_event.dart';
+
+import '../views/painters/painter.dart';
 import '../views/widgets/painter_controller_widget.dart';
 import 'actions/actions.dart';
-import 'drawables/image_drawable.dart';
-import 'events/events.dart';
 import 'drawables/background/background_drawable.dart';
-import 'drawables/object_drawable.dart';
-import 'settings/settings.dart';
-import '../views/painters/painter.dart';
-
 import 'drawables/drawable.dart';
+import 'drawables/image_drawable.dart';
+import 'drawables/object_drawable.dart';
+import 'events/events.dart';
+import 'events/selected_object_drawable_removed_event.dart';
+import 'settings/settings.dart';
 
 /// Controller used to control a [FlutterPainter] widget.
 ///
@@ -56,10 +56,8 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     PainterSettings settings = const PainterSettings(),
     List<Drawable>? drawables = const [],
     BackgroundDrawable? background,
-  }) : this.fromValue(PainterControllerValue(
-            settings: settings,
-            drawables: drawables ?? const [],
-            background: background));
+  }) : this.fromValue(
+            PainterControllerValue(settings: settings, drawables: drawables ?? const [], background: background));
 
   /// Create a [PainterController] from a [PainterControllerValue].
   PainterController.fromValue(PainterControllerValue value)
@@ -78,13 +76,11 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this value should only be set between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  set background(BackgroundDrawable? background) =>
-      value = value.copyWith(background: background);
+  set background(BackgroundDrawable? background) => value = value.copyWith(background: background);
 
   /// Queues used to track the actions performed on drawables in the controller.
   /// This is used to [undo] and [redo] actions.
-  Queue<ControllerAction> performedActions = DoubleLinkedQueue(),
-      unperformedActions = DoubleLinkedQueue();
+  Queue<ControllerAction> performedActions = DoubleLinkedQueue(), unperformedActions = DoubleLinkedQueue();
 
   /// Uses the [PainterControllerWidget] inherited widget to fetch the [PainterController] instance in this context.
   /// This is used internally in the library to fetch the controller at different widgets.
@@ -118,8 +114,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void insertDrawables(int index, Iterable<Drawable> drawables,
-      {bool newAction = true}) {
+  void insertDrawables(int index, Iterable<Drawable> drawables, {bool newAction = true}) {
     final action = InsertDrawablesAction(index, drawables.toList());
     action.perform(this);
     _addAction(action, newAction);
@@ -140,8 +135,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if the return value is `false`.
-  bool replaceDrawable(Drawable oldDrawable, Drawable newDrawable,
-      {bool newAction = true}) {
+  bool replaceDrawable(Drawable oldDrawable, Drawable newDrawable, {bool newAction = true}) {
     final action = ReplaceDrawableAction(oldDrawable, newDrawable);
     final value = action.perform(this);
     if (value) _addAction(action, newAction);
@@ -290,8 +284,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// ```
   void addImage(ui.Image image, [Size? size]) {
     // Calculate the center of the painter
-    final renderBox =
-        painterKey.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox = painterKey.currentContext?.findRenderObject() as RenderBox?;
     final center = renderBox == null
         ? Offset.zero
         : Offset(
@@ -304,8 +297,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     if (size == null) {
       drawable = ImageDrawable(image: image, position: center);
     } else {
-      drawable = ImageDrawable.fittedToSize(
-          image: image, position: center, size: size);
+      drawable = ImageDrawable.fittedToSize(image: image, position: center, size: size);
     }
 
     addDrawables([drawable]);
@@ -316,17 +308,25 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// The size of the output image is controlled by [size].
   /// All drawables will be scaled according to that image size.
   Future<ui.Image> renderImage(Size size) async {
+    final painterSize = painterKey.currentContext?.size;
+
+    final imageSize = painterSize == null
+        ? null
+        : Size(
+            painterSize.width,
+            painterSize.width / size.aspectRatio,
+          );
+
+    print('passed: $size - imageSize: $imageSize - size: $painterSize');
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final painter = Painter(
       drawables: value.drawables,
-      scale: painterKey.currentContext?.size ?? size,
+      scale: imageSize,
       background: value.background,
     );
     painter.paint(canvas, size);
-    return await recorder
-        .endRecording()
-        .toImage(size.width.floor(), size.height.floor());
+    return await recorder.endRecording().toImage(size.width.floor(), size.height.floor());
   }
 
   /// The currently selected object drawable.
@@ -404,21 +404,16 @@ class PainterControllerValue {
   PainterControllerValue copyWith({
     PainterSettings? settings,
     List<Drawable>? drawables,
-    BackgroundDrawable? background =
-        _NoBackgroundPassedBackgroundDrawable.instance,
-    ObjectDrawable? selectedObjectDrawable =
-        _NoObjectPassedBackgroundDrawable.instance,
+    BackgroundDrawable? background = _NoBackgroundPassedBackgroundDrawable.instance,
+    ObjectDrawable? selectedObjectDrawable = _NoObjectPassedBackgroundDrawable.instance,
   }) {
     return PainterControllerValue(
       settings: settings ?? this.settings,
       drawables: drawables ?? _drawables,
-      background: background == _NoBackgroundPassedBackgroundDrawable.instance
-          ? this.background
-          : background,
-      selectedObjectDrawable:
-          selectedObjectDrawable == _NoObjectPassedBackgroundDrawable.instance
-              ? this.selectedObjectDrawable
-              : selectedObjectDrawable,
+      background: background == _NoBackgroundPassedBackgroundDrawable.instance ? this.background : background,
+      selectedObjectDrawable: selectedObjectDrawable == _NoObjectPassedBackgroundDrawable.instance
+          ? this.selectedObjectDrawable
+          : selectedObjectDrawable,
     );
   }
 
@@ -433,16 +428,14 @@ class PainterControllerValue {
   }
 
   @override
-  int get hashCode => hashValues(
-      hashList(_drawables), background, settings, selectedObjectDrawable);
+  int get hashCode => hashValues(hashList(_drawables), background, settings, selectedObjectDrawable);
 }
 
 /// Private class that is used internally to represent no
 /// [BackgroundDrawable] argument passed for [PainterControllerValue.copyWith].
 class _NoBackgroundPassedBackgroundDrawable extends BackgroundDrawable {
   /// Single instance.
-  static const _NoBackgroundPassedBackgroundDrawable instance =
-      _NoBackgroundPassedBackgroundDrawable._();
+  static const _NoBackgroundPassedBackgroundDrawable instance = _NoBackgroundPassedBackgroundDrawable._();
 
   /// Private constructor.
   const _NoBackgroundPassedBackgroundDrawable._() : super();
@@ -459,8 +452,7 @@ class _NoBackgroundPassedBackgroundDrawable extends BackgroundDrawable {
 /// [BackgroundDrawable] argument passed for [PainterControllerValue.copyWith].
 class _NoObjectPassedBackgroundDrawable extends ObjectDrawable {
   /// Single instance.
-  static const _NoObjectPassedBackgroundDrawable instance =
-      _NoObjectPassedBackgroundDrawable._();
+  static const _NoObjectPassedBackgroundDrawable instance = _NoObjectPassedBackgroundDrawable._();
 
   /// Private constructor.
   const _NoObjectPassedBackgroundDrawable._()

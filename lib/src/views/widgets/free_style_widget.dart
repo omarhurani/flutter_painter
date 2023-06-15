@@ -29,8 +29,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
     return RawGestureDetector(
       behavior: HitTestBehavior.opaque,
       gestures: {
-        _DragGestureDetector:
-            GestureRecognizerFactoryWithHandlers<_DragGestureDetector>(
+        _DragGestureDetector: GestureRecognizerFactoryWithHandlers<_DragGestureDetector>(
           () => _DragGestureDetector(
             onHorizontalDragDown: _handleHorizontalDragDown,
             onHorizontalDragUpdate: _handleHorizontalDragUpdate,
@@ -44,12 +43,10 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
   }
 
   /// Getter for [FreeStyleSettings] from `widget.controller.value` to make code more readable.
-  FreeStyleSettings get settings =>
-      PainterController.of(context).value.settings.freeStyle;
+  FreeStyleSettings get settings => PainterController.of(context).value.settings.freeStyle;
 
   /// Getter for [ShapeSettings] from `widget.controller.value` to make code more readable.
-  ShapeSettings get shapeSettings =>
-      PainterController.of(context).value.settings.shape;
+  ShapeSettings get shapeSettings => PainterController.of(context).value.settings.shape;
 
   /// Callback when the user holds their pointer(s) down onto the widget.
   void _handleHorizontalDragDown(Offset globalPosition) {
@@ -92,12 +89,10 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
     // Add the new point to a copy of the current drawable
     final newDrawable = drawable.copyWith(
-      path: List<Offset>.from(drawable.path)
-        ..add(_globalToLocal(globalPosition)),
+      path: List<Offset>.from(drawable.path)..add(_globalToLocal(globalPosition)),
     );
     // Replace the current drawable with the copy with the added point
-    PainterController.of(context)
-        .replaceDrawable(drawable, newDrawable, newAction: false);
+    PainterController.of(context).replaceDrawable(drawable, newDrawable, newAction: false);
     // Update the current drawable to be the new copy
     this.drawable = newDrawable;
   }

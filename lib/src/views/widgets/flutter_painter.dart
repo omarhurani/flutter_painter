@@ -1,41 +1,41 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import '../../controllers/events/selected_object_drawable_removed_event.dart';
-import '../../controllers/helpers/renderer_check/renderer_check.dart';
+
 import '../../controllers/drawables/drawable.dart';
-import '../../controllers/notifications/notifications.dart';
-import '../../controllers/drawables/sized1ddrawable.dart';
-import '../../controllers/drawables/shape/shape_drawable.dart';
-import '../../controllers/drawables/sized2ddrawable.dart';
 import '../../controllers/drawables/object_drawable.dart';
-import '../../controllers/events/events.dart';
-import '../../controllers/drawables/text_drawable.dart';
 import '../../controllers/drawables/path/path_drawables.dart';
-import '../../controllers/settings/settings.dart';
-import '../painters/painter.dart';
-import '../../controllers/painter_controller.dart';
+import '../../controllers/drawables/shape/shape_drawable.dart';
+import '../../controllers/drawables/sized1ddrawable.dart';
+import '../../controllers/drawables/sized2ddrawable.dart';
+import '../../controllers/drawables/text_drawable.dart';
+import '../../controllers/events/events.dart';
+import '../../controllers/events/selected_object_drawable_removed_event.dart';
 import '../../controllers/helpers/border_box_shadow.dart';
+import '../../controllers/helpers/renderer_check/renderer_check.dart';
+import '../../controllers/notifications/notifications.dart';
+import '../../controllers/painter_controller.dart';
+import '../../controllers/settings/settings.dart';
 import '../../extensions/painter_controller_helper_extension.dart';
+import '../painters/painter.dart';
 import 'painter_controller_widget.dart';
-import 'dart:math' as math;
 
 part 'free_style_widget.dart';
-part 'text_widget.dart';
 part 'object_widget.dart';
 part 'shape_widget.dart';
+part 'text_widget.dart';
 
 typedef DrawableCreatedCallback = Function(Drawable drawable);
 
 typedef DrawableDeletedCallback = Function(Drawable drawable);
 
 /// Defines the builder used with [FlutterPainter.builder] constructor.
-typedef FlutterPainterBuilderCallback = Widget Function(
-    BuildContext context, Widget painter);
+typedef FlutterPainterBuilderCallback = Widget Function(BuildContext context, Widget painter);
 
 /// Widget that allows user to draw on it
 class FlutterPainter extends StatelessWidget {
@@ -54,6 +54,8 @@ class FlutterPainter extends StatelessWidget {
   /// Callback when the [PainterSettings] of [PainterController] are updated internally.
   final ValueChanged<PainterSettings>? onPainterSettingsChanged;
 
+  final double? aspectRatio;
+
   /// The builder used to build this widget.
   ///
   /// Using the default constructor, it will default to returning the [_FlutterPainterWidget].
@@ -66,6 +68,7 @@ class FlutterPainter extends StatelessWidget {
   const FlutterPainter(
       {Key? key,
       required this.controller,
+      this.aspectRatio,
       this.onDrawableCreated,
       this.onDrawableDeleted,
       this.onSelectedObjectDrawableChanged,
@@ -80,6 +83,7 @@ class FlutterPainter extends StatelessWidget {
   const FlutterPainter.builder(
       {Key? key,
       required this.controller,
+      this.aspectRatio,
       required FlutterPainterBuilderCallback builder,
       this.onDrawableCreated,
       this.onDrawableDeleted,
@@ -100,11 +104,11 @@ class FlutterPainter extends StatelessWidget {
                 _FlutterPainterWidget(
                   key: controller.painterKey,
                   controller: controller,
+                  aspectRatio: aspectRatio,
                   onDrawableCreated: onDrawableCreated,
                   onDrawableDeleted: onDrawableDeleted,
                   onPainterSettingsChanged: onPainterSettingsChanged,
-                  onSelectedObjectDrawableChanged:
-                      onSelectedObjectDrawableChanged,
+                  onSelectedObjectDrawableChanged: onSelectedObjectDrawableChanged,
                 ));
           }),
     );
@@ -120,6 +124,8 @@ class FlutterPainter extends StatelessWidget {
 class _FlutterPainterWidget extends StatelessWidget {
   /// The controller for this painter.
   final PainterController controller;
+
+  final double? aspectRatio;
 
   /// Callback when a [Drawable] is created internally in [FlutterPainter].
   final DrawableCreatedCallback? onDrawableCreated;
@@ -137,6 +143,7 @@ class _FlutterPainterWidget extends StatelessWidget {
   const _FlutterPainterWidget(
       {Key? key,
       required this.controller,
+      this.aspectRatio,
       this.onDrawableCreated,
       this.onDrawableDeleted,
       this.onSelectedObjectDrawableChanged,
@@ -151,37 +158,21 @@ class _FlutterPainterWidget extends StatelessWidget {
             opaque: false,
             pageBuilder: (context, animation, secondaryAnimation) {
               final controller = PainterController.of(context);
+
               return NotificationListener<FlutterPainterNotification>(
                 onNotification: onNotification,
                 child: InteractiveViewer(
                   transformationController: controller.transformationController,
-                  minScale: controller.settings.scale.enabled
-                      ? controller.settings.scale.minScale
-                      : 1,
-                  maxScale: controller.settings.scale.enabled
-                      ? controller.settings.scale.maxScale
-                      : 1,
-                  panEnabled: controller.settings.scale.enabled &&
-                      (controller.freeStyleSettings.mode == FreeStyleMode.none),
+                  minScale: controller.settings.scale.enabled ? controller.settings.scale.minScale : 1,
+                  maxScale: controller.settings.scale.enabled ? controller.settings.scale.maxScale : 1,
+                  panEnabled:
+                      controller.settings.scale.enabled && (controller.freeStyleSettings.mode == FreeStyleMode.none),
                   scaleEnabled: controller.settings.scale.enabled,
-                  child: _FreeStyleWidget(
-                      // controller: controller,
-                      child: _TextWidget(
-                    // controller: controller,
-                    child: _ShapeWidget(
-                      // controller: controller,
-                      child: _ObjectWidget(
-                        // controller: controller,
-                        interactionEnabled: true,
-                        child: CustomPaint(
-                          painter: Painter(
-                            drawables: controller.value.drawables,
-                            background: controller.value.background,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )),
+                  child: Center(
+                    child: aspectRatio == null
+                        ? _PainterWidget(controller)
+                        : AspectRatio(aspectRatio: aspectRatio!, child: _PainterWidget(controller)),
+                  ),
                 ),
               );
             }));
@@ -199,5 +190,35 @@ class _FlutterPainterWidget extends StatelessWidget {
       onPainterSettingsChanged?.call(notification.settings);
     }
     return true;
+  }
+}
+
+class _PainterWidget extends StatelessWidget {
+  _PainterWidget(this.controller, {Key? key}) : super(key: key);
+
+  final PainterController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return _FreeStyleWidget(
+        // controller: controller,
+        child: _TextWidget(
+      // controller: controller,
+      child: _ShapeWidget(
+        // controller: controller,
+        child: _ObjectWidget(
+          // controller: controller,
+          interactionEnabled: true,
+          child: ClipRect(
+            child: CustomPaint(
+              painter: Painter(
+                drawables: controller.value.drawables,
+                background: controller.value.background,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ));
   }
 }
