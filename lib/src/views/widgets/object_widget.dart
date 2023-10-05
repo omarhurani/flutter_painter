@@ -104,7 +104,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     super.initState();
 
     // Listen to the stream of events from the paint controller
-    WidgetsBinding.instance?.addPostFrameCallback((timestamp) {
+    _ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timestamp) {
       controllerEventSubscription =
           PainterController.of(context).events.listen((event) {
         // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object
@@ -357,7 +357,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                             ),
                                           ),
                                         ],
-                                        if (entry.value is Sized2DDrawable) ...[
+                                        if (entry.value is Sized2DDrawable &&
+                                            entry.value
+                                                is! NodePolygonDrawable) ...[
                                           Positioned(
                                             top: objectPadding - (controlsSize),
                                             left: (size.width / 2) +
@@ -489,7 +491,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                               ),
                                             ),
                                           ),
-                                        ]
+                                        ],
                                       ],
                                     )
                                   : widget,
@@ -969,8 +971,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
             (isReversed ? -1 : 1));
     final initialLength = vertical ? initial.size.height : initial.size.width;
 
-    final totalLength = (length / initial.scale + initialLength)
-        .clamp(0, double.infinity) as double;
+    final totalLength =
+        (length / initial.scale + initialLength).clamp(0.0, double.infinity);
 
     // final double scale = initialLength == 0 ?
     //   (length*2).clamp(0.001, double.infinity) :
@@ -1062,7 +1064,8 @@ class _ObjectControlBox extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData? theme = Theme.of(context);
     if (theme == ThemeData.fallback()) theme = null;
-    final activeColor = this.activeColor ?? theme?.accentColor ?? Colors.blue;
+    final activeColor =
+        this.activeColor ?? theme?.colorScheme.secondary ?? Colors.blue;
     return AnimatedContainer(
       duration: _ObjectWidgetState.controlsTransitionDuration,
       decoration: BoxDecoration(
