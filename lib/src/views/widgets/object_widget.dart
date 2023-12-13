@@ -140,12 +140,18 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   @override
   Widget build(BuildContext context) {
     final drawables = this.drawables;
+    final drawableAirTransformable = controller?.selectedObjectDrawable != null && controller?.shapeSettings.factory == null ;
+    final selectedDrawableEntry = drawableAirTransformable ? MapEntry<int, ObjectDrawable> (drawables.indexOf(controller!.selectedObjectDrawable!), controller!.selectedObjectDrawable!) : MapEntry<int, ObjectDrawable> (0, TextDrawable(position: Offset(0,0), text: '', ));
     return LayoutBuilder(builder: (context, constraints) {
       return Stack(
         children: [
           Positioned.fill(
               child: GestureDetector(
-                  onTap: onBackgroundTapped, child: widget.child)),
+                  onTap: onBackgroundTapped,
+                  onScaleStart: drawableAirTransformable ? (details) => onDrawableScaleStart(selectedDrawableEntry, details) : null,
+                  onScaleUpdate: drawableAirTransformable ? (details) => onDrawableScaleUpdate(selectedDrawableEntry, details) : null,
+                  onScaleEnd: drawableAirTransformable ? (_) => onDrawableScaleEnd(selectedDrawableEntry) : null, 
+                  child: widget.child)),
           ...drawables.asMap().entries.map((entry) {
             final drawable = entry.value;
             final selected = drawable == controller?.selectedObjectDrawable;
