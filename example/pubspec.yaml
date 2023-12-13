@@ -4,17 +4,17 @@ publish_to: none
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ^3.2.0
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_painter:
     path: ../
-  phosphor_flutter: ^2.0.0
+  phosphor_flutter: ^2.0.1
 
 dev_dependencies:
-  flutter_lints: ^2.0.1
+  flutter_lints: ^3.0.1
   flutter_test:
     sdk: flutter
 

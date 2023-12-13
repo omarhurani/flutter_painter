@@ -6,10 +6,7 @@ class _TextWidget extends StatefulWidget {
   final Widget child;
 
   /// Creates a [_TextWidget] with the given [controller] and [child] widget.
-  const _TextWidget({
-    Key? key,
-    required this.child,
-  }) : super(key: key);
+  const _TextWidget({required this.child});
 
   @override
   _TextWidgetState createState() => _TextWidgetState();
@@ -152,11 +149,11 @@ class EditTextWidget extends StatefulWidget {
   final bool isNew;
 
   const EditTextWidget({
-    Key? key,
+    super.key,
     required this.controller,
     required this.drawable,
     this.isNew = false,
-  }) : super(key: key);
+  });
 
   @override
   EditTextWidgetState createState() => EditTextWidgetState();

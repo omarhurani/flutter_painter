@@ -6,10 +6,7 @@ class _FreeStyleWidget extends StatefulWidget {
   final Widget child;
 
   /// Creates a [_FreeStyleWidget] with the given [controller], [child] widget.
-  const _FreeStyleWidget({
-    Key? key,
-    required this.child,
-  }) : super(key: key);
+  const _FreeStyleWidget({required this.child});
 
   @override
   _FreeStyleWidgetState createState() => _FreeStyleWidgetState();
@@ -104,7 +101,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
   /// Callback when the user removes all pointers from the widget.
   void _handleHorizontalDragUp() {
-    DrawableCreatedNotification(drawable).dispatch(context);
+    DrawableCreatedNotification(drawable!).dispatch(context);
 
     /// Reset the current drawable for the user to draw a new one next time
     drawable = null;

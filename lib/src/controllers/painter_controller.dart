@@ -62,11 +62,10 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
             background: background));
 
   /// Create a [PainterController] from a [PainterControllerValue].
-  PainterController.fromValue(PainterControllerValue value)
+  PainterController.fromValue(super.value)
       : _eventsSteamController = StreamController<PainterEvent>.broadcast(),
         painterKey = GlobalKey(),
-        transformationController = TransformationController(),
-        super(value);
+        transformationController = TransformationController();
 
   /// The stream of [PainterEvent]s dispatched from this controller.
   ///

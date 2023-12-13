@@ -12,10 +12,9 @@ class _ObjectWidget extends StatefulWidget {
 
   /// Creates a [_ObjectWidget] with the given [controller], [child] widget.
   const _ObjectWidget({
-    Key? key,
     required this.child,
     this.interactionEnabled = true,
-  }) : super(key: key);
+  });
 
   @override
   _ObjectWidgetState createState() => _ObjectWidgetState();
@@ -140,17 +139,36 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   @override
   Widget build(BuildContext context) {
     final drawables = this.drawables;
-    final drawableAirTransformable = controller?.selectedObjectDrawable != null && controller?.shapeSettings.factory == null ;
-    final selectedDrawableEntry = drawableAirTransformable ? MapEntry<int, ObjectDrawable> (drawables.indexOf(controller!.selectedObjectDrawable!), controller!.selectedObjectDrawable!) : MapEntry<int, ObjectDrawable> (0, TextDrawable(position: Offset(0,0), text: '', ));
+    final drawableAirTransformable =
+        controller?.selectedObjectDrawable != null &&
+            controller?.shapeSettings.factory == null;
+    final selectedDrawableEntry = drawableAirTransformable
+        ? MapEntry<int, ObjectDrawable>(
+            drawables.indexOf(controller!.selectedObjectDrawable!),
+            controller!.selectedObjectDrawable!)
+        : MapEntry<int, ObjectDrawable>(
+            0,
+            TextDrawable(
+              position: const Offset(0, 0),
+              text: '',
+            ));
     return LayoutBuilder(builder: (context, constraints) {
       return Stack(
         children: [
           Positioned.fill(
               child: GestureDetector(
                   onTap: onBackgroundTapped,
-                  onScaleStart: drawableAirTransformable ? (details) => onDrawableScaleStart(selectedDrawableEntry, details) : null,
-                  onScaleUpdate: drawableAirTransformable ? (details) => onDrawableScaleUpdate(selectedDrawableEntry, details) : null,
-                  onScaleEnd: drawableAirTransformable ? (_) => onDrawableScaleEnd(selectedDrawableEntry) : null, 
+                  onScaleStart: drawableAirTransformable
+                      ? (details) =>
+                          onDrawableScaleStart(selectedDrawableEntry, details)
+                      : null,
+                  onScaleUpdate: drawableAirTransformable
+                      ? (details) =>
+                          onDrawableScaleUpdate(selectedDrawableEntry, details)
+                      : null,
+                  onScaleEnd: drawableAirTransformable
+                      ? (_) => onDrawableScaleEnd(selectedDrawableEntry)
+                      : null,
                   child: widget.child)),
           ...drawables.asMap().entries.map((entry) {
             final drawable = entry.value;
@@ -1044,10 +1062,9 @@ class _ObjectControlBox extends StatelessWidget {
   ///
   /// By default, it will be a [BoxShape.rectangle] shape and not active.
   const _ObjectControlBox({
-    Key? key,
     this.shape = BoxShape.rectangle,
     this.active = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

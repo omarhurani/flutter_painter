@@ -11,6 +11,5 @@ import 'drawable_notification.dart';
 class SelectedObjectDrawableUpdatedNotification
     extends DrawableNotification<ObjectDrawable?> {
   /// Creates a [SelectedObjectDrawableUpdatedNotification] with the given [drawable].
-  SelectedObjectDrawableUpdatedNotification(ObjectDrawable? drawable)
-      : super(drawable);
+  SelectedObjectDrawableUpdatedNotification(super.drawable);
 }

@@ -11,22 +11,14 @@ abstract class Sized2DDrawable extends ObjectDrawable {
   /// Creates a new [Sized2DDrawable] with the given [size] and [painting].
   const Sized2DDrawable({
     required this.size,
-    required Offset position,
-    double rotationAngle = 0,
-    double scale = 1,
-    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints =
-        const <ObjectDrawableAssist, Paint>{},
-    bool locked = false,
-    bool hidden = false,
-  }) : super(
-            position: position,
-            rotationAngle: rotationAngle,
-            scale: scale,
-            assists: assists,
-            assistPaints: assistPaints,
-            locked: locked,
-            hidden: hidden);
+    required super.position,
+    super.rotationAngle,
+    super.scale,
+    super.assists,
+    super.assistPaints,
+    super.locked,
+    super.hidden,
+  });
 
   /// Getter for padding of drawable.
   ///
