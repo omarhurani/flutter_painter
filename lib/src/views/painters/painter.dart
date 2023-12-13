@@ -27,7 +27,7 @@ class Painter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // This is to allow [_scale] to be upgraded to non-nullable after checking for null
-    final _scale = scale;
+    final scale = this.scale;
 
     // Draw the background if it was provided
     if (background != null && background!.isNotHidden) {
@@ -36,10 +36,10 @@ class Painter extends CustomPainter {
 
     // If a scale size is being used, save the canvas (with the background), scale it
     // and then proceed to drawing the drawables
-    if (_scale != null) {
+    if (scale != null) {
       canvas.save();
       canvas.transform(Matrix4.identity()
-          .scaled(size.width / _scale.width, size.height / _scale.height)
+          .scaled(size.width / scale.width, size.height / scale.height)
           .storage);
     }
 
@@ -48,13 +48,13 @@ class Painter extends CustomPainter {
     // Draw all the drawables
     for (final drawable
         in drawables.where((drawable) => drawable.isNotHidden)) {
-      drawable.draw(canvas, _scale ?? size);
+      drawable.draw(canvas, scale ?? size);
     }
 
     canvas.restore();
 
     // If a scale size is being used, restore the saved canvas, which will scale all the drawn drawables
-    if (_scale != null) {
+    if (scale != null) {
       canvas.restore();
     }
   }

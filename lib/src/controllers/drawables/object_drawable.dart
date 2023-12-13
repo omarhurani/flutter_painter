@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'drawable.dart';
@@ -61,9 +60,8 @@ abstract class ObjectDrawable extends Drawable {
     this.assists = const <ObjectDrawableAssist>{},
     this.assistPaints = const <ObjectDrawableAssist, Paint>{},
     this.locked = false,
-    bool hidden = false,
-  })  : scale = scale < minScale ? minScale : scale,
-        super(hidden: hidden);
+    super.hidden,
+  }) : scale = scale < minScale ? minScale : scale;
 
   /// Draws any assist lines that the object has on [canvas] with [size].
   void drawAssists(Canvas canvas, Size size) {

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'path_drawable.dart';
 
@@ -9,10 +7,10 @@ class EraseDrawable extends PathDrawable {
   ///
   /// The path will be erased with the passed [strokeWidth] if provided.
   EraseDrawable({
-    required List<Offset> path,
-    double strokeWidth = 1,
-    bool hidden = false,
-  }) : super(path: path, strokeWidth: strokeWidth, hidden: hidden);
+    required super.path,
+    super.strokeWidth,
+    super.hidden,
+  });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override

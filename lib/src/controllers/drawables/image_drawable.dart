@@ -1,7 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/rendering.dart';
-
 import 'object_drawable.dart';
 
 /// A drawable of an image as an object.
@@ -14,24 +12,16 @@ class ImageDrawable extends ObjectDrawable {
 
   /// Creates an [ImageDrawable] with the given [image].
   ImageDrawable({
-    required Offset position,
-    double rotationAngle = 0,
-    double scale = 1,
-    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints =
-        const <ObjectDrawableAssist, Paint>{},
-    bool locked = false,
-    bool hidden = false,
+    required super.position,
+    super.rotationAngle,
+    super.scale,
+    super.assists,
+    super.assistPaints,
+    super.locked,
+    super.hidden,
     required this.image,
     this.flipped = false,
-  }) : super(
-            position: position,
-            rotationAngle: rotationAngle,
-            scale: scale,
-            assists: assists,
-            assistPaints: assistPaints,
-            hidden: hidden,
-            locked: locked);
+  });
 
   /// Creates an [ImageDrawable] with the given [image], and calculates the scale based on the given [size].
   /// The scale will be calculated such that the size of the drawable fits into the provided size.

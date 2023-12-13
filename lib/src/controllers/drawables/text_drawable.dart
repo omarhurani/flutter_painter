@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import 'object_drawable.dart';
@@ -23,30 +21,24 @@ class TextDrawable extends ObjectDrawable {
   /// The path will be drawn with the passed [style] if provided.
   TextDrawable({
     required this.text,
-    required Offset position,
+    required super.position,
     double rotation = 0,
-    double scale = 1,
+    super.scale,
     this.style = const TextStyle(
       fontSize: 14,
       color: Colors.black,
     ),
     this.direction = TextDirection.ltr,
-    bool locked = false,
-    bool hidden = false,
-    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
+    super.locked,
+    super.hidden,
+    super.assists,
   })  : textPainter = TextPainter(
           text: TextSpan(text: text, style: style),
           textAlign: TextAlign.center,
-          textScaleFactor: scale,
+          textScaler: TextScaler.linear(scale),
           textDirection: direction,
         ),
-        super(
-            position: position,
-            rotationAngle: rotation,
-            scale: scale,
-            assists: assists,
-            locked: locked,
-            hidden: hidden);
+        super(rotationAngle: rotation);
 
   /// Draws the text on the provided [canvas] of size [size].
   @override

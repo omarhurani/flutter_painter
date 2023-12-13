@@ -1,6 +1,3 @@
-import 'dart:typed_data';
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
@@ -12,25 +9,22 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
+    return const MaterialApp(
+      home: FlutterPainterExample(),
       title: "Flutter Painter Example",
-      theme: ThemeData(
-          primaryColor: Colors.brown, accentColor: Colors.amberAccent),
-      home: const FlutterPainterExample(),
     );
   }
 }
 
 class FlutterPainterExample extends StatefulWidget {
-  const FlutterPainterExample({Key? key}) : super(key: key);
+  const FlutterPainterExample({super.key});
 
   @override
-  _FlutterPainterExampleState createState() => _FlutterPainterExampleState();
+  State<FlutterPainterExample> createState() => _FlutterPainterExampleState();
 }
 
 class _FlutterPainterExampleState extends State<FlutterPainterExample> {
@@ -133,8 +127,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                   actions: [
                     // Delete the selected drawable
                     IconButton(
-                      icon: const Icon(
-                        PhosphorIcons.trash,
+                      icon: PhosphorIcon(
+                        PhosphorIcons.trash(),
                       ),
                       onPressed: controller.selectedObjectDrawable == null
                           ? null
@@ -152,15 +146,15 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                     ),
                     // Redo action
                     IconButton(
-                      icon: const Icon(
-                        PhosphorIcons.arrowClockwise,
+                      icon: PhosphorIcon(
+                        PhosphorIcons.arrowClockwise(),
                       ),
                       onPressed: controller.canRedo ? redo : null,
                     ),
                     // Undo action
                     IconButton(
-                      icon: const Icon(
-                        PhosphorIcons.arrowCounterClockwise,
+                      icon: PhosphorIcon(
+                        PhosphorIcons.arrowCounterClockwise(),
                       ),
                       onPressed: controller.canUndo ? undo : null,
                     ),
@@ -170,10 +164,10 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         ),
         // Generate image
         floatingActionButton: FloatingActionButton(
-          child: const Icon(
-            PhosphorIcons.imageFill,
-          ),
           onPressed: renderAndDisplayImage,
+          child: PhosphorIcon(
+            PhosphorIcons.image(PhosphorIconsStyle.fill),
+          ),
         ),
         body: Stack(
           children: [
@@ -394,38 +388,38 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
             children: [
               // Free-style eraser
               IconButton(
-                icon: Icon(
-                  PhosphorIcons.eraser,
+                icon: PhosphorIcon(
+                  PhosphorIcons.eraser(),
                   color: controller.freeStyleMode == FreeStyleMode.erase
-                      ? Theme.of(context).accentColor
+                      ? Theme.of(context).colorScheme.secondary
                       : null,
                 ),
                 onPressed: toggleFreeStyleErase,
               ),
               // Free-style drawing
               IconButton(
-                icon: Icon(
-                  PhosphorIcons.scribbleLoop,
+                icon: PhosphorIcon(
+                  PhosphorIcons.scribbleLoop(),
                   color: controller.freeStyleMode == FreeStyleMode.draw
-                      ? Theme.of(context).accentColor
+                      ? Theme.of(context).colorScheme.secondary
                       : null,
                 ),
                 onPressed: toggleFreeStyleDraw,
               ),
               // Add text
               IconButton(
-                icon: Icon(
-                  PhosphorIcons.textT,
+                icon: PhosphorIcon(
+                  PhosphorIcons.textT(),
                   color: textFocusNode.hasFocus
-                      ? Theme.of(context).accentColor
+                      ? Theme.of(context).colorScheme.secondary
                       : null,
                 ),
                 onPressed: addText,
               ),
               // Add sticker image
               IconButton(
-                icon: const Icon(
-                  PhosphorIcons.sticker,
+                icon: PhosphorIcon(
+                  PhosphorIcons.sticker(),
                 ),
                 onPressed: addSticker,
               ),
@@ -460,7 +454,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                     child: Icon(
                       getShapeIcon(controller.shapeFactory),
                       color: controller.shapeFactory != null
-                          ? Theme.of(context).accentColor
+                          ? Theme.of(context).colorScheme.secondary
                           : null,
                     ),
                   ),
@@ -469,7 +463,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                 IconButton(
                   icon: Icon(
                     getShapeIcon(controller.shapeFactory),
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                   onPressed: () => selectShape(null),
                 ),
@@ -484,14 +478,16 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   }
 
   static IconData getShapeIcon(ShapeFactory? shapeFactory) {
-    if (shapeFactory is LineFactory) return PhosphorIcons.lineSegment;
-    if (shapeFactory is ArrowFactory) return PhosphorIcons.arrowUpRight;
+    if (shapeFactory is LineFactory) return PhosphorIcons.lineSegment();
+    if (shapeFactory is ArrowFactory) return PhosphorIcons.arrowUpRight();
     if (shapeFactory is DoubleArrowFactory) {
-      return PhosphorIcons.arrowsHorizontal;
+      return PhosphorIcons.arrowsHorizontal();
     }
-    if (shapeFactory is RectangleFactory) return PhosphorIcons.rectangle;
-    if (shapeFactory is OvalFactory) return PhosphorIcons.circle;
-    return PhosphorIcons.polygon;
+    if (shapeFactory is RectangleFactory) {
+      return PhosphorIcons.rectangle();
+    }
+    if (shapeFactory is OvalFactory) return PhosphorIcons.circle();
+    return PhosphorIcons.polygon();
   }
 
   void undo() {
@@ -607,8 +603,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 class RenderedImageDialog extends StatelessWidget {
   final Future<Uint8List?> imageFuture;
 
-  const RenderedImageDialog({Key? key, required this.imageFuture})
-      : super(key: key);
+  const RenderedImageDialog({super.key, required this.imageFuture});
 
   @override
   Widget build(BuildContext context) {
@@ -637,8 +632,7 @@ class RenderedImageDialog extends StatelessWidget {
 class SelectStickerImageDialog extends StatelessWidget {
   final List<String> imagesLinks;
 
-  const SelectStickerImageDialog({Key? key, this.imagesLinks = const []})
-      : super(key: key);
+  const SelectStickerImageDialog({super.key, this.imagesLinks = const []});
 
   @override
   Widget build(BuildContext context) {

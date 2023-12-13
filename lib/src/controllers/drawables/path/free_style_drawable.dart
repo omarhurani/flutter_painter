@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import 'path_drawable.dart';
@@ -13,18 +11,17 @@ class FreeStyleDrawable extends PathDrawable {
   ///
   /// The path will be drawn with the passed [color] and [strokeWidth] if provided.
   FreeStyleDrawable({
-    required List<Offset> path,
-    double strokeWidth = 1,
+    required super.path,
+    super.strokeWidth,
     this.color = Colors.black,
-    bool hidden = false,
+    super.hidden,
   })  :
         // An empty path cannot be drawn, so it is an invalid argument.
         assert(path.isNotEmpty, 'The path cannot be an empty list'),
 
         // The line cannot have a non-positive stroke width.
         assert(strokeWidth > 0,
-            'The stroke width cannot be less than or equal to 0'),
-        super(path: path, strokeWidth: strokeWidth, hidden: hidden);
+            'The stroke width cannot be less than or equal to 0');
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override

@@ -17,23 +17,14 @@ abstract class ShapeDrawable extends ObjectDrawable {
   /// Default constructor for [ObjectDrawable].
   ShapeDrawable({
     Paint? paint,
-    required Offset position,
-    double rotationAngle = 0,
-    double scale = 1,
-    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints =
-        const <ObjectDrawableAssist, Paint>{},
-    bool locked = false,
-    bool hidden = false,
-  })  : paint = paint ?? defaultPaint,
-        super(
-            position: position,
-            rotationAngle: rotationAngle,
-            scale: scale,
-            assists: assists,
-            assistPaints: assistPaints,
-            locked: locked,
-            hidden: hidden);
+    required super.position,
+    super.rotationAngle,
+    super.scale,
+    super.assists,
+    super.assistPaints,
+    super.locked,
+    super.hidden,
+  }) : paint = paint ?? defaultPaint;
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override

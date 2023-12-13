@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
@@ -20,26 +18,16 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable {
   /// Creates a new [RectangleDrawable] with the given [size], [paint] and [borderRadius].
   RectangleDrawable({
     Paint? paint,
-    required Size size,
-    required Offset position,
-    double rotationAngle = 0,
-    double scale = 1,
-    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints =
-        const <ObjectDrawableAssist, Paint>{},
-    bool locked = false,
-    bool hidden = false,
+    required super.size,
+    required super.position,
+    super.rotationAngle,
+    super.scale,
+    super.assists,
+    super.assistPaints,
+    super.locked,
+    super.hidden,
     this.borderRadius = const BorderRadius.all(Radius.circular(5)),
-  })  : paint = paint ?? ShapeDrawable.defaultPaint,
-        super(
-            size: size,
-            position: position,
-            rotationAngle: rotationAngle,
-            scale: scale,
-            assists: assists,
-            assistPaints: assistPaints,
-            locked: locked,
-            hidden: hidden);
+  }) : paint = paint ?? ShapeDrawable.defaultPaint;
 
   /// Getter for padding of drawable.
   ///
