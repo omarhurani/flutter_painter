@@ -1,13 +1,13 @@
 name: flutter_painter
-version: 1.0.1
+version: 1.0.2
 description: A Flutter widget to draw scribbles, text, shapes and images on a background image or color
 homepage: https://github.com/omarhurani/flutter_painter
 repository: https://github.com/omarhurani/flutter_painter
 issue_tracker: https://github.com/omarhurani/flutter_painter/issues
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=1.17.0"
+  sdk: '>=2.14.0 <3.0.0'
+  flutter: '>=1.17.0'
 
 dependencies:
   flutter:
@@ -20,5 +20,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^0.3.0-dev.1
-
-flutter:
