@@ -4,6 +4,7 @@ import '../controllers/factories/shape_factory.dart';
 import '../controllers/painter_controller.dart';
 import '../controllers/settings/settings.dart';
 import '../controllers/drawables/drawables.dart';
+import 'paint_copy_extension.dart';
 
 /// Adds extra getters and setters in [PainterController] to make it easier to use.
 ///
@@ -17,6 +18,38 @@ extension PainterControllerHelper on PainterController {
 
   /// The unmodifiable list of drawables directly from `value`.
   List<Drawable> get drawables => value.drawables;
+
+  /// Replaces a color-bearing [drawable] with a copy using [color].
+  ///
+  /// [FreeStyleDrawable], [ShapeDrawable], and [TextDrawable] are supported.
+  /// Returns `false` when [drawable] does not support colors or is not owned by
+  /// this controller.
+  ///
+  /// The replacement participates in undo and redo. Set [newAction] to `false`
+  /// to merge this update with the previous controller action.
+  bool setDrawableColor(
+    Drawable drawable,
+    Color color, {
+    bool newAction = true,
+  }) {
+    final Drawable? coloredDrawable;
+    if (drawable is FreeStyleDrawable) {
+      coloredDrawable = drawable.copyWith(color: color);
+    } else if (drawable is ShapeDrawable) {
+      coloredDrawable = drawable.copyWith(
+        paint: drawable.paint.copyWith(color: color),
+      );
+    } else if (drawable is TextDrawable) {
+      coloredDrawable = drawable.copyWith(
+        style: drawable.style.copyWith(color: color),
+      );
+    } else {
+      coloredDrawable = null;
+    }
+
+    return coloredDrawable != null &&
+        replaceDrawable(drawable, coloredDrawable, newAction: newAction);
+  }
 
   /// The object settings directly from the painter settings.
   ObjectSettings get objectSettings => settings.object;

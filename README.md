@@ -232,6 +232,22 @@ if (imageDrawable is ImageDrawable) {
 }
 ```
 
+### Updating Drawable Colors
+
+Use `setDrawableColor` to update an existing free-style, shape, or text
+drawable. The controller replaces the stored drawable, preserves object
+selection, and records the change for undo and redo.
+
+```dart
+final selectedDrawable = controller.selectedObjectDrawable;
+if (selectedDrawable is ShapeDrawable) {
+  controller.setDrawableColor(selectedDrawable, Colors.blue);
+}
+
+final stroke = controller.drawables.whereType<FreeStyleDrawable>().first;
+controller.setDrawableColor(stroke, Colors.red);
+```
+
 ### Rendering Image
 
 From the `PainterController`, you can render the contents of `FlutterPainter` as a PNG-encoded `ui.Image` object. In order to do that, you need to provide the size of the output image. All the drawings will be scaled according to that size.

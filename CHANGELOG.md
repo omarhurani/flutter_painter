@@ -7,6 +7,7 @@
 * Allow images to opt out of free-style erasing and remain interactive in erase mode ([Issue #85](https://github.com/omarhurani/flutter_painter/issues/85)).
 * Allow two-pointer zooming while free-style mode is active without leaving an accidental stroke, and keep drawing responsive after zooming ([Issue #64](https://github.com/omarhurani/flutter_painter/issues/64), [Issue #72](https://github.com/omarhurani/flutter_painter/issues/72), [Issue #76](https://github.com/omarhurani/flutter_painter/issues/76)).
 * Add configurable opacity to `ImageDrawable` ([Issue #30](https://github.com/omarhurani/flutter_painter/issues/30)).
+* Add undo-aware color updates for existing free-style, shape, and text drawables ([Issue #42](https://github.com/omarhurani/flutter_painter/issues/42), [Issue #66](https://github.com/omarhurani/flutter_painter/issues/66)).
 
 ## [2.0.0] - 2026-07-28
 

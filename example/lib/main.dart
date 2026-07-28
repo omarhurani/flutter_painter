@@ -42,6 +42,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   static const double maxHue = 359.8;
 
   bool updatingImageOpacity = false;
+  bool updatingSelectedShapeColor = false;
   FocusNode textFocusNode = FocusNode();
   late PainterController controller;
   ui.Image? backgroundImage;
@@ -431,6 +432,31 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                               ],
                             ),
                           ],
+                          if (controller.selectedObjectDrawable
+                              case final ShapeDrawable shapeDrawable) ...[
+                            const Divider(),
+                            const Text("Selected Shape Settings"),
+                            Row(
+                              children: [
+                                const Expanded(flex: 1, child: Text("Color")),
+                                Expanded(
+                                  flex: 3,
+                                  child: Slider.adaptive(
+                                    min: 0,
+                                    max: maxHue,
+                                    value: HSVColor.fromColor(
+                                      shapeDrawable.paint.color,
+                                    ).hue,
+                                    activeColor: shapeDrawable.paint.color,
+                                    onChangeStart:
+                                        startSelectedShapeColorUpdate,
+                                    onChanged: setSelectedShapeColor,
+                                    onChangeEnd: endSelectedShapeColorUpdate,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -707,6 +733,26 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 
   void endImageOpacityUpdate(double _) {
     updatingImageOpacity = false;
+  }
+
+  void startSelectedShapeColorUpdate(double _) {
+    updatingSelectedShapeColor = false;
+  }
+
+  void setSelectedShapeColor(double hue) {
+    final selectedDrawable = controller.selectedObjectDrawable;
+    if (selectedDrawable is! ShapeDrawable) return;
+
+    final replaced = controller.setDrawableColor(
+      selectedDrawable,
+      HSVColor.fromAHSV(1, hue, 1, 1).toColor(),
+      newAction: !updatingSelectedShapeColor,
+    );
+    if (replaced) updatingSelectedShapeColor = true;
+  }
+
+  void endSelectedShapeColorUpdate(double _) {
+    updatingSelectedShapeColor = false;
   }
 
   void editSelectedTextDrawable() {
