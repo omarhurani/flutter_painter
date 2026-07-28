@@ -7,43 +7,59 @@ import '../drawables/drawable.dart';
 import '../painter_controller.dart';
 import 'action.dart';
 
-/// An action of merging all drawables in the [PainterController] into a [GroupedDrawable].
+/// An action of merging drawables in the [PainterController] into a
+/// [GroupedDrawable].
 class MergeDrawablesAction extends ControllerAction<void, void> {
+  /// Whether drawables that opt out of erasing should remain outside the group.
+  final bool erasableOnly;
+
+  List<Drawable>? _previousDrawables;
+
   /// Creates a [MergeDrawablesAction].
-  MergeDrawablesAction();
+  MergeDrawablesAction({this.erasableOnly = false});
 
   /// Performs the action.
   ///
-  /// Removes all drawables from [controller.value] and inserts a new [GroupedDrawable]
-  /// containing all the removed drawables.
+  /// Removes the affected drawables from [controller.value] and inserts a new
+  /// [GroupedDrawable] containing them.
   ///
-  /// Also sets the selected object drawable to `null` since the selected object drawable would
-  /// be removed and replaced with the [GroupedDrawable].
+  /// Also deselects the selected object when it is included in the group.
   @protected
   @override
   void perform$(PainterController controller) {
     final value = controller.value;
 
     final currentDrawables = List<Drawable>.from(value.drawables);
-    final groupedDrawable = GroupedDrawable(drawables: currentDrawables);
-    controller.value = value.copyWith(drawables: [groupedDrawable]);
-    controller.deselectObjectDrawable(isRemoved: true);
+    _previousDrawables = currentDrawables;
+
+    final groupedDrawables = erasableOnly
+        ? currentDrawables.where((drawable) => drawable.erasable).toList()
+        : currentDrawables;
+    final protectedDrawables = erasableOnly
+        ? currentDrawables.where((drawable) => !drawable.erasable).toList()
+        : const <Drawable>[];
+    final groupedDrawable = GroupedDrawable(drawables: groupedDrawables);
+    controller.value = value.copyWith(
+      drawables: [groupedDrawable, ...protectedDrawables],
+    );
+
+    final selectedObject = value.selectedObjectDrawable;
+    if (selectedObject != null && (!erasableOnly || selectedObject.erasable)) {
+      controller.deselectObjectDrawable(isRemoved: true);
+    }
   }
 
   /// Un-performs the action.
   ///
-  /// Removes the [GroupedDrawable] from [controller.value] and inserts back
-  /// [GroupedDrawable.drawables] from it.
+  /// Restores the exact drawable list from before the action.
   @protected
   @override
   void unperform$(PainterController controller) {
+    final previousDrawables = _previousDrawables;
+    if (previousDrawables == null) return;
+
     final value = controller.value;
-    final currentDrawables = List<Drawable>.from(value.drawables);
-    final last = currentDrawables.last;
-    if (last is! GroupedDrawable) return;
-    final drawables = last.drawables;
-    currentDrawables.removeLast();
-    currentDrawables.addAll(drawables);
-    controller.value = value.copyWith(drawables: currentDrawables);
+    controller.value = value.copyWith(drawables: previousDrawables);
+    _previousDrawables = null;
   }
 }

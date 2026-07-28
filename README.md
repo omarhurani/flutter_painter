@@ -227,6 +227,20 @@ Uint8List? renderImage(Size size) async {
 
 Flutter Painter supports free-style erasing of drawables. However, whenever you use the erase mode, all object drawables will be locked in place and cannot be modified. This is done because erasing is just another layer, and if objects stayed movable, you'd be able to move from under and around erased areas of the painting, which doesn't make sense. If you un-do the action of using the erase mode, the objects will be unlocked again and you'll be able to move them.
 
+Images can opt out of this behavior. A non-erasable image stays above erased
+content and remains selectable, movable, scalable, and rotatable while erase
+mode is active:
+
+```dart
+controller.addDrawables([
+  ImageDrawable(
+    image: sticker,
+    position: const Offset(120, 120),
+    erasable: false,
+  ),
+]);
+```
+
 ### Extensions
 Flutter Painter consists of 3 libraries:
 

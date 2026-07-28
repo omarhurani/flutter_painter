@@ -10,6 +10,12 @@ class ImageDrawable extends ObjectDrawable {
   /// Whether the image is flipped or not.
   final bool flipped;
 
+  /// Whether free-style erasing can affect this image.
+  ///
+  /// Non-erasable images remain selectable and movable in erase mode.
+  @override
+  final bool erasable;
+
   /// Creates an [ImageDrawable] with the given [image].
   ImageDrawable({
     required super.position,
@@ -21,6 +27,7 @@ class ImageDrawable extends ObjectDrawable {
     super.hidden,
     required this.image,
     this.flipped = false,
+    this.erasable = true,
   });
 
   /// Creates an [ImageDrawable] with the given [image], and calculates the scale based on the given [size].
@@ -39,6 +46,7 @@ class ImageDrawable extends ObjectDrawable {
     bool hidden = false,
     required Image image,
     bool flipped = false,
+    bool erasable = true,
   }) : this(
          position: position,
          rotationAngle: rotationAngle,
@@ -47,6 +55,7 @@ class ImageDrawable extends ObjectDrawable {
          assistPaints: assistPaints,
          image: image,
          flipped: flipped,
+         erasable: erasable,
          hidden: hidden,
          locked: locked,
        );
@@ -61,6 +70,7 @@ class ImageDrawable extends ObjectDrawable {
     double? scale,
     Image? image,
     bool? flipped,
+    bool? erasable,
     bool? locked,
   }) {
     return ImageDrawable(
@@ -71,6 +81,7 @@ class ImageDrawable extends ObjectDrawable {
       scale: scale ?? this.scale,
       image: image ?? this.image,
       flipped: flipped ?? this.flipped,
+      erasable: erasable ?? this.erasable,
       locked: locked ?? this.locked,
     );
   }

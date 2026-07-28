@@ -223,6 +223,16 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     _addAction(action, newAction);
   }
 
+  /// Groups only drawables that can be erased.
+  ///
+  /// Drawables with [Drawable.erasable] set to `false` remain outside the
+  /// group so they can stay interactive above the erased content.
+  void groupErasableDrawables({bool newAction = true}) {
+    final action = MergeDrawablesAction(erasableOnly: true);
+    action.perform(this);
+    _addAction(action, newAction);
+  }
+
   void _addAction(ControllerAction action, bool newAction) {
     performedActions.add(action);
     if (!newAction) _mergeAction();

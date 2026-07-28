@@ -5,6 +5,11 @@ abstract class Drawable {
   /// Whether the drawable is hidden or not.
   final bool hidden;
 
+  /// Whether free-style erasing can affect this drawable.
+  ///
+  /// Custom drawables can override this to remain above the erased content.
+  bool get erasable => true;
+
   /// Default constructor.
   const Drawable({this.hidden = false});
 

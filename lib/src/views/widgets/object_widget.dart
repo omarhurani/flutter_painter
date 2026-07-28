@@ -153,6 +153,10 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
               final drawable = entry.value;
               final selected = drawable == controller?.selectedObjectDrawable;
               final size = drawable.getSize(maxWidth: constraints.maxWidth);
+              final interactionEnabled =
+                  freeStyleSettings.mode == FreeStyleMode.none ||
+                  (freeStyleSettings.mode == FreeStyleMode.erase &&
+                      !drawable.erasable);
               final widget = Padding(
                 padding: EdgeInsets.all(objectPadding),
                 child: SizedBox(width: size.width, height: size.height),
@@ -166,7 +170,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                   angle: drawable.rotationAngle,
                   transformHitTests: true,
                   child: Container(
-                    child: freeStyleSettings.mode != FreeStyleMode.none
+                    child: !interactionEnabled
                         ? widget
                         : MouseRegion(
                             cursor: drawable.locked

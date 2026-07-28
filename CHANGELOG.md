@@ -4,6 +4,7 @@
 * Add free-style drawing state and lifecycle callbacks, including cancellation cleanup ([Issue #52](https://github.com/omarhurani/flutter_painter/issues/52)).
 * Add configurable text alignment for editing and rendered `TextDrawable`s ([Issue #49](https://github.com/omarhurani/flutter_painter/issues/49)).
 * Add `TriangleDrawable` and `TriangleFactory` support ([Issue #65](https://github.com/omarhurani/flutter_painter/issues/65)).
+* Allow images to opt out of free-style erasing and remain interactive in erase mode ([Issue #85](https://github.com/omarhurani/flutter_painter/issues/85)).
 
 ## [2.0.0] - 2026-07-28
 

@@ -29,6 +29,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
         _DragGestureDetector:
             GestureRecognizerFactoryWithHandlers<_DragGestureDetector>(
               () => _DragGestureDetector(
+                shouldAcceptPointer: _shouldAcceptPointer,
                 onHorizontalDragDown: _handleHorizontalDragDown,
                 onHorizontalDragUpdate: _handleHorizontalDragUpdate,
                 onHorizontalDragUp: _handleHorizontalDragUp,
@@ -48,6 +49,42 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
   /// Getter for [ShapeSettings] from `widget.controller.value` to make code more readable.
   ShapeSettings get shapeSettings =>
       PainterController.of(context).value.settings.shape;
+
+  bool _shouldAcceptPointer(PointerDownEvent event) {
+    if (settings.mode != FreeStyleMode.erase) return true;
+
+    final renderBox = context.findRenderObject() as RenderBox;
+    final position = renderBox.globalToLocal(event.position);
+    final controller = PainterController.of(context);
+    final transformationScale = controller.transformationController.value
+        .getMaxScaleOnAxis();
+    final objectPadding = 25 / transformationScale;
+
+    for (final drawable
+        in controller.value.drawables
+            .whereType<ObjectDrawable>()
+            .toList()
+            .reversed) {
+      if (drawable.erasable || drawable.isHidden) continue;
+
+      final offset = position - drawable.position;
+      final cosine = cos(drawable.rotationAngle);
+      final sine = sin(drawable.rotationAngle);
+      final unrotated = Offset(
+        offset.dx * cosine + offset.dy * sine,
+        -offset.dx * sine + offset.dy * cosine,
+      );
+      final size = drawable.getSize(maxWidth: renderBox.size.width);
+      final hitBounds = Rect.fromCenter(
+        center: Offset.zero,
+        width: size.width + objectPadding * 2,
+        height: size.height + objectPadding * 2,
+      );
+      if (hitBounds.contains(unrotated)) return false;
+    }
+
+    return true;
+  }
 
   /// Callback when the user holds their pointer(s) down onto the widget.
   void _handleHorizontalDragDown(Offset globalPosition) {
@@ -70,10 +107,11 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
         path: [_globalToLocal(globalPosition)],
         strokeWidth: settings.strokeWidth,
       );
-      PainterController.of(context).groupDrawables();
+      final controller = PainterController.of(context);
+      controller.groupErasableDrawables();
 
-      // Add the drawable to the controller's drawables
-      PainterController.of(context).addDrawables([drawable], newAction: false);
+      // Keep protected drawables above the erase layer.
+      controller.insertDrawables(1, [drawable], newAction: false);
     } else {
       return;
     }
@@ -154,12 +192,14 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 /// A custom recognizer that recognize at most only one gesture sequence.
 class _DragGestureDetector extends OneSequenceGestureRecognizer {
   _DragGestureDetector({
+    required this.shouldAcceptPointer,
     required this.onHorizontalDragDown,
     required this.onHorizontalDragUpdate,
     required this.onHorizontalDragUp,
     required this.onHorizontalDragCancel,
   });
 
+  final bool Function(PointerDownEvent event) shouldAcceptPointer;
   final ValueSetter<Offset> onHorizontalDragDown;
   final ValueSetter<Offset> onHorizontalDragUpdate;
   final VoidCallback onHorizontalDragUp;
@@ -169,6 +209,8 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
 
   @override
   void addPointer(PointerEvent event) {
+    if (event is PointerDownEvent && !shouldAcceptPointer(event)) return;
+
     if (!_isTrackingGesture) {
       resolve(GestureDisposition.accepted);
       startTrackingPointer(event.pointer);

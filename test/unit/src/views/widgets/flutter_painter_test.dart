@@ -1,5 +1,8 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
+import 'package:flutter_painter/src/controllers/drawables/grouped_drawable.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../widget_test_utils.dart';
@@ -210,6 +213,93 @@ void main() {
     expect(controller.canRedo, isFalse);
   });
 
+  testWidgets('non-erasable images remain interactive above the erase layer', (
+    tester,
+  ) async {
+    final image = await _createTestImage();
+    addTearDown(image.dispose);
+    final stroke = FreeStyleDrawable(
+      path: const [Offset(20, 170), Offset(280, 170)],
+      strokeWidth: 12,
+    );
+    final imageDrawable = ImageDrawable(
+      image: image,
+      position: const Offset(150, 150),
+      erasable: false,
+    );
+    final controller = PainterController(
+      drawables: [stroke, imageDrawable],
+      settings: const PainterSettings(
+        freeStyle: FreeStyleSettings(
+          mode: FreeStyleMode.erase,
+          strokeWidth: 20,
+        ),
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(buildPainter(controller));
+    await tester.pumpAndSettle();
+
+    final painterTopLeft = tester.getTopLeft(find.byType(FlutterPainter));
+    final imageCenter = painterTopLeft + imageDrawable.position;
+    await tester.tapAt(imageCenter);
+    await tester.pumpAndSettle();
+
+    expect(controller.selectedObjectDrawable, same(imageDrawable));
+
+    final moveGesture = await tester.startGesture(imageCenter);
+    await moveGesture.moveBy(const Offset(20, 20));
+    await tester.pump();
+    await moveGesture.moveBy(const Offset(30, 20));
+    await moveGesture.up();
+    await tester.pumpAndSettle();
+
+    final movedImage = controller.selectedObjectDrawable;
+    expect(movedImage, isA<ImageDrawable>());
+    expect(movedImage, isNot(same(imageDrawable)));
+    expect(movedImage!.position, isNot(imageDrawable.position));
+    expect(movedImage.erasable, isFalse);
+
+    final eraseY = movedImage.position.dy;
+    final eraseGesture = await tester.startGesture(
+      painterTopLeft + Offset(20, eraseY),
+    );
+    await eraseGesture.moveTo(painterTopLeft + Offset(120, eraseY));
+    await eraseGesture.moveTo(painterTopLeft + Offset(280, eraseY));
+    await eraseGesture.up();
+    await tester.pumpAndSettle();
+
+    expect(controller.drawables, hasLength(3));
+    final groupedDrawable = controller.drawables[0] as GroupedDrawable;
+    expect(groupedDrawable.drawables, [same(stroke)]);
+    expect(controller.drawables[1], isA<EraseDrawable>());
+    expect(controller.drawables[2], same(movedImage));
+    expect(controller.selectedObjectDrawable, isNull);
+
+    final movedImageCenter = painterTopLeft + movedImage.position;
+    await tester.tapAt(movedImageCenter);
+    await tester.pumpAndSettle();
+    expect(controller.selectedObjectDrawable, same(movedImage));
+
+    final secondMoveGesture = await tester.startGesture(movedImageCenter);
+    await secondMoveGesture.moveBy(const Offset(20, 20));
+    await tester.pump();
+    await secondMoveGesture.moveBy(const Offset(-20, 30));
+    await secondMoveGesture.up();
+    await tester.pumpAndSettle();
+    expect(
+      controller.selectedObjectDrawable!.position,
+      isNot(movedImage.position),
+    );
+
+    controller.undo();
+    controller.undo();
+
+    expect(controller.drawables, [same(stroke), same(movedImage)]);
+    expect(controller.selectedObjectDrawable, same(movedImage));
+  });
+
   testWidgets('multi-touch shape gesture does not create a null drawable', (
     tester,
   ) async {
@@ -298,4 +388,14 @@ void main() {
     expect(drawable.position, const Offset(120, 115));
     expect(drawable.size, const Size(100, 90));
   });
+}
+
+Future<ui.Image> _createTestImage() {
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+  canvas.drawRect(
+    const Rect.fromLTWH(0, 0, 40, 40),
+    Paint()..color = Colors.red,
+  );
+  return recorder.endRecording().toImage(40, 40);
 }
