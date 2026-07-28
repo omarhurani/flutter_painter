@@ -39,14 +39,15 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool> {
     final currentDrawables = List<Drawable>.from(value.drawables);
     final selectedObject = controller.value.selectedObjectDrawable;
     final isSelectedObject = oldDrawable == selectedObject;
-    currentDrawables
-        .setRange(oldDrawableIndex, oldDrawableIndex + 1, [newDrawable]);
+    currentDrawables.setRange(oldDrawableIndex, oldDrawableIndex + 1, [
+      newDrawable,
+    ]);
     controller.value = value.copyWith(
       drawables: currentDrawables,
       selectedObjectDrawable: isSelectedObject
           ? newDrawable is ObjectDrawable
-              ? (newDrawable as ObjectDrawable)
-              : selectedObject
+                ? (newDrawable as ObjectDrawable)
+                : selectedObject
           : null,
     );
     if (isSelectedObject && newDrawable is! ObjectDrawable) {
@@ -72,14 +73,15 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool> {
     final currentDrawables = List<Drawable>.from(value.drawables);
     final selectedObject = controller.value.selectedObjectDrawable;
     final isSelectedObject = newDrawable == selectedObject;
-    currentDrawables
-        .setRange(newDrawableIndex, newDrawableIndex + 1, [oldDrawable]);
+    currentDrawables.setRange(newDrawableIndex, newDrawableIndex + 1, [
+      oldDrawable,
+    ]);
     controller.value = value.copyWith(
       drawables: currentDrawables,
       selectedObjectDrawable: isSelectedObject
           ? oldDrawable is ObjectDrawable
-              ? (oldDrawable as ObjectDrawable)
-              : selectedObject
+                ? (oldDrawable as ObjectDrawable)
+                : selectedObject
           : null,
     );
     if (isSelectedObject && oldDrawable is! ObjectDrawable) {
@@ -99,17 +101,20 @@ class ReplaceDrawableAction extends ControllerAction<bool, bool> {
   ControllerAction? merge$(ControllerAction previousAction) {
     if (previousAction is AddDrawablesAction &&
         previousAction.drawables.last == oldDrawable) {
-      return AddDrawablesAction([...previousAction.drawables]
-        ..removeLast()
-        ..add(newDrawable));
+      return AddDrawablesAction(
+        [...previousAction.drawables]
+          ..removeLast()
+          ..add(newDrawable),
+      );
     }
     if (previousAction is InsertDrawablesAction &&
         previousAction.drawables.last == oldDrawable) {
       return InsertDrawablesAction(
-          previousAction.index,
-          [...previousAction.drawables]
-            ..removeLast()
-            ..add(newDrawable));
+        previousAction.index,
+        [...previousAction.drawables]
+          ..removeLast()
+          ..add(newDrawable),
+      );
     }
     if (previousAction is ReplaceDrawableAction &&
         previousAction.newDrawable == oldDrawable) {

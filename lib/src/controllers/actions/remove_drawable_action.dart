@@ -41,9 +41,7 @@ class RemoveDrawableAction extends ControllerAction<bool, bool> {
     final isSelectedObject = currentDrawables[index] == selectedObject;
     currentDrawables.removeAt(index);
     _removedIndex = index;
-    controller.value = value.copyWith(
-      drawables: currentDrawables,
-    );
+    controller.value = value.copyWith(drawables: currentDrawables);
     if (isSelectedObject) controller.deselectObjectDrawable(isRemoved: true);
     return true;
   }
@@ -77,10 +75,14 @@ class RemoveDrawableAction extends ControllerAction<bool, bool> {
   ControllerAction? merge$(ControllerAction previousAction) {
     if (previousAction is AddDrawablesAction &&
         previousAction.drawables.length == 1 &&
-        previousAction.drawables.first == drawable) return null;
+        previousAction.drawables.first == drawable) {
+      return null;
+    }
     if (previousAction is InsertDrawablesAction &&
         previousAction.drawables.length == 1 &&
-        previousAction.drawables.first == drawable) return null;
+        previousAction.drawables.first == drawable) {
+      return null;
+    }
     return super.merge$(previousAction);
   }
 }

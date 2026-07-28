@@ -22,15 +22,11 @@ class ScaleSettings {
     this.enabled = false,
     double minScale = 1,
     double maxScale = 5,
-  })  : minScale = minScale <= 0 ? 1 : minScale,
-        maxScale = maxScale >= minScale ? maxScale : minScale;
+  }) : minScale = minScale <= 0 ? 1 : minScale,
+       maxScale = maxScale >= minScale ? maxScale : minScale;
 
   /// Creates a copy of this but with the given fields replaced with the new values.
-  ScaleSettings copyWith({
-    bool? enabled,
-    double? minScale,
-    double? maxScale,
-  }) {
+  ScaleSettings copyWith({bool? enabled, double? minScale, double? maxScale}) {
     return ScaleSettings(
       enabled: enabled ?? this.enabled,
       minScale: minScale ?? this.minScale,

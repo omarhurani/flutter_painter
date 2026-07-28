@@ -101,8 +101,9 @@ abstract class ControllerActionError extends Error {
 class AlreadyPerformedError extends ControllerActionError {
   /// Creates a [AlreadyPerformedError].
   AlreadyPerformedError()
-      : super(
-            "This action cannot be performed or merged because it already has been performed.");
+    : super(
+        "This action cannot be performed or merged because it already has been performed.",
+      );
 }
 
 /// An error that occurs when [ControllerAction.unperform] is called on an action that
@@ -110,6 +111,5 @@ class AlreadyPerformedError extends ControllerActionError {
 class NotPerformedError extends ControllerActionError {
   /// Creates a [NotPerformedError].
   NotPerformedError()
-      : super(
-            "This action cannot be un-performed because it wasn't performed.");
+    : super("This action cannot be un-performed because it wasn't performed.");
 }

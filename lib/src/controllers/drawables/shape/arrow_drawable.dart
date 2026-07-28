@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
@@ -23,25 +21,15 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
   ArrowDrawable({
     Paint? paint,
     this.arrowHeadSize,
-    required double length,
-    required Offset position,
-    double rotationAngle = 0,
-    double scale = 1,
-    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints =
-        const <ObjectDrawableAssist, Paint>{},
-    bool locked = false,
-    bool hidden = false,
-  })  : paint = paint ?? ShapeDrawable.defaultPaint,
-        super(
-            length: length,
-            position: position,
-            rotationAngle: rotationAngle,
-            scale: scale,
-            assists: assists,
-            assistPaints: assistPaints,
-            locked: locked,
-            hidden: hidden);
+    required super.length,
+    required super.position,
+    super.rotationAngle,
+    super.scale,
+    super.assists,
+    super.assistPaints,
+    super.locked,
+    super.hidden,
+  }) : paint = paint ?? ShapeDrawable.defaultPaint;
 
   /// The actual arrow head size used in drawing.
   double get _arrowHeadSize => arrowHeadSize ?? paint.strokeWidth * 3;
@@ -52,8 +40,9 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
   @protected
   @override
   EdgeInsets get padding => EdgeInsets.symmetric(
-      horizontal: paint.strokeWidth / 2,
-      vertical: paint.strokeWidth / 2 + (_arrowHeadSize / 2));
+    horizontal: paint.strokeWidth / 2,
+    vertical: paint.strokeWidth / 2 + (_arrowHeadSize / 2),
+  );
 
   /// Draws the arrow on the provided [canvas] of size [size].
   @override
@@ -75,9 +64,7 @@ class ArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
     path.lineTo(position.dx + pathDx, position.dy + (arrowHeadSize / 2));
     path.lineTo(position.dx + pathDx + arrowHeadSize, position.dy);
 
-    final headPaint = paint.copyWith(
-      style: PaintingStyle.fill,
-    );
+    final headPaint = paint.copyWith(style: PaintingStyle.fill);
 
     canvas.drawPath(path, headPaint);
   }

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import 'object_drawable.dart';
@@ -23,30 +21,21 @@ class TextDrawable extends ObjectDrawable {
   /// The path will be drawn with the passed [style] if provided.
   TextDrawable({
     required this.text,
-    required Offset position,
+    required super.position,
     double rotation = 0,
-    double scale = 1,
-    this.style = const TextStyle(
-      fontSize: 14,
-      color: Colors.black,
-    ),
+    super.scale,
+    this.style = const TextStyle(fontSize: 14, color: Colors.black),
     this.direction = TextDirection.ltr,
-    bool locked = false,
-    bool hidden = false,
-    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-  })  : textPainter = TextPainter(
-          text: TextSpan(text: text, style: style),
-          textAlign: TextAlign.center,
-          textScaleFactor: scale,
-          textDirection: direction,
-        ),
-        super(
-            position: position,
-            rotationAngle: rotation,
-            scale: scale,
-            assists: assists,
-            locked: locked,
-            hidden: hidden);
+    super.locked,
+    super.hidden,
+    super.assists,
+  }) : textPainter = TextPainter(
+         text: TextSpan(text: text, style: style),
+         textAlign: TextAlign.center,
+         textScaler: TextScaler.linear(scale),
+         textDirection: direction,
+       ),
+       super(rotationAngle: rotation);
 
   /// Draws the text on the provided [canvas] of size [size].
   @override
@@ -56,8 +45,10 @@ class TextDrawable extends ObjectDrawable {
 
     // Paint the text on the canvas
     // It is shifted back by half of its width and height to be drawn in the center
-    textPainter.paint(canvas,
-        position - Offset(textPainter.width / 2, textPainter.height / 2));
+    textPainter.paint(
+      canvas,
+      position - Offset(textPainter.width / 2, textPainter.height / 2),
+    );
   }
 
   /// Creates a copy of this but with the given fields replaced with the new values.

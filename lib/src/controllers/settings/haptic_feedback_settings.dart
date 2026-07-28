@@ -12,7 +12,7 @@ enum HapticFeedbackSettings {
   medium,
 
   /// Heavy haptic feedback impact.
-  heavy
+  heavy,
 }
 
 /// An extension to add a method that performs the haptic feedback impact.

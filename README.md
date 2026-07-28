@@ -4,6 +4,9 @@
 
 A pure-Flutter package for painting. 
 
+Requires Flutter 3.32 or later and Dart 3.8 or later.
+Active maintenance resumed in 2026, with support for Flutter 3.44.8.
+
 ## Summary
 
 Flutter Painter provides you with a widget that can be used to draw on it. Right now, it supports:

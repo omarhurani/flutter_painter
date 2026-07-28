@@ -15,9 +15,10 @@ class DoubleArrowFactory extends ShapeFactory<DoubleArrowDrawable> {
   @override
   DoubleArrowDrawable create(Offset position, [Paint? paint]) {
     return DoubleArrowDrawable(
-        length: 0,
-        position: position,
-        paint: paint,
-        arrowHeadSize: arrowHeadSize);
+      length: 0,
+      position: position,
+      paint: paint,
+      arrowHeadSize: arrowHeadSize,
+    );
   }
 }

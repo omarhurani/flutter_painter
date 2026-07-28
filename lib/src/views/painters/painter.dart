@@ -17,17 +17,12 @@ class Painter extends CustomPainter {
   final Size? scale;
 
   /// Creates a [Painter] that paints the [drawables] onto a background [background].
-  const Painter({
-    required this.drawables,
-    this.background,
-    this.scale,
-  });
+  const Painter({required this.drawables, this.background, this.scale});
 
   /// Paints the drawables onto the [canvas] of size [size].
   @override
   void paint(Canvas canvas, Size size) {
-    // This is to allow [_scale] to be upgraded to non-nullable after checking for null
-    final _scale = scale;
+    final paintScale = scale;
 
     // Draw the background if it was provided
     if (background != null && background!.isNotHidden) {
@@ -36,25 +31,33 @@ class Painter extends CustomPainter {
 
     // If a scale size is being used, save the canvas (with the background), scale it
     // and then proceed to drawing the drawables
-    if (_scale != null) {
+    if (paintScale != null) {
       canvas.save();
-      canvas.transform(Matrix4.identity()
-          .scaled(size.width / _scale.width, size.height / _scale.height)
-          .storage);
+      canvas.transform(
+        Matrix4.identity()
+            .scaledByDouble(
+              size.width / paintScale.width,
+              size.height / paintScale.height,
+              1,
+              1,
+            )
+            .storage,
+      );
     }
 
     canvas.saveLayer(Rect.largest, Paint());
 
     // Draw all the drawables
-    for (final drawable
-        in drawables.where((drawable) => drawable.isNotHidden)) {
-      drawable.draw(canvas, _scale ?? size);
+    for (final drawable in drawables.where(
+      (drawable) => drawable.isNotHidden,
+    )) {
+      drawable.draw(canvas, paintScale ?? size);
     }
 
     canvas.restore();
 
     // If a scale size is being used, restore the saved canvas, which will scale all the drawn drawables
-    if (_scale != null) {
+    if (paintScale != null) {
       canvas.restore();
     }
   }
@@ -66,6 +69,7 @@ class Painter extends CustomPainter {
 
     // If the background changed, or any of the drawables changed, a repaint is needed
     return oldDelegate.background != background ||
+        oldDelegate.scale != scale ||
         !const ListEquality().equals(oldDelegate.drawables, drawables);
   }
 }

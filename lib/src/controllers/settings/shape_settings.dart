@@ -18,24 +18,18 @@ class ShapeSettings {
   final Paint? paint;
 
   /// Creates a new instance of [ShapeSettings] with the given [factory].
-  const ShapeSettings({
-    this.factory,
-    this.drawOnce = true,
-    this.paint,
-  });
+  const ShapeSettings({this.factory, this.drawOnce = true, this.paint});
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   ShapeSettings copyWith({
     ShapeFactory? factory = _NoShapePassedFactory.instance,
     bool? drawOnce,
     Paint? paint,
-  }) =>
-      ShapeSettings(
-        factory:
-            factory == _NoShapePassedFactory.instance ? this.factory : factory,
-        drawOnce: drawOnce ?? this.drawOnce,
-        paint: paint ?? this.paint,
-      );
+  }) => ShapeSettings(
+    factory: factory == _NoShapePassedFactory.instance ? this.factory : factory,
+    drawOnce: drawOnce ?? this.drawOnce,
+    paint: paint ?? this.paint,
+  );
 }
 
 /// Private class that is used internally to represent no

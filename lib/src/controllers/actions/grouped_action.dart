@@ -27,8 +27,10 @@ class GroupedAction extends ControllerAction<void, void> {
         previousActions = [];
         previousAction = null;
       } else {
-        previousActions =
-            action1.actions.sublist(0, action1.actions.length - 1);
+        previousActions = action1.actions.sublist(
+          0,
+          action1.actions.length - 1,
+        );
         previousAction = action1.actions.last;
       }
     } else {
@@ -64,7 +66,7 @@ class GroupedAction extends ControllerAction<void, void> {
       ...previousActions,
       if (merged != null)
         if (merged is GroupedAction) ...merged.actions else merged,
-      ...currentActions
+      ...currentActions,
     ];
   }
 
@@ -112,11 +114,8 @@ class GroupedAction extends ControllerAction<void, void> {
     final merged = actions.first.merge(toMerge);
     return GroupedAction([
       ...beforeMerge,
-      if (merged is GroupedAction)
-        ...merged.actions
-      else if (merged != null)
-        merged,
-      ...actions.sublist(1)
+      if (merged is GroupedAction) ...merged.actions else ?merged,
+      ...actions.sublist(1),
     ]);
   }
 

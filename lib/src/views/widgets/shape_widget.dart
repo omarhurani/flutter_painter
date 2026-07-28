@@ -6,10 +6,7 @@ class _ShapeWidget extends StatefulWidget {
   final Widget child;
 
   /// Creates a [_ShapeWidget] with the given [controller], [child] widget.
-  const _ShapeWidget({
-    Key? key,
-    required this.child,
-  }) : super(key: key);
+  const _ShapeWidget({required this.child});
 
   @override
   _ShapeWidgetState createState() => _ShapeWidgetState();
@@ -39,8 +36,10 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
     final factory = settings.factory;
     if (factory == null || details.pointerCount > 1) return;
 
-    final shapeDrawable =
-        factory.create(details.localFocalPoint, settings.paint);
+    final shapeDrawable = factory.create(
+      details.localFocalPoint,
+      settings.paint,
+    );
 
     setState(() {
       PainterController.of(context).addDrawables([shapeDrawable]);
@@ -56,10 +55,12 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
     if (shapeDrawable is Sized1DDrawable) {
       final sized1DDrawable = (shapeDrawable as Sized1DDrawable);
       final length = sized1DDrawable.length;
-      final startingPosition = shapeDrawable.position -
+      final startingPosition =
+          shapeDrawable.position -
           Offset.fromDirection(sized1DDrawable.rotationAngle, length / 2);
       final newLine = (details.localFocalPoint - startingPosition);
-      final newPosition = startingPosition +
+      final newPosition =
+          startingPosition +
           Offset.fromDirection(newLine.direction, newLine.distance / 2);
       final newDrawable = sized1DDrawable.copyWith(
         position: newPosition,
@@ -74,8 +75,10 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
       final startingPosition =
           shapeDrawable.position - Offset(size.width / 2, size.height / 2);
 
-      final newSize = Size((details.localFocalPoint.dx - startingPosition.dx),
-          (details.localFocalPoint.dy - startingPosition.dy));
+      final newSize = Size(
+        (details.localFocalPoint.dx - startingPosition.dx),
+        (details.localFocalPoint.dy - startingPosition.dy),
+      );
       final newPosition =
           startingPosition + Offset(newSize.width / 2, newSize.height / 2);
       final newDrawable = sized2DDrawable.copyWith(
@@ -100,16 +103,18 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
       updateDrawable(sized2DDrawable as ShapeDrawable, newDrawable);
     }
     if (settings.drawOnce) {
-      PainterController.of(context).settings =
-          PainterController.of(context).settings.copyWith(
-                  shape: settings.copyWith(
-                factory: null,
-              ));
-      SettingsUpdatedNotification(PainterController.of(context).value.settings)
-          .dispatch(context);
+      PainterController.of(context).settings = PainterController.of(
+        context,
+      ).settings.copyWith(shape: settings.copyWith(factory: null));
+      SettingsUpdatedNotification(
+        PainterController.of(context).value.settings,
+      ).dispatch(context);
     }
 
-    DrawableCreatedNotification(currentShapeDrawable).dispatch(context);
+    final completedDrawable = currentShapeDrawable;
+    if (completedDrawable == null) return;
+
+    DrawableCreatedNotification(completedDrawable).dispatch(context);
 
     setState(() {
       currentShapeDrawable = null;
@@ -119,8 +124,9 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
   /// Replaces a drawable with a new one.
   void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable) {
     setState(() {
-      PainterController.of(context)
-          .replaceDrawable(oldDrawable, newDrawable, newAction: false);
+      PainterController.of(
+        context,
+      ).replaceDrawable(oldDrawable, newDrawable, newAction: false);
     });
   }
 }

@@ -27,9 +27,7 @@ class ClearDrawablesAction extends ControllerAction<void, void> {
   void perform$(PainterController controller) {
     final value = controller.value;
     _removedDrawables = List<Drawable>.from(value.drawables);
-    controller.value = value.copyWith(
-      drawables: const <Drawable>[],
-    );
+    controller.value = value.copyWith(drawables: const <Drawable>[]);
     controller.deselectObjectDrawable(isRemoved: true);
   }
 

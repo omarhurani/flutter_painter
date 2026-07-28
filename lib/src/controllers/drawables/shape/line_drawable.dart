@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
@@ -16,25 +14,15 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable {
   /// Creates a new [LineDrawable] with the given [length] and [paint].
   LineDrawable({
     Paint? paint,
-    required double length,
-    required Offset position,
-    double rotationAngle = 0,
-    double scale = 1,
-    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints =
-        const <ObjectDrawableAssist, Paint>{},
-    bool locked = false,
-    bool hidden = false,
-  })  : paint = paint ?? ShapeDrawable.defaultPaint,
-        super(
-            length: length,
-            position: position,
-            rotationAngle: rotationAngle,
-            scale: scale,
-            assists: assists,
-            assistPaints: assistPaints,
-            locked: locked,
-            hidden: hidden);
+    required super.length,
+    required super.position,
+    super.rotationAngle,
+    super.scale,
+    super.assists,
+    super.assistPaints,
+    super.locked,
+    super.hidden,
+  }) : paint = paint ?? ShapeDrawable.defaultPaint;
 
   /// Getter for padding of drawable.
   ///
@@ -46,8 +34,11 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable {
   /// Draws the line on the provided [canvas] of size [size].
   @override
   void drawObject(Canvas canvas, Size size) {
-    canvas.drawLine(position.translate(-length / 2 * scale, 0),
-        position.translate(length / 2 * scale, 0), paint);
+    canvas.drawLine(
+      position.translate(-length / 2 * scale, 0),
+      position.translate(length / 2 * scale, 0),
+      paint,
+    );
   }
 
   /// Creates a copy of this but with the given fields replaced with the new values.

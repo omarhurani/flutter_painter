@@ -21,8 +21,11 @@ class FreeStyleSettings {
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
-  FreeStyleSettings copyWith(
-      {FreeStyleMode? mode, Color? color, double? strokeWidth}) {
+  FreeStyleSettings copyWith({
+    FreeStyleMode? mode,
+    Color? color,
+    double? strokeWidth,
+  }) {
     return FreeStyleSettings(
       mode: mode ?? this.mode,
       color: color ?? this.color,

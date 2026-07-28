@@ -1,3 +1,11 @@
 # flutter_painter example
 
-An example on how to use the flutter_painter package.
+An interactive example showing free-style drawing, erasing, text, image
+stickers, shapes, object transforms, undo/redo, zoom, and PNG rendering.
+
+Run it with:
+
+```sh
+flutter pub get
+flutter run
+```

@@ -7,6 +7,5 @@ import 'drawable_notification.dart';
 class ObjectDrawableReselectedNotification
     extends DrawableNotification<ObjectDrawable?> {
   /// Creates a [ObjectDrawableReselectedNotification] with the given [drawable].
-  ObjectDrawableReselectedNotification(ObjectDrawable? drawable)
-      : super(drawable);
+  ObjectDrawableReselectedNotification(super.drawable);
 }

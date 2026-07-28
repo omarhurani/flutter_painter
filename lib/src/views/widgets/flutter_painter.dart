@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import '../../controllers/events/selected_object_drawable_removed_event.dart';
 import '../../controllers/helpers/renderer_check/renderer_check.dart';
 import '../../controllers/drawables/drawable.dart';
@@ -29,13 +27,13 @@ part 'text_widget.dart';
 part 'object_widget.dart';
 part 'shape_widget.dart';
 
-typedef DrawableCreatedCallback = Function(Drawable drawable);
+typedef DrawableCreatedCallback = void Function(Drawable drawable);
 
-typedef DrawableDeletedCallback = Function(Drawable drawable);
+typedef DrawableDeletedCallback = void Function(Drawable drawable);
 
 /// Defines the builder used with [FlutterPainter.builder] constructor.
-typedef FlutterPainterBuilderCallback = Widget Function(
-    BuildContext context, Widget painter);
+typedef FlutterPainterBuilderCallback =
+    Widget Function(BuildContext context, Widget painter);
 
 /// Widget that allows user to draw on it
 class FlutterPainter extends StatelessWidget {
@@ -63,50 +61,49 @@ class FlutterPainter extends StatelessWidget {
   final FlutterPainterBuilderCallback _builder;
 
   /// Creates a [FlutterPainter] with the given [controller] and optional callbacks.
-  const FlutterPainter(
-      {Key? key,
-      required this.controller,
-      this.onDrawableCreated,
-      this.onDrawableDeleted,
-      this.onSelectedObjectDrawableChanged,
-      this.onPainterSettingsChanged})
-      : _builder = _defaultBuilder,
-        super(key: key);
+  const FlutterPainter({
+    super.key,
+    required this.controller,
+    this.onDrawableCreated,
+    this.onDrawableDeleted,
+    this.onSelectedObjectDrawableChanged,
+    this.onPainterSettingsChanged,
+  }) : _builder = _defaultBuilder;
 
   /// Creates a [FlutterPainter] with the given [controller], [builder] and optional callbacks.
   ///
   /// Using this constructor, the [builder] will be called any time the [controller] updates.
   /// It is useful if you want to build UI that automatically rebuilds on updates from [controller].
-  const FlutterPainter.builder(
-      {Key? key,
-      required this.controller,
-      required FlutterPainterBuilderCallback builder,
-      this.onDrawableCreated,
-      this.onDrawableDeleted,
-      this.onSelectedObjectDrawableChanged,
-      this.onPainterSettingsChanged})
-      : _builder = builder,
-        super(key: key);
+  const FlutterPainter.builder({
+    super.key,
+    required this.controller,
+    required FlutterPainterBuilderCallback builder,
+    this.onDrawableCreated,
+    this.onDrawableDeleted,
+    this.onSelectedObjectDrawableChanged,
+    this.onPainterSettingsChanged,
+  }) : _builder = builder;
 
   @override
   Widget build(BuildContext context) {
     return PainterControllerWidget(
       controller: controller,
       child: ValueListenableBuilder<PainterControllerValue>(
-          valueListenable: controller,
-          builder: (context, value, child) {
-            return _builder(
-                context,
-                _FlutterPainterWidget(
-                  key: controller.painterKey,
-                  controller: controller,
-                  onDrawableCreated: onDrawableCreated,
-                  onDrawableDeleted: onDrawableDeleted,
-                  onPainterSettingsChanged: onPainterSettingsChanged,
-                  onSelectedObjectDrawableChanged:
-                      onSelectedObjectDrawableChanged,
-                ));
-          }),
+        valueListenable: controller,
+        builder: (context, value, child) {
+          return _builder(
+            context,
+            _FlutterPainterWidget(
+              key: controller.painterKey,
+              controller: controller,
+              onDrawableCreated: onDrawableCreated,
+              onDrawableDeleted: onDrawableDeleted,
+              onPainterSettingsChanged: onPainterSettingsChanged,
+              onSelectedObjectDrawableChanged: onSelectedObjectDrawableChanged,
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -134,26 +131,63 @@ class _FlutterPainterWidget extends StatelessWidget {
   final ValueChanged<PainterSettings>? onPainterSettingsChanged;
 
   /// Creates a [_FlutterPainterWidget] with the given [controller] and optional callbacks.
-  const _FlutterPainterWidget(
-      {Key? key,
-      required this.controller,
-      this.onDrawableCreated,
-      this.onDrawableDeleted,
-      this.onSelectedObjectDrawableChanged,
-      this.onPainterSettingsChanged})
-      : super(key: key);
+  const _FlutterPainterWidget({
+    super.key,
+    required this.controller,
+    this.onDrawableCreated,
+    this.onDrawableDeleted,
+    this.onSelectedObjectDrawableChanged,
+    this.onPainterSettingsChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Navigator(
-        onGenerateRoute: (settings) => PageRouteBuilder(
-            settings: settings,
-            opaque: false,
-            pageBuilder: (context, animation, secondaryAnimation) {
-              final controller = PainterController.of(context);
-              return NotificationListener<FlutterPainterNotification>(
-                onNotification: onNotification,
-                child: InteractiveViewer(
+      onGenerateRoute: (settings) => PageRouteBuilder(
+        settings: settings,
+        opaque: false,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          final controller = PainterController.of(context);
+          return NotificationListener<FlutterPainterNotification>(
+            onNotification: onNotification,
+            child: ValueListenableBuilder<PainterControllerValue>(
+              valueListenable: controller,
+              builder: (context, value, _) {
+                final painter = _FreeStyleWidget(
+                  child: _TextWidget(
+                    child: _ShapeWidget(
+                      child: _ObjectWidget(
+                        interactionEnabled: true,
+                        child: CustomPaint(
+                          painter: Painter(
+                            drawables: value.drawables,
+                            background: value.background,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+
+                // InteractiveViewer always owns scale gestures, even when its
+                // pan and scale options are disabled. Temporarily replace it
+                // while an object is selected so the object's gesture detector
+                // can receive move, scale, and rotation updates.
+                if (value.selectedObjectDrawable != null) {
+                  return ClipRect(
+                    child: AnimatedBuilder(
+                      animation: controller.transformationController,
+                      child: painter,
+                      builder: (context, child) => Transform(
+                        transform: controller.transformationController.value,
+                        alignment: Alignment.topLeft,
+                        child: child,
+                      ),
+                    ),
+                  );
+                }
+
+                return InteractiveViewer(
                   transformationController: controller.transformationController,
                   minScale: controller.settings.scale.enabled
                       ? controller.settings.scale.minScale
@@ -161,30 +195,18 @@ class _FlutterPainterWidget extends StatelessWidget {
                   maxScale: controller.settings.scale.enabled
                       ? controller.settings.scale.maxScale
                       : 1,
-                  panEnabled: controller.settings.scale.enabled &&
+                  panEnabled:
+                      controller.settings.scale.enabled &&
                       (controller.freeStyleSettings.mode == FreeStyleMode.none),
                   scaleEnabled: controller.settings.scale.enabled,
-                  child: _FreeStyleWidget(
-                      // controller: controller,
-                      child: _TextWidget(
-                    // controller: controller,
-                    child: _ShapeWidget(
-                      // controller: controller,
-                      child: _ObjectWidget(
-                        // controller: controller,
-                        interactionEnabled: true,
-                        child: CustomPaint(
-                          painter: Painter(
-                            drawables: controller.value.drawables,
-                            background: controller.value.background,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )),
-                ),
-              );
-            }));
+                  child: painter,
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
   }
 
   /// Handles all notifications that might be dispatched from children.

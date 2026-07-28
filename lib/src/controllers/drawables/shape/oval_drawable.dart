@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
@@ -16,25 +14,15 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
   /// Creates a new [OvalDrawable] with the given [size] and [paint].
   OvalDrawable({
     Paint? paint,
-    required Size size,
-    required Offset position,
-    double rotationAngle = 0,
-    double scale = 1,
-    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints =
-        const <ObjectDrawableAssist, Paint>{},
-    bool locked = false,
-    bool hidden = false,
-  })  : paint = paint ?? ShapeDrawable.defaultPaint,
-        super(
-            size: size,
-            position: position,
-            rotationAngle: rotationAngle,
-            scale: scale,
-            assists: assists,
-            assistPaints: assistPaints,
-            locked: locked,
-            hidden: hidden);
+    required super.size,
+    required super.position,
+    super.rotationAngle,
+    super.scale,
+    super.assists,
+    super.assistPaints,
+    super.locked,
+    super.hidden,
+  }) : paint = paint ?? ShapeDrawable.defaultPaint;
 
   /// Getter for padding of drawable.
   ///
@@ -48,11 +36,13 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
   void drawObject(Canvas canvas, Size size) {
     final drawingSize = this.size * scale;
     canvas.drawOval(
-        Rect.fromCenter(
-            center: position,
-            width: drawingSize.width,
-            height: drawingSize.height),
-        paint);
+      Rect.fromCenter(
+        center: position,
+        width: drawingSize.width,
+        height: drawingSize.height,
+      ),
+      paint,
+    );
   }
 
   /// Creates a copy of this but with the given fields replaced with the new values.

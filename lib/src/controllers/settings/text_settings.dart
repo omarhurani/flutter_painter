@@ -15,17 +15,15 @@ class TextSettings {
 
   /// Creates a [TextSettings] with the given [textStyle] and [focusNode].
   const TextSettings({
-    this.textStyle = const TextStyle(
-      fontSize: 14,
-      color: Colors.black,
-    ),
+    this.textStyle = const TextStyle(fontSize: 14, color: Colors.black),
     this.focusNode,
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   TextSettings copyWith({TextStyle? textStyle, FocusNode? focusNode}) {
     return TextSettings(
-        textStyle: textStyle ?? this.textStyle,
-        focusNode: focusNode ?? this.focusNode);
+      textStyle: textStyle ?? this.textStyle,
+      focusNode: focusNode ?? this.focusNode,
+    );
   }
 }

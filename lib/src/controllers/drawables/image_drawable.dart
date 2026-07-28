@@ -1,7 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/rendering.dart';
-
 import 'object_drawable.dart';
 
 /// A drawable of an image as an object.
@@ -14,24 +12,16 @@ class ImageDrawable extends ObjectDrawable {
 
   /// Creates an [ImageDrawable] with the given [image].
   ImageDrawable({
-    required Offset position,
-    double rotationAngle = 0,
-    double scale = 1,
-    Set<ObjectDrawableAssist> assists = const <ObjectDrawableAssist>{},
-    Map<ObjectDrawableAssist, Paint> assistPaints =
-        const <ObjectDrawableAssist, Paint>{},
-    bool locked = false,
-    bool hidden = false,
+    required super.position,
+    super.rotationAngle,
+    super.scale,
+    super.assists,
+    super.assistPaints,
+    super.locked,
+    super.hidden,
     required this.image,
     this.flipped = false,
-  }) : super(
-            position: position,
-            rotationAngle: rotationAngle,
-            scale: scale,
-            assists: assists,
-            assistPaints: assistPaints,
-            hidden: hidden,
-            locked: locked);
+  });
 
   /// Creates an [ImageDrawable] with the given [image], and calculates the scale based on the given [size].
   /// The scale will be calculated such that the size of the drawable fits into the provided size.
@@ -50,27 +40,29 @@ class ImageDrawable extends ObjectDrawable {
     required Image image,
     bool flipped = false,
   }) : this(
-            position: position,
-            rotationAngle: rotationAngle,
-            scale: _calculateScaleFittedToSize(image, size),
-            assists: assists,
-            assistPaints: assistPaints,
-            image: image,
-            flipped: flipped,
-            hidden: hidden,
-            locked: locked);
+         position: position,
+         rotationAngle: rotationAngle,
+         scale: _calculateScaleFittedToSize(image, size),
+         assists: assists,
+         assistPaints: assistPaints,
+         image: image,
+         flipped: flipped,
+         hidden: hidden,
+         locked: locked,
+       );
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   @override
-  ImageDrawable copyWith(
-      {bool? hidden,
-      Set<ObjectDrawableAssist>? assists,
-      Offset? position,
-      double? rotation,
-      double? scale,
-      Image? image,
-      bool? flipped,
-      bool? locked}) {
+  ImageDrawable copyWith({
+    bool? hidden,
+    Set<ObjectDrawableAssist>? assists,
+    Offset? position,
+    double? rotation,
+    double? scale,
+    Image? image,
+    bool? flipped,
+    bool? locked,
+  }) {
     return ImageDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
@@ -94,20 +86,20 @@ class ImageDrawable extends ObjectDrawable {
 
     // Draw the image onto the canvas.
     canvas.drawImageRect(
-        image,
-        Rect.fromPoints(Offset.zero,
-            Offset(image.width.toDouble(), image.height.toDouble())),
-        Rect.fromPoints(position - scaledSize / 2, position + scaledSize / 2),
-        Paint());
+      image,
+      Rect.fromPoints(
+        Offset.zero,
+        Offset(image.width.toDouble(), image.height.toDouble()),
+      ),
+      Rect.fromPoints(position - scaledSize / 2, position + scaledSize / 2),
+      Paint(),
+    );
   }
 
   /// Calculates the size of the rendered object.
   @override
   Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
-    return Size(
-      image.width * scale,
-      image.height * scale,
-    );
+    return Size(image.width * scale, image.height * scale);
   }
 
   /// Compares two [ImageDrawable]s for equality.

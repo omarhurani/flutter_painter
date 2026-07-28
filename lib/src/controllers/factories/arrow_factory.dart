@@ -15,9 +15,10 @@ class ArrowFactory extends ShapeFactory<ArrowDrawable> {
   @override
   ArrowDrawable create(Offset position, [Paint? paint]) {
     return ArrowDrawable(
-        length: 0,
-        position: position,
-        paint: paint,
-        arrowHeadSize: arrowHeadSize);
+      length: 0,
+      position: position,
+      paint: paint,
+      arrowHeadSize: arrowHeadSize,
+    );
   }
 }

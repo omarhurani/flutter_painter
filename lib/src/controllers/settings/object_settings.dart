@@ -17,7 +17,7 @@ class ObjectSettings {
   static const Set<TargetPlatform> _mobileTargetPlatforms = {
     TargetPlatform.android,
     TargetPlatform.fuchsia,
-    TargetPlatform.iOS
+    TargetPlatform.iOS,
   };
 
   /// The layout-assist settings of the current object.
@@ -41,7 +41,7 @@ class ObjectSettings {
   /// If you need more custom control, you can for example use the cursor state from a [MouseRegion]
   /// to determine if the user is using a mouse or not (for example, if someone is using an iPad with a mouse and keyboard).
   final ObjectShowScaleRotationControlsResolver
-      showScaleRotationControlsResolver;
+  showScaleRotationControlsResolver;
 
   /// Creates a [TextSettings] with the given [layoutAssist].
   const ObjectSettings({
@@ -60,7 +60,8 @@ class ObjectSettings {
       layoutAssist: layoutAssist ?? this.layoutAssist,
       enlargeControlsResolver:
           enlargeControlsResolver ?? this.enlargeControlsResolver,
-      showScaleRotationControlsResolver: showScaleRotationControlsResolver ??
+      showScaleRotationControlsResolver:
+          showScaleRotationControlsResolver ??
           this.showScaleRotationControlsResolver,
     );
   }

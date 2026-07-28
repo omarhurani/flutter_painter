@@ -18,11 +18,14 @@ class ImageBackgroundDrawable extends BackgroundDrawable {
   void draw(Canvas canvas, Size size) {
     // Draw the image onto the canvas.
     canvas.drawImageRect(
-        image,
-        Rect.fromPoints(Offset.zero,
-            Offset(image.width.toDouble(), image.height.toDouble())),
-        Rect.fromPoints(Offset.zero, Offset(size.width, size.height)),
-        Paint());
+      image,
+      Rect.fromPoints(
+        Offset.zero,
+        Offset(image.width.toDouble(), image.height.toDouble()),
+      ),
+      Rect.fromPoints(Offset.zero, Offset(size.width, size.height)),
+      Paint(),
+    );
   }
 
   // /// Compares two [ImageBackgroundDrawable]s for equality.

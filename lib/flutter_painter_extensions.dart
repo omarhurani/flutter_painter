@@ -2,6 +2,6 @@
 ///
 /// From this library, you can access extensions that reduce the code size
 /// and make it easier to read.
-library flutter_painter_helper;
+library;
 
 export 'src/extensions/extensions.dart';

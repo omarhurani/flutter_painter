@@ -1,3 +1,14 @@
+## [2.0.0] - 2026-07-28
+
+* Resume active maintenance after four years.
+* Add support for Flutter 3.44.8 and current Dart SDKs.
+* **Breaking:** Require Dart 3.8+ and Flutter 3.32+.
+* Restore Android, iOS, web, and desktop example runners.
+* Replace removed and deprecated framework APIs.
+* Fix repainting when the painter scale changes.
+* Respect hidden drawables inside groups and use the correct vertical assist paint.
+* Restore selecting, moving, scaling, and rotating objects when canvas zoom is enabled.
+
 ## [1.0.1]
 * Fix a bug where `TextDrawable`s would incorrectly render on the final image ([Issue #19](https://github.com/omarhurani/flutter_painter/issues/19)).
 * Add Flutter linting using [flutter_lints](https://pub.dev/packages/flutter_lints) ([Issue #20](https://github.com/omarhurani/flutter_painter/issues/20)).
