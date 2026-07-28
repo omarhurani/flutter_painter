@@ -149,7 +149,7 @@ void setStrokeWidth(double value){
 ### Background
 
 
-You can also provide a background for the `FlutterPainter` widget from the controller. You can either use a color or an image as a background.
+You can also provide a background for the `FlutterPainter` widget from the controller. You can use a color, an image, or an image fitted over a color.
 
 In order to use a color, you can simply call the `backgroundDrawable` extension getter on any color.[*](#extensions)
 ```dart
@@ -175,6 +175,18 @@ void setBackground() async {
   // Sets the background to the image
   controller.background = myImage.backgroundDrawable;
 }
+```
+
+To preserve the image aspect ratio and show a color around it, configure an
+`ImageBackgroundDrawable` directly. `BoxFit.fill` remains the default for
+backward compatibility.
+```dart
+controller.background = ImageBackgroundDrawable(
+  image: myImage,
+  fit: BoxFit.contain,
+  alignment: Alignment.center,
+  backgroundColor: Colors.white,
+);
 ```
 
 The background can also be assigned from the constructor of `PainterController` directly.
