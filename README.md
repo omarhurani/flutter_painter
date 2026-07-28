@@ -127,6 +127,11 @@ When scaling and free-style drawing are both enabled, one pointer draws and a
 two-pointer pinch zooms the canvas. Starting a pinch cancels the pending
 free-style stroke so it does not leave an accidental line.
 
+Use the built-in `ScaleSettings` to zoom and pan the painter. Drawing positions
+remain in the painter's local coordinate system after transformation, so the
+background and drawables stay aligned. Avoid transforming the background or
+`FlutterPainter` separately with an external widget.
+
 You can provide initial settings for the things you want to draw through the settings parameter in the constructor of the `PainterController`.
 
 Each setting and sub-setting has extension setters and getters which you can use to read and modify the value of that setting.[*](#extensions)

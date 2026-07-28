@@ -8,6 +8,7 @@
 * Allow two-pointer zooming while free-style mode is active without leaving an accidental stroke, and keep drawing responsive after zooming ([Issue #64](https://github.com/omarhurani/flutter_painter/issues/64), [Issue #72](https://github.com/omarhurani/flutter_painter/issues/72), [Issue #76](https://github.com/omarhurani/flutter_painter/issues/76)).
 * Add configurable opacity to `ImageDrawable` ([Issue #30](https://github.com/omarhurani/flutter_painter/issues/30)).
 * Add undo-aware color updates for existing free-style, shape, and text drawables ([Issue #42](https://github.com/omarhurani/flutter_painter/issues/42), [Issue #66](https://github.com/omarhurani/flutter_painter/issues/66)).
+* Document and cover local drawing coordinates after zooming and panning the painter ([Issue #40](https://github.com/omarhurani/flutter_painter/issues/40)).
 
 ## [2.0.0] - 2026-07-28
 

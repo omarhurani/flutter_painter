@@ -208,6 +208,42 @@ void main() {
     );
   });
 
+  testWidgets('drawing coordinates stay local after zoom and pan', (
+    tester,
+  ) async {
+    final controller = PainterController(
+      settings: const PainterSettings(
+        freeStyle: FreeStyleSettings(mode: FreeStyleMode.draw),
+        scale: ScaleSettings(enabled: true, minScale: 1, maxScale: 4),
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(buildPainter(controller));
+    await tester.pumpAndSettle();
+
+    controller.transformationController.value = Matrix4.identity()
+      ..setEntry(0, 0, 2)
+      ..setEntry(1, 1, 2)
+      ..setEntry(0, 3, -60)
+      ..setEntry(1, 3, -40);
+    await tester.pump();
+
+    final viewportTopLeft = tester.getTopLeft(find.byType(InteractiveViewer));
+    final start = viewportTopLeft + const Offset(100, 140);
+    final end = viewportTopLeft + const Offset(160, 200);
+    final gesture = await tester.startGesture(start);
+    await gesture.moveTo(end);
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    final stroke = controller.drawables.single as FreeStyleDrawable;
+    expect(stroke.path.first.dx, closeTo(80, 0.01));
+    expect(stroke.path.first.dy, closeTo(90, 0.01));
+    expect(stroke.path.last.dx, closeTo(110, 0.01));
+    expect(stroke.path.last.dy, closeTo(120, 0.01));
+  });
+
   testWidgets('pinch zoom cancels drawing and leaves the brush responsive', (
     tester,
   ) async {
