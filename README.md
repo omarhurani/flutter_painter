@@ -218,6 +218,20 @@ final textDrawable = controller.drawables.whereType<TextDrawable>().first;
 controller.editTextDrawable(textDrawable);
 ```
 
+Image drawables support opacity values from `0` (transparent) to `1` (opaque).
+Replace the selected image through the controller so selection and undo history
+stay synchronized.
+
+```dart
+final imageDrawable = controller.selectedObjectDrawable;
+if (imageDrawable is ImageDrawable) {
+  controller.replaceDrawable(
+    imageDrawable,
+    imageDrawable.copyWith(opacity: 0.5),
+  );
+}
+```
+
 ### Rendering Image
 
 From the `PainterController`, you can render the contents of `FlutterPainter` as a PNG-encoded `ui.Image` object. In order to do that, you need to provide the size of the output image. All the drawings will be scaled according to that size.

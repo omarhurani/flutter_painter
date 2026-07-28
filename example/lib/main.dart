@@ -41,6 +41,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   // zero when converted to red, so stop before that rounding boundary.
   static const double maxHue = 359.8;
 
+  bool updatingImageOpacity = false;
   FocusNode textFocusNode = FocusNode();
   late PainterController controller;
   ui.Image? backgroundImage;
@@ -215,7 +216,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
             ),
           Positioned(
             bottom: 0,
-            right: 0,
+            // Keep the settings controls clear of the floating action button.
+            right: kFloatingActionButtonMargin + 56,
             left: 0,
             child: ValueListenableBuilder(
               valueListenable: controller,
@@ -403,6 +405,27 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                                 ),
                                           ),
                                     ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (controller.selectedObjectDrawable
+                              case final ImageDrawable imageDrawable) ...[
+                            const Divider(),
+                            const Text("Image Settings"),
+                            Row(
+                              children: [
+                                const Expanded(flex: 1, child: Text("Opacity")),
+                                Expanded(
+                                  flex: 3,
+                                  child: Slider.adaptive(
+                                    min: 0,
+                                    max: 1,
+                                    value: imageDrawable.opacity,
+                                    onChangeStart: startImageOpacityUpdate,
+                                    onChanged: setSelectedImageOpacity,
+                                    onChangeEnd: endImageOpacityUpdate,
                                   ),
                                 ),
                               ],
@@ -664,6 +687,26 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   void removeSelectedDrawable() {
     final selectedDrawable = controller.selectedObjectDrawable;
     if (selectedDrawable != null) controller.removeDrawable(selectedDrawable);
+  }
+
+  void startImageOpacityUpdate(double _) {
+    updatingImageOpacity = false;
+  }
+
+  void setSelectedImageOpacity(double opacity) {
+    final selectedDrawable = controller.selectedObjectDrawable;
+    if (selectedDrawable is! ImageDrawable) return;
+
+    final replaced = controller.replaceDrawable(
+      selectedDrawable,
+      selectedDrawable.copyWith(opacity: opacity),
+      newAction: !updatingImageOpacity,
+    );
+    if (replaced) updatingImageOpacity = true;
+  }
+
+  void endImageOpacityUpdate(double _) {
+    updatingImageOpacity = false;
   }
 
   void editSelectedTextDrawable() {

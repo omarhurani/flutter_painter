@@ -10,6 +10,9 @@ class ImageDrawable extends ObjectDrawable {
   /// Whether the image is flipped or not.
   final bool flipped;
 
+  /// The opacity used to draw the image, between 0 (transparent) and 1 (opaque).
+  final double opacity;
+
   /// Whether free-style erasing can affect this image.
   ///
   /// Non-erasable images remain selectable and movable in erase mode.
@@ -27,8 +30,10 @@ class ImageDrawable extends ObjectDrawable {
     super.hidden,
     required this.image,
     this.flipped = false,
+    double opacity = 1,
     this.erasable = true,
-  });
+  }) : assert(opacity.isFinite && opacity >= 0 && opacity <= 1),
+       opacity = opacity.isFinite ? opacity.clamp(0.0, 1.0) : 1;
 
   /// Creates an [ImageDrawable] with the given [image], and calculates the scale based on the given [size].
   /// The scale will be calculated such that the size of the drawable fits into the provided size.
@@ -46,6 +51,7 @@ class ImageDrawable extends ObjectDrawable {
     bool hidden = false,
     required Image image,
     bool flipped = false,
+    double opacity = 1,
     bool erasable = true,
   }) : this(
          position: position,
@@ -55,6 +61,7 @@ class ImageDrawable extends ObjectDrawable {
          assistPaints: assistPaints,
          image: image,
          flipped: flipped,
+         opacity: opacity,
          erasable: erasable,
          hidden: hidden,
          locked: locked,
@@ -70,6 +77,7 @@ class ImageDrawable extends ObjectDrawable {
     double? scale,
     Image? image,
     bool? flipped,
+    double? opacity,
     bool? erasable,
     bool? locked,
   }) {
@@ -81,6 +89,7 @@ class ImageDrawable extends ObjectDrawable {
       scale: scale ?? this.scale,
       image: image ?? this.image,
       flipped: flipped ?? this.flipped,
+      opacity: opacity ?? this.opacity,
       erasable: erasable ?? this.erasable,
       locked: locked ?? this.locked,
     );
@@ -103,7 +112,7 @@ class ImageDrawable extends ObjectDrawable {
         Offset(image.width.toDouble(), image.height.toDouble()),
       ),
       Rect.fromPoints(position - scaledSize / 2, position + scaledSize / 2),
-      Paint(),
+      Paint()..color = Color.fromRGBO(255, 255, 255, opacity),
     );
   }
 
