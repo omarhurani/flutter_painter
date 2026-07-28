@@ -30,6 +30,8 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
             GestureRecognizerFactoryWithHandlers<_DragGestureDetector>(
               () => _DragGestureDetector(
                 shouldAcceptPointer: _shouldAcceptPointer,
+                shouldYieldToMultitouch: () =>
+                    PainterController.of(context).value.settings.scale.enabled,
                 onHorizontalDragDown: _handleHorizontalDragDown,
                 onHorizontalDragUpdate: _handleHorizontalDragUpdate,
                 onHorizontalDragUp: _handleHorizontalDragUp,
@@ -189,10 +191,11 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
   }
 }
 
-/// A custom recognizer that recognize at most only one gesture sequence.
+/// A custom recognizer that draws with one pointer and yields to multi-touch.
 class _DragGestureDetector extends OneSequenceGestureRecognizer {
   _DragGestureDetector({
     required this.shouldAcceptPointer,
+    required this.shouldYieldToMultitouch,
     required this.onHorizontalDragDown,
     required this.onHorizontalDragUpdate,
     required this.onHorizontalDragUp,
@@ -200,46 +203,115 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
   });
 
   final bool Function(PointerDownEvent event) shouldAcceptPointer;
+  final bool Function() shouldYieldToMultitouch;
   final ValueSetter<Offset> onHorizontalDragDown;
   final ValueSetter<Offset> onHorizontalDragUpdate;
   final VoidCallback onHorizontalDragUp;
   final VoidCallback onHorizontalDragCancel;
 
-  bool _isTrackingGesture = false;
+  final Set<int> _trackedPointers = <int>{};
+  int? _primaryPointer;
+  Offset? _initialPosition;
+  bool _drawingActive = false;
+  bool _accepted = false;
+  bool _multitouch = false;
 
   @override
-  void addPointer(PointerEvent event) {
-    if (event is PointerDownEvent && !shouldAcceptPointer(event)) return;
-
-    if (!_isTrackingGesture) {
-      resolve(GestureDisposition.accepted);
-      startTrackingPointer(event.pointer);
-      _isTrackingGesture = true;
-    } else {
+  void addAllowedPointer(PointerDownEvent event) {
+    final isFirstPointer = _trackedPointers.isEmpty;
+    if (isFirstPointer && !shouldAcceptPointer(event)) {
+      startTrackingPointer(event.pointer, event.transform);
+      resolvePointer(event.pointer, GestureDisposition.rejected);
       stopTrackingPointer(event.pointer);
+      return;
     }
+
+    startTrackingPointer(event.pointer, event.transform);
+
+    if (isFirstPointer) {
+      _trackedPointers.add(event.pointer);
+      _primaryPointer = event.pointer;
+      _initialPosition = event.position;
+      _drawingActive = true;
+      onHorizontalDragDown(event.position);
+      return;
+    }
+
+    if (!shouldYieldToMultitouch()) {
+      resolvePointer(event.pointer, GestureDisposition.rejected);
+      stopTrackingPointer(event.pointer);
+      return;
+    }
+
+    _trackedPointers.add(event.pointer);
+
+    // Let InteractiveViewer win both gesture arenas when a pinch starts.
+    _multitouch = true;
+    resolve(GestureDisposition.rejected);
+    _cancelDrawing();
   }
 
   @override
   void handleEvent(PointerEvent event) {
-    if (event is PointerDownEvent) {
-      onHorizontalDragDown(event.position);
-    } else if (event is PointerMoveEvent) {
+    if (event is PointerMoveEvent &&
+        event.pointer == _primaryPointer &&
+        _drawingActive &&
+        !_multitouch) {
+      if (!_accepted) {
+        final initialPosition = _initialPosition;
+        if (shouldYieldToMultitouch() &&
+            initialPosition != null &&
+            (event.position - initialPosition).distance <=
+                computeHitSlop(event.kind, gestureSettings)) {
+          return;
+        }
+        _accepted = true;
+        resolve(GestureDisposition.accepted);
+      }
       onHorizontalDragUpdate(event.position);
     } else if (event is PointerUpEvent) {
-      onHorizontalDragUp();
-      _isTrackingGesture = false;
-      stopTrackingPointer(event.pointer);
+      if (event.pointer == _primaryPointer && _drawingActive && !_multitouch) {
+        if (!_accepted) {
+          _accepted = true;
+          resolve(GestureDisposition.accepted);
+        }
+        onHorizontalDragUp();
+        _drawingActive = false;
+      }
+      _stopTracking(event.pointer);
     } else if (event is PointerCancelEvent) {
-      onHorizontalDragCancel();
-      _isTrackingGesture = false;
-      stopTrackingPointer(event.pointer);
+      if (event.pointer == _primaryPointer) _cancelDrawing();
+      if (!_accepted) resolve(GestureDisposition.rejected);
+      _stopTracking(event.pointer);
     }
+  }
+
+  void _cancelDrawing() {
+    if (!_drawingActive) return;
+    _drawingActive = false;
+    onHorizontalDragCancel();
+  }
+
+  void _stopTracking(int pointer) {
+    _trackedPointers.remove(pointer);
+    stopTrackingPointer(pointer);
+  }
+
+  @override
+  void rejectGesture(int pointer) {
+    if (pointer == _primaryPointer && !_multitouch) _cancelDrawing();
   }
 
   @override
   String get debugDescription => '_DragGestureDetector';
 
   @override
-  void didStopTrackingLastPointer(int pointer) {}
+  void didStopTrackingLastPointer(int pointer) {
+    _trackedPointers.clear();
+    _primaryPointer = null;
+    _initialPosition = null;
+    _drawingActive = false;
+    _accepted = false;
+    _multitouch = false;
+  }
 }

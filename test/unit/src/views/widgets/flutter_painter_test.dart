@@ -144,6 +144,64 @@ void main() {
     expect(created.single, same(controller.drawables.single));
   });
 
+  testWidgets('pinch zoom cancels drawing and leaves the brush responsive', (
+    tester,
+  ) async {
+    final controller = PainterController(
+      settings: const PainterSettings(
+        freeStyle: FreeStyleSettings(mode: FreeStyleMode.draw),
+        scale: ScaleSettings(enabled: true, minScale: 1, maxScale: 4),
+      ),
+    );
+    addTearDown(controller.dispose);
+    final drawingStates = <bool>[];
+    final canceled = <PathDrawable>[];
+    final created = <Drawable>[];
+
+    await tester.pumpWidget(
+      buildPainter(
+        controller,
+        onDrawableCreated: created.add,
+        onIsDrawingStateChanged: drawingStates.add,
+        onFreeStyleDrawingCanceled: canceled.add,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final center = tester.getCenter(find.byType(FlutterPainter));
+    final first = await tester.createGesture(pointer: 1);
+    final second = await tester.createGesture(pointer: 2);
+    await first.down(center - const Offset(30, 0));
+    await first.moveBy(const Offset(-5, 0));
+    await second.down(center + const Offset(30, 0));
+    await first.moveTo(center - const Offset(80, 0));
+    await second.moveTo(center + const Offset(80, 0));
+    await tester.pump();
+    await first.up();
+    await second.up();
+    await tester.pumpAndSettle();
+
+    expect(controller.drawables, isEmpty);
+    expect(created, isEmpty);
+    expect(canceled, hasLength(1));
+    expect(drawingStates, [true, false]);
+    expect(
+      controller.transformationController.value.getMaxScaleOnAxis(),
+      greaterThan(1),
+    );
+
+    final stroke = await tester.startGesture(center, pointer: 3);
+    await stroke.moveBy(const Offset(20, 10));
+    await tester.pump();
+    await stroke.moveBy(const Offset(20, 10));
+    await stroke.up();
+    await tester.pump();
+
+    expect(controller.drawables, hasLength(1));
+    expect(created, hasLength(1));
+    expect(drawingStates, [true, false, true, false]);
+  });
+
   testWidgets('canceling free-style drawing removes it and its undo action', (
     tester,
   ) async {

@@ -116,12 +116,16 @@ All setters on `PainterController` directly notify your `FlutterPainter` to resp
 
 ### Settings
 
-There are currently three types of settings:
+There are currently five types of settings:
 - `freeStyleSettings`: They control the parameters used in drawing scribbles, such as the width and color. It also has a field to enable/disable scribbles, to prevent the user from drawing on the `FlutterPainter`.
 - `textSettings`: They control the `TextStyle` and `TextAlign` of text being drawn. They also include a focus node ([more on focus nodes here](https://flutter.dev/docs/cookbook/forms/focus)) so you can detect when the user starts and stops editing text.
 - `objectSettings`: These settings control objects that can be moved, scaled and rotated. Texts, shapes and images are all considered objects. It controls layout assist, which allows to center objects and rotate them at a right angle, and settings regarding the object controls for scaling, rotating and resizing.
 - `shapeSettings`: These control the paint and shape factory used (Shape Factory is used to create shapes), and whether the shape is drawn once or continiously.
 - `scaleSettings`: These settings control the scaling on the painter (zooming in/out). By default, scaling is disabled.
+
+When scaling and free-style drawing are both enabled, one pointer draws and a
+two-pointer pinch zooms the canvas. Starting a pinch cancels the pending
+free-style stroke so it does not leave an accidental line.
 
 You can provide initial settings for the things you want to draw through the settings parameter in the constructor of the `PainterController`.
 
