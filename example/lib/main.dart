@@ -169,10 +169,11 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                 ),
                 // Delete the selected drawable
                 IconButton(
+                  tooltip: "Remove selected drawable",
                   icon: const Icon(Icons.delete_outline),
                   onPressed: controller.selectedObjectDrawable == null
                       ? null
-                      : removeSelectedDrawable,
+                      : () => controller.removeSelectedObjectDrawable(),
                 ),
                 // Delete the selected drawable
                 IconButton(
@@ -708,11 +709,6 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
       context: context,
       builder: (context) => RenderedImageDialog(imageFuture: imageFuture),
     );
-  }
-
-  void removeSelectedDrawable() {
-    final selectedDrawable = controller.selectedObjectDrawable;
-    if (selectedDrawable != null) controller.removeDrawable(selectedDrawable);
   }
 
   void startImageOpacityUpdate(double _) {

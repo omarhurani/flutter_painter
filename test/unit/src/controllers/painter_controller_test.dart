@@ -47,4 +47,57 @@ void main() {
 
     await streamClosed;
   });
+
+  test('removeSelectedObjectDrawable removes only the selected object', () {
+    final first = TextDrawable(text: 'First', position: Offset.zero);
+    final selected = TextDrawable(text: 'Selected', position: Offset.zero);
+    final controller = PainterController(drawables: [first, selected]);
+    addTearDown(controller.dispose);
+    controller.selectObjectDrawable(selected);
+
+    final removed = controller.removeSelectedObjectDrawable();
+
+    expect(removed, isTrue);
+    expect(controller.value.drawables, [first]);
+    expect(controller.selectedObjectDrawable, isNull);
+    expect(controller.canUndo, isTrue);
+
+    controller.undo();
+    expect(controller.value.drawables, [first, selected]);
+
+    controller.redo();
+    expect(controller.value.drawables, [first]);
+  });
+
+  test('removeSelectedObjectDrawable is a no-op without a selection', () {
+    final controller = PainterController();
+    addTearDown(controller.dispose);
+
+    expect(controller.removeSelectedObjectDrawable(), isFalse);
+    expect(controller.canUndo, isFalse);
+  });
+
+  test('removeDrawable does not record a failed removal', () {
+    final controller = PainterController();
+    addTearDown(controller.dispose);
+    final foreign = TextDrawable(text: 'Foreign', position: Offset.zero);
+
+    expect(controller.removeDrawable(foreign), isFalse);
+    expect(controller.canUndo, isFalse);
+  });
+
+  test('removeLastDrawable is safe when empty and forwards newAction', () {
+    final controller = PainterController();
+    addTearDown(controller.dispose);
+
+    expect(controller.removeLastDrawable, returnsNormally);
+    expect(controller.canUndo, isFalse);
+
+    final drawable = TextDrawable(text: 'Temporary', position: Offset.zero);
+    controller.addDrawables([drawable]);
+    controller.removeLastDrawable(newAction: false);
+
+    expect(controller.value.drawables, isEmpty);
+    expect(controller.canUndo, isFalse);
+  });
 }

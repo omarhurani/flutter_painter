@@ -174,8 +174,22 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   bool removeDrawable(Drawable drawable, {bool newAction = true}) {
     final action = RemoveDrawableAction(drawable);
     final value = action.perform(this);
-    _addAction(action, newAction);
+    if (value) _addAction(action, newAction);
     return value;
+  }
+
+  /// Removes the currently selected object drawable.
+  ///
+  /// Returns `true` if an object was selected and removed, or `false` if there
+  /// was no selected object drawable.
+  ///
+  /// If [newAction] is `true`, the removal is added as an independent action
+  /// and can be [undo]ne in the future. If it is `false`, the action is
+  /// connected to the previous action and merged with it.
+  bool removeSelectedObjectDrawable({bool newAction = true}) {
+    final drawable = selectedObjectDrawable;
+    if (drawable == null) return false;
+    return removeDrawable(drawable, newAction: newAction);
   }
 
   /// Removes the last drawable from the controller value.
@@ -191,7 +205,8 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   ///
   /// [notifyListeners] will not be called if there are no drawables in the controller value.
   void removeLastDrawable({bool newAction = true}) {
-    removeDrawable(value.drawables.last);
+    if (value.drawables.isEmpty) return;
+    removeDrawable(value.drawables.last, newAction: newAction);
   }
 
   /// Removes all drawables from the controller value.

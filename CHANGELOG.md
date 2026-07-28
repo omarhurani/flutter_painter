@@ -10,6 +10,7 @@
 * Add undo-aware color updates for existing free-style, shape, and text drawables ([Issue #42](https://github.com/omarhurani/flutter_painter/issues/42), [Issue #66](https://github.com/omarhurani/flutter_painter/issues/66)).
 * Document and cover local drawing coordinates after zooming and panning the painter ([Issue #40](https://github.com/omarhurani/flutter_painter/issues/40)).
 * Allow image backgrounds to be fitted and aligned over a background color ([Issue #69](https://github.com/omarhurani/flutter_painter/issues/69)).
+* Add direct, undo-aware removal of the selected object drawable and make failed or empty removals safe no-ops ([Issue #58](https://github.com/omarhurani/flutter_painter/issues/58)).
 
 ## [2.0.0] - 2026-07-28
 

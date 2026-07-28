@@ -227,6 +227,17 @@ void deselectObjectDrawable(){
 
 The selected object drawable will also be automatically update if it is replaced or removed from the controller.
 
+To remove one known drawable, pass it to `removeDrawable`. For an object the
+user selected, call `removeSelectedObjectDrawable` directly. Both operations
+participate in undo and redo.
+
+```dart
+controller.removeDrawable(drawable);
+
+// Returns false without changing history when no object is selected.
+final removed = controller.removeSelectedObjectDrawable();
+```
+
 To select an existing `TextDrawable` and open it for editing, use
 `editTextDrawable`. The drawable must already belong to the controller.
 
