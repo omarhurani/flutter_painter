@@ -16,6 +16,33 @@ void main() {
     expect(find.byType(FlutterPainter), findsOneWidget);
   });
 
+  testWidgets('background can rotate without replacing the painter', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    final painter = tester.widget<FlutterPainter>(find.byType(FlutterPainter));
+    final controller = painter.controller;
+    final originalBackground =
+        controller.value.background as ImageBackgroundDrawable;
+
+    await tester.tap(find.byTooltip('Rotate background'));
+    await tester.pump();
+
+    final rotatedBackground =
+        controller.value.background as ImageBackgroundDrawable;
+    expect(rotatedBackground.image, same(originalBackground.image));
+    expect(rotatedBackground.quarterTurns, 1);
+    expect(
+      tester.widget<FlutterPainter>(find.byType(FlutterPainter)).controller,
+      same(controller),
+    );
+  });
+
   testWidgets('text alignment can be selected before editing', (tester) async {
     tester.view.physicalSize = const Size(1280, 800);
     addTearDown(tester.view.resetPhysicalSize);

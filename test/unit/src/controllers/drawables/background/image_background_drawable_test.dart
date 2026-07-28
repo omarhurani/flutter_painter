@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart' show Alignment, BoxFit, Colors;
@@ -41,6 +42,8 @@ void main() {
       ),
     );
     verifyNever(() => canvas.drawColor(any(), any()));
+    verifyNever(() => canvas.save());
+    verifyNever(() => canvas.rotate(any()));
   });
 
   test('paints a color behind a contained and centered image', () {
@@ -80,5 +83,79 @@ void main() {
         any(),
       ),
     );
+  });
+
+  test('rotates the background clockwise without changing canvas bounds', () {
+    final drawable = ImageBackgroundDrawable(image: image, quarterTurns: 1);
+
+    drawable.draw(canvas, const ui.Size(800, 1200));
+
+    verifyInOrder([
+      () => canvas.save(),
+      () => canvas.translate(400, 600),
+      () => canvas.rotate(math.pi / 2),
+      () => canvas.drawImageRect(
+        image,
+        const ui.Rect.fromLTWH(0, 0, 800, 400),
+        const ui.Rect.fromLTWH(-600, -400, 1200, 800),
+        any(),
+      ),
+      () => canvas.restore(),
+    ]);
+  });
+
+  test('keeps alignment relative to the visible canvas after rotation', () {
+    final drawable = ImageBackgroundDrawable(
+      image: image,
+      fit: BoxFit.contain,
+      alignment: Alignment.topLeft,
+      quarterTurns: 1,
+    );
+
+    drawable.draw(canvas, const ui.Size(800, 1200));
+
+    verify(
+      () => canvas.drawImageRect(
+        image,
+        const ui.Rect.fromLTWH(0, 0, 800, 400),
+        const ui.Rect.fromLTWH(-600, -200, 1200, 600),
+        any(),
+      ),
+    );
+  });
+
+  test('normalizes positive and negative quarter turns', () {
+    ImageBackgroundDrawable(
+      image: image,
+      quarterTurns: 5,
+    ).draw(canvas, const ui.Size(800, 1200));
+
+    verify(() => canvas.rotate(math.pi / 2));
+    reset(canvas);
+
+    ImageBackgroundDrawable(
+      image: image,
+      quarterTurns: -1,
+    ).draw(canvas, const ui.Size(800, 1200));
+
+    verify(() => canvas.rotate(3 * math.pi / 2));
+  });
+
+  test('rotated preserves configuration and accumulates turns', () {
+    final drawable = ImageBackgroundDrawable(
+      image: image,
+      fit: BoxFit.contain,
+      alignment: Alignment.bottomCenter,
+      backgroundColor: Colors.white,
+      quarterTurns: -1,
+    );
+
+    final rotated = drawable.rotated(2);
+
+    expect(rotated.image, same(image));
+    expect(rotated.fit, BoxFit.contain);
+    expect(rotated.alignment, Alignment.bottomCenter);
+    expect(rotated.backgroundColor, Colors.white);
+    expect(rotated.quarterTurns, 1);
   });
 }

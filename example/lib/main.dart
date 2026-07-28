@@ -129,7 +129,11 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 
     setState(() {
       backgroundImage = image;
-      controller.background = image.backgroundDrawable;
+      controller.background = ImageBackgroundDrawable(
+        image: image,
+        fit: BoxFit.contain,
+        backgroundColor: Colors.white,
+      );
     });
   }
 
@@ -147,6 +151,14 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     setState(() {});
   }
 
+  /// Rotates only the background, keeping drawable coordinates unchanged.
+  void rotateBackground() {
+    final background = controller.value.background;
+    if (background is ImageBackgroundDrawable) {
+      controller.background = background.rotated();
+    }
+  }
+
   Widget buildDefault(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
@@ -159,6 +171,14 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
             return AppBar(
               title: child,
               actions: [
+                IconButton(
+                  tooltip: "Rotate background",
+                  icon: const Icon(Icons.rotate_90_degrees_cw),
+                  onPressed:
+                      controller.value.background is ImageBackgroundDrawable
+                      ? rotateBackground
+                      : null,
+                ),
                 // Edit the selected text drawable
                 IconButton(
                   tooltip: "Edit selected text",

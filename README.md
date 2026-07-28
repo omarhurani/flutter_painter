@@ -186,8 +186,15 @@ controller.background = ImageBackgroundDrawable(
   fit: BoxFit.contain,
   alignment: Alignment.center,
   backgroundColor: Colors.white,
+  quarterTurns: 1,
 );
 ```
+
+`quarterTurns` rotates only the background image clockwise, so drawable
+coordinates remain unchanged. Avoid wrapping `FlutterPainter` in `RotatedBox`,
+which rotates the entire painter coordinate space. To rotate an image object
+instead, replace its `ImageDrawable` with
+`copyWith(rotation: angleInRadians)`.
 
 The background can also be assigned from the constructor of `PainterController` directly.
 
