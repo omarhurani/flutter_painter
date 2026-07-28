@@ -91,17 +91,21 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
   }
 
   void onScaleEnd(ScaleEndDetails details) {
-    final shapeDrawable = currentShapeDrawable;
-    if (shapeDrawable is Sized2DDrawable) {
-      final sized2DDrawable = (shapeDrawable as Sized2DDrawable);
+    var completedDrawable = currentShapeDrawable;
+    if (completedDrawable == null) return;
+
+    if (completedDrawable is Sized2DDrawable) {
+      final sized2DDrawable = completedDrawable as Sized2DDrawable;
       final newDrawable = sized2DDrawable.copyWith(
         size: Size(
           sized2DDrawable.size.width.abs(),
           sized2DDrawable.size.height.abs(),
         ),
       );
-      updateDrawable(sized2DDrawable as ShapeDrawable, newDrawable);
+      completedDrawable = newDrawable as ShapeDrawable;
+      updateDrawable(sized2DDrawable as ShapeDrawable, completedDrawable);
     }
+
     if (settings.drawOnce) {
       PainterController.of(context).settings = PainterController.of(
         context,
@@ -110,9 +114,6 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
         PainterController.of(context).value.settings,
       ).dispatch(context);
     }
-
-    final completedDrawable = currentShapeDrawable;
-    if (completedDrawable == null) return;
 
     DrawableCreatedNotification(completedDrawable).dispatch(context);
 

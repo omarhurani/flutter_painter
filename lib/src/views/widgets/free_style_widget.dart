@@ -32,6 +32,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
                 onHorizontalDragDown: _handleHorizontalDragDown,
                 onHorizontalDragUpdate: _handleHorizontalDragUpdate,
                 onHorizontalDragUp: _handleHorizontalDragUp,
+                onHorizontalDragCancel: _handleHorizontalDragCancel,
               ),
               (_) {},
             ),
@@ -79,6 +80,10 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
     // Set the drawable as the current drawable
     this.drawable = drawable;
+    FreeStyleDrawingNotification(
+      drawable,
+      FreeStyleDrawingPhase.started,
+    ).dispatch(context);
   }
 
   /// Callback when the user moves, rotates or scales the pointer(s).
@@ -98,6 +103,10 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
     ).replaceDrawable(drawable, newDrawable, newAction: false);
     // Update the current drawable to be the new copy
     this.drawable = newDrawable;
+    FreeStyleDrawingNotification(
+      newDrawable,
+      FreeStyleDrawingPhase.updated,
+    ).dispatch(context);
   }
 
   /// Callback when the user removes all pointers from the widget.
@@ -105,10 +114,34 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
     final completedDrawable = drawable;
     if (completedDrawable == null) return;
 
+    FreeStyleDrawingNotification(
+      completedDrawable,
+      FreeStyleDrawingPhase.ended,
+    ).dispatch(context);
     DrawableCreatedNotification(completedDrawable).dispatch(context);
 
-    /// Reset the current drawable for the user to draw a new one next time
+    // Reset the current drawable for the user to draw a new one next time.
     drawable = null;
+  }
+
+  /// Removes the incomplete drawable when the active pointer is canceled.
+  void _handleHorizontalDragCancel() {
+    final canceledDrawable = drawable;
+    if (canceledDrawable == null) return;
+
+    final controller = PainterController.of(context);
+    // The gesture's add, erase-grouping and update actions are merged into one
+    // undo entry. Undo and discard that entry so cancellation restores the
+    // exact pre-gesture state without leaving a redo action behind.
+    controller.undo();
+    if (controller.unperformedActions.isNotEmpty) {
+      controller.unperformedActions.removeLast();
+    }
+    drawable = null;
+    FreeStyleDrawingNotification(
+      canceledDrawable,
+      FreeStyleDrawingPhase.canceled,
+    ).dispatch(context);
   }
 
   Offset _globalToLocal(Offset globalPosition) {
@@ -124,11 +157,13 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
     required this.onHorizontalDragDown,
     required this.onHorizontalDragUpdate,
     required this.onHorizontalDragUp,
+    required this.onHorizontalDragCancel,
   });
 
   final ValueSetter<Offset> onHorizontalDragDown;
   final ValueSetter<Offset> onHorizontalDragUpdate;
   final VoidCallback onHorizontalDragUp;
+  final VoidCallback onHorizontalDragCancel;
 
   bool _isTrackingGesture = false;
 
@@ -151,8 +186,12 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
       onHorizontalDragUpdate(event.position);
     } else if (event is PointerUpEvent) {
       onHorizontalDragUp();
-      stopTrackingPointer(event.pointer);
       _isTrackingGesture = false;
+      stopTrackingPointer(event.pointer);
+    } else if (event is PointerCancelEvent) {
+      onHorizontalDragCancel();
+      _isTrackingGesture = false;
+      stopTrackingPointer(event.pointer);
     }
   }
 

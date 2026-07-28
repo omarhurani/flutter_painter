@@ -1,3 +1,10 @@
+## Unreleased
+
+* Fix shape gestures under current Flutter: restore drag updates, prevent missing-drawable notifications, and keep draw-once factories active after invalid multi-touch gestures ([Issue #43](https://github.com/omarhurani/flutter_painter/issues/43)).
+* Add free-style drawing state and lifecycle callbacks, including cancellation cleanup ([Issue #52](https://github.com/omarhurani/flutter_painter/issues/52)).
+* Add configurable text alignment for editing and rendered `TextDrawable`s ([Issue #49](https://github.com/omarhurani/flutter_painter/issues/49)).
+* Add `TriangleDrawable` and `TriangleFactory` support ([Issue #65](https://github.com/omarhurani/flutter_painter/issues/65)).
+
 ## [2.0.0] - 2026-07-28
 
 * Resume active maintenance after four years.

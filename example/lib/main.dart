@@ -431,14 +431,33 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
               onPressed: toggleFreeStyleDraw,
             ),
             // Add text
-            IconButton(
-              icon: Icon(
-                Icons.text_fields,
-                color: textFocusNode.hasFocus
-                    ? Theme.of(context).colorScheme.secondary
-                    : null,
+            PopupMenuButton<TextAlign>(
+              tooltip: "Add text",
+              initialValue: controller.textAlign,
+              itemBuilder: (context) => const [
+                PopupMenuItem(
+                  value: TextAlign.start,
+                  child: Text("Start aligned"),
+                ),
+                PopupMenuItem(
+                  value: TextAlign.center,
+                  child: Text("Center aligned"),
+                ),
+                PopupMenuItem(value: TextAlign.end, child: Text("End aligned")),
+              ],
+              onSelected: (alignment) {
+                setTextAlign(alignment);
+                addText();
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Icon(
+                  Icons.text_fields,
+                  color: textFocusNode.hasFocus
+                      ? Theme.of(context).colorScheme.secondary
+                      : null,
+                ),
               ),
-              onPressed: addText,
             ),
             // Add sticker image
             IconButton(
@@ -456,6 +475,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                           DoubleArrowFactory(): "Double Arrow",
                           RectangleFactory(): "Rectangle",
                           OvalFactory(): "Oval",
+                          TriangleFactory(): "Triangle",
                         }.entries
                         .map(
                           (e) => PopupMenuItem(
@@ -508,6 +528,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     }
     if (shapeFactory is RectangleFactory) return Icons.rectangle_outlined;
     if (shapeFactory is OvalFactory) return Icons.circle_outlined;
+    if (shapeFactory is TriangleFactory) return Icons.change_history;
     return Icons.category_outlined;
   }
 
@@ -589,6 +610,10 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     controller.textStyle = controller.textStyle.copyWith(
       color: HSVColor.fromAHSV(1, hue, 1, 1).toColor(),
     );
+  }
+
+  void setTextAlign(TextAlign textAlign) {
+    controller.textAlign = textAlign;
   }
 
   void selectShape(ShapeFactory? factory) {

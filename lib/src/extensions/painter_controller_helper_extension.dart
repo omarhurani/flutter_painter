@@ -113,6 +113,9 @@ extension PainterControllerHelper on PainterController {
   /// The text style to be used for text drawables from `value.settings.text` directly.
   TextStyle get textStyle => value.settings.text.textStyle;
 
+  /// The alignment used for text drawables from `value.settings.text` directly.
+  TextAlign get textAlign => value.settings.text.textAlign;
+
   /// The focus node used to edit text drawables text from `value.settings.text` directly.
   FocusNode? get textFocusNode => value.settings.text.focusNode;
 
@@ -197,6 +200,16 @@ extension PainterControllerHelper on PainterController {
   set textStyle(TextStyle textStyle) => value = value.copyWith(
     settings: value.settings.copyWith(
       text: value.settings.text.copyWith(textStyle: textStyle),
+    ),
+  );
+
+  /// The alignment used for text drawables from `value.settings.text` directly.
+  ///
+  /// Setting this will notify all the listeners of this [PainterController]
+  /// that they need to update.
+  set textAlign(TextAlign textAlign) => value = value.copyWith(
+    settings: value.settings.copyWith(
+      text: value.settings.text.copyWith(textAlign: textAlign),
     ),
   );
 

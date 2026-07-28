@@ -13,7 +13,7 @@ Flutter Painter provides you with a widget that can be used to draw on it. Right
 - **Free-style drawing**: Scribble anything you want with any width and color.
 - **Objects** that you can move, scale and rotate in an easy and familiar way, such as:
   - **Text** with any `TextStyle`.
-  - **Shapes** such as lines, arrows, ovals and rectangles with any `Paint`.
+  - **Shapes** such as lines, arrows, ovals, rectangles and triangles with any `Paint`.
   - **Images** that can be flipped.
 - **Free-style eraser** to erase any part of a drawing or object you don't want on the painter.[*](#erasing)
 
@@ -97,11 +97,13 @@ class _ExampleWidgetState extends State<ExampleWidget> {
 ### Callbacks
 
 `FlutterPainter` has some helpful callbacks that are called when internal changes happen in the widget itself.
-- `onDrawableCreated`: Called when a drawable is created from `FlutterPainter`. Passes the drawable as an arugment.
-- `onDrawableDeleted`: Called when a drawable is deleted from `FlutterPainter`. Passes the drawable as an arugment.
+- `onDrawableCreated`: Called when a drawable is created from `FlutterPainter`. Passes the drawable as an argument.
+- `onDrawableDeleted`: Called when a drawable is deleted from `FlutterPainter`. Passes the drawable as an argument.
 - `onSelectedObjectDrawableChanged`: Called when the selected object drawable changes. This can be useful if you want to display some UI to edit the object's properties. Passes the selected object drawable as an argument.
   - If the drawable is updated (moved, for example), the passed drawable will become invalid. Make sure to use [`PainterController.selectedObjectDrawable`](#selected-object-drawable) to get the up-to-date value of the selected drawable.
 - `onPainterSettingsChanged`: Called when the settings of `PainterController` are changed from `FlutterPainter` itself. Passes the new settings as an argument.
+- `onIsDrawingStateChanged`: Called with `true` when a free-style gesture starts and `false` when it ends or is canceled.
+- `onFreeStyleDrawingStarted`, `onFreeStyleDrawingUpdated`, `onFreeStyleDrawingEnded`, and `onFreeStyleDrawingCanceled`: Report the complete free-style gesture lifecycle and pass its current `PathDrawable`.
 
 
 ## `PainterController`
@@ -116,7 +118,7 @@ All setters on `PainterController` directly notify your `FlutterPainter` to resp
 
 There are currently three types of settings:
 - `freeStyleSettings`: They control the parameters used in drawing scribbles, such as the width and color. It also has a field to enable/disable scribbles, to prevent the user from drawing on the `FlutterPainter`.
-- `textSettings`: They mainly control the `TextStyle` of the text being drawn. It also has a focus node field ([more on focus nodes here](https://flutter.dev/docs/cookbook/forms/focus)) to allow you to detect when the user starts and stops editing text.
+- `textSettings`: They control the `TextStyle` and `TextAlign` of text being drawn. They also include a focus node ([more on focus nodes here](https://flutter.dev/docs/cookbook/forms/focus)) so you can detect when the user starts and stops editing text.
 - `objectSettings`: These settings control objects that can be moved, scaled and rotated. Texts, shapes and images are all considered objects. It controls layout assist, which allows to center objects and rotate them at a right angle, and settings regarding the object controls for scaling, rotating and resizing.
 - `shapeSettings`: These control the paint and shape factory used (Shape Factory is used to create shapes), and whether the shape is drawn once or continiously.
 - `scaleSettings`: These settings control the scaling on the painter (zooming in/out). By default, scaling is disabled.

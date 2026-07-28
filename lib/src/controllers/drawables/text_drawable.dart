@@ -13,6 +13,9 @@ class TextDrawable extends ObjectDrawable {
   /// The direction of the text to be drawn.
   final TextDirection direction;
 
+  /// The alignment of the text within its available layout width.
+  final TextAlign textAlign;
+
   // A text painter which will paint the text on the canvas.
   final TextPainter textPainter;
 
@@ -26,12 +29,13 @@ class TextDrawable extends ObjectDrawable {
     super.scale,
     this.style = const TextStyle(fontSize: 14, color: Colors.black),
     this.direction = TextDirection.ltr,
+    this.textAlign = TextAlign.center,
     super.locked,
     super.hidden,
     super.assists,
   }) : textPainter = TextPainter(
          text: TextSpan(text: text, style: style),
-         textAlign: TextAlign.center,
+         textAlign: textAlign,
          textScaler: TextScaler.linear(scale),
          textDirection: direction,
        ),
@@ -63,6 +67,7 @@ class TextDrawable extends ObjectDrawable {
     TextStyle? style,
     bool? locked,
     TextDirection? direction,
+    TextAlign? textAlign,
   }) {
     return TextDrawable(
       text: text ?? this.text,
@@ -71,6 +76,7 @@ class TextDrawable extends ObjectDrawable {
       scale: scale ?? this.scale,
       style: style ?? this.style,
       direction: direction ?? this.direction,
+      textAlign: textAlign ?? this.textAlign,
       assists: assists ?? this.assists,
       hidden: hidden ?? this.hidden,
       locked: locked ?? this.locked,
@@ -92,7 +98,8 @@ class TextDrawable extends ObjectDrawable {
   //       super == other &&
   //       other.text == text &&
   //       other.style == style &&
-  //       other.direction == direction;
+  //       other.direction == direction &&
+  //       other.textAlign == textAlign;
   // }
   //
   // @override
@@ -104,5 +111,6 @@ class TextDrawable extends ObjectDrawable {
   //     rotationAngle,
   //     scale,
   //     style,
-  //     direction);
+  //     direction,
+  //     textAlign);
 }

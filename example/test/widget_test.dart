@@ -13,4 +13,20 @@ void main() {
 
     expect(find.byType(FlutterPainter), findsOneWidget);
   });
+
+  testWidgets('text alignment can be selected before editing', (tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add text'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start aligned'));
+    await tester.pumpAndSettle();
+
+    final textField = tester.widget<TextField>(find.byType(TextField));
+    expect(textField.textAlign, TextAlign.start);
+  });
 }

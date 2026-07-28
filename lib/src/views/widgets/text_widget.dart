@@ -92,6 +92,7 @@ class _TextWidgetState extends State<_TextWidget> {
       text: '',
       position: center,
       style: settings.textStyle,
+      textAlign: settings.textAlign,
       hidden: true,
     );
     PainterController.of(context).addDrawables([drawable]);
@@ -174,6 +175,9 @@ class EditTextWidgetState extends State<EditTextWidget>
   /// This is used to detect when the keyboard starts closing.
   double bottomViewInsets = 0;
 
+  /// Alignment used by the text currently being edited.
+  late TextAlign textAlign;
+
   /// Getter for [TextSettings] from `widget.controller.value` to make code more readable.
   TextSettings get settings => widget.controller.value.settings.text;
 
@@ -194,6 +198,7 @@ class EditTextWidgetState extends State<EditTextWidget>
 
     // Initialize the text in the [TextField] to the drawable text
     textEditingController.text = widget.drawable.text;
+    textAlign = widget.drawable.textAlign;
 
     // Add this object as an observer for widget bindings
     //
@@ -259,7 +264,7 @@ class EditTextWidgetState extends State<EditTextWidget>
               controller: textEditingController,
               focusNode: textFieldNode,
               style: settings.textStyle,
-              textAlign: TextAlign.center,
+              textAlign: textAlign,
               textAlignVertical: TextAlignVertical.center,
               onEditingComplete: onEditingComplete,
             ),
@@ -309,6 +314,7 @@ class EditTextWidgetState extends State<EditTextWidget>
       final drawable = widget.drawable.copyWith(
         text: textEditingController.text.trim(),
         style: settings.textStyle,
+        textAlign: textAlign,
         hidden: false,
       );
       updateDrawable(widget.drawable, drawable);

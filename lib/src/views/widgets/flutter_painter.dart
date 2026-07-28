@@ -31,6 +31,9 @@ typedef DrawableCreatedCallback = void Function(Drawable drawable);
 
 typedef DrawableDeletedCallback = void Function(Drawable drawable);
 
+/// A callback for a free-style [PathDrawable] drawing lifecycle event.
+typedef FreeStyleDrawingCallback = void Function(PathDrawable drawable);
+
 /// Defines the builder used with [FlutterPainter.builder] constructor.
 typedef FlutterPainterBuilderCallback =
     Widget Function(BuildContext context, Widget painter);
@@ -52,6 +55,26 @@ class FlutterPainter extends StatelessWidget {
   /// Callback when the [PainterSettings] of [PainterController] are updated internally.
   final ValueChanged<PainterSettings>? onPainterSettingsChanged;
 
+  /// Callback when the user starts or stops a free-style drawing gesture.
+  ///
+  /// The value is `true` after a drawable is created for an accepted pointer
+  /// and `false` after that gesture ends or is canceled.
+  final ValueChanged<bool>? onIsDrawingStateChanged;
+
+  /// Callback when a free-style drawing gesture starts.
+  final FreeStyleDrawingCallback? onFreeStyleDrawingStarted;
+
+  /// Callback when a free-style drawing gesture updates its drawable.
+  final FreeStyleDrawingCallback? onFreeStyleDrawingUpdated;
+
+  /// Callback when a free-style drawing gesture completes.
+  final FreeStyleDrawingCallback? onFreeStyleDrawingEnded;
+
+  /// Callback when a free-style drawing gesture is canceled.
+  ///
+  /// The incomplete [PathDrawable] is removed before this callback is called.
+  final FreeStyleDrawingCallback? onFreeStyleDrawingCanceled;
+
   /// The builder used to build this widget.
   ///
   /// Using the default constructor, it will default to returning the [_FlutterPainterWidget].
@@ -68,6 +91,11 @@ class FlutterPainter extends StatelessWidget {
     this.onDrawableDeleted,
     this.onSelectedObjectDrawableChanged,
     this.onPainterSettingsChanged,
+    this.onIsDrawingStateChanged,
+    this.onFreeStyleDrawingStarted,
+    this.onFreeStyleDrawingUpdated,
+    this.onFreeStyleDrawingEnded,
+    this.onFreeStyleDrawingCanceled,
   }) : _builder = _defaultBuilder;
 
   /// Creates a [FlutterPainter] with the given [controller], [builder] and optional callbacks.
@@ -82,6 +110,11 @@ class FlutterPainter extends StatelessWidget {
     this.onDrawableDeleted,
     this.onSelectedObjectDrawableChanged,
     this.onPainterSettingsChanged,
+    this.onIsDrawingStateChanged,
+    this.onFreeStyleDrawingStarted,
+    this.onFreeStyleDrawingUpdated,
+    this.onFreeStyleDrawingEnded,
+    this.onFreeStyleDrawingCanceled,
   }) : _builder = builder;
 
   @override
@@ -100,6 +133,11 @@ class FlutterPainter extends StatelessWidget {
               onDrawableDeleted: onDrawableDeleted,
               onPainterSettingsChanged: onPainterSettingsChanged,
               onSelectedObjectDrawableChanged: onSelectedObjectDrawableChanged,
+              onIsDrawingStateChanged: onIsDrawingStateChanged,
+              onFreeStyleDrawingStarted: onFreeStyleDrawingStarted,
+              onFreeStyleDrawingUpdated: onFreeStyleDrawingUpdated,
+              onFreeStyleDrawingEnded: onFreeStyleDrawingEnded,
+              onFreeStyleDrawingCanceled: onFreeStyleDrawingCanceled,
             ),
           );
         },
@@ -130,6 +168,21 @@ class _FlutterPainterWidget extends StatelessWidget {
   /// Callback when the [PainterSettings] of [PainterController] are updated internally.
   final ValueChanged<PainterSettings>? onPainterSettingsChanged;
 
+  /// Callback when the user starts or stops a free-style drawing gesture.
+  final ValueChanged<bool>? onIsDrawingStateChanged;
+
+  /// Callback when a free-style drawing gesture starts.
+  final FreeStyleDrawingCallback? onFreeStyleDrawingStarted;
+
+  /// Callback when a free-style drawing gesture updates.
+  final FreeStyleDrawingCallback? onFreeStyleDrawingUpdated;
+
+  /// Callback when a free-style drawing gesture ends.
+  final FreeStyleDrawingCallback? onFreeStyleDrawingEnded;
+
+  /// Callback when a free-style drawing gesture is canceled.
+  final FreeStyleDrawingCallback? onFreeStyleDrawingCanceled;
+
   /// Creates a [_FlutterPainterWidget] with the given [controller] and optional callbacks.
   const _FlutterPainterWidget({
     super.key,
@@ -138,6 +191,11 @@ class _FlutterPainterWidget extends StatelessWidget {
     this.onDrawableDeleted,
     this.onSelectedObjectDrawableChanged,
     this.onPainterSettingsChanged,
+    this.onIsDrawingStateChanged,
+    this.onFreeStyleDrawingStarted,
+    this.onFreeStyleDrawingUpdated,
+    this.onFreeStyleDrawingEnded,
+    this.onFreeStyleDrawingCanceled,
   });
 
   @override
@@ -171,9 +229,10 @@ class _FlutterPainterWidget extends StatelessWidget {
 
                 // InteractiveViewer always owns scale gestures, even when its
                 // pan and scale options are disabled. Temporarily replace it
-                // while an object is selected so the object's gesture detector
-                // can receive move, scale, and rotation updates.
-                if (value.selectedObjectDrawable != null) {
+                // while an object is selected or a shape tool is active so the
+                // appropriate gesture detector can receive updates.
+                if (value.selectedObjectDrawable != null ||
+                    value.settings.shape.factory != null) {
                   return ClipRect(
                     child: AnimatedBuilder(
                       animation: controller.transformationController,
@@ -219,6 +278,20 @@ class _FlutterPainterWidget extends StatelessWidget {
       onSelectedObjectDrawableChanged?.call(notification.drawable);
     } else if (notification is SettingsUpdatedNotification) {
       onPainterSettingsChanged?.call(notification.settings);
+    } else if (notification is FreeStyleDrawingNotification) {
+      switch (notification.phase) {
+        case FreeStyleDrawingPhase.started:
+          onIsDrawingStateChanged?.call(true);
+          onFreeStyleDrawingStarted?.call(notification.drawable);
+        case FreeStyleDrawingPhase.updated:
+          onFreeStyleDrawingUpdated?.call(notification.drawable);
+        case FreeStyleDrawingPhase.ended:
+          onIsDrawingStateChanged?.call(false);
+          onFreeStyleDrawingEnded?.call(notification.drawable);
+        case FreeStyleDrawingPhase.canceled:
+          onIsDrawingStateChanged?.call(false);
+          onFreeStyleDrawingCanceled?.call(notification.drawable);
+      }
     }
     return true;
   }
