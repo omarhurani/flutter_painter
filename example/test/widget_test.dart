@@ -32,6 +32,33 @@ void main() {
     expect(textField.textAlign, TextAlign.start);
   });
 
+  testWidgets('selected text can be reopened from the toolbar', (tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add text'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start aligned'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Edit me again');
+
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsNothing);
+
+    await tester.tapAt(tester.getCenter(find.byType(FlutterPainter)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Edit selected text'));
+    await tester.pumpAndSettle();
+
+    final textField = tester.widget<TextField>(find.byType(TextField));
+    expect(textField.controller?.text, 'Edit me again');
+    expect(textField.focusNode?.hasFocus, isTrue);
+  });
+
   testWidgets('font size slider stays interactive while editing text', (
     tester,
   ) async {

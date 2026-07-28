@@ -210,6 +210,13 @@ void deselectObjectDrawable(){
 
 The selected object drawable will also be automatically update if it is replaced or removed from the controller.
 
+To select an existing `TextDrawable` and open it for editing, use
+`editTextDrawable`. The drawable must already belong to the controller.
+
+```dart
+final textDrawable = controller.drawables.whereType<TextDrawable>().first;
+controller.editTextDrawable(textDrawable);
+```
 
 ### Rendering Image
 

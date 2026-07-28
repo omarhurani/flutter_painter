@@ -27,12 +27,16 @@ class _TextWidgetState extends State<_TextWidget> {
 
     // Listen to the stream of events from the paint controller
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      controllerEventSubscription = PainterController.of(context).events.listen((
-        event,
-      ) {
-        // When an [AddTextPainterEvent] event is received, create a new text drawable
-        if (event is AddTextPainterEvent) createDrawable();
-      });
+      controllerEventSubscription = PainterController.of(context).events.listen(
+        (event) {
+          // Handle controller requests to add or edit text drawables.
+          if (event is AddTextPainterEvent) {
+            createDrawable();
+          } else if (event is EditTextPainterEvent) {
+            editDrawable(event.drawable);
+          }
+        },
+      );
     });
   }
 
@@ -65,7 +69,7 @@ class _TextWidgetState extends State<_TextWidget> {
     final drawable = notification.drawable;
 
     if (drawable is TextDrawable) {
-      openTextEditor(drawable);
+      editDrawable(drawable);
       // Mark notification as handled
       return true;
     }
@@ -97,19 +101,27 @@ class _TextWidgetState extends State<_TextWidget> {
     );
     PainterController.of(context).addDrawables([drawable]);
 
-    if (mounted) {
-      setState(() {
-        selectedDrawable = drawable;
-      });
-    }
+    editDrawable(drawable, true);
+  }
 
-    openTextEditor(drawable, true).then((value) {
+  /// Opens [drawable] in the text editor if another text is not being edited.
+  Future<void> editDrawable(TextDrawable drawable, [bool isNew = false]) async {
+    if (!mounted || selectedDrawable != null) return;
+    if (!PainterController.of(context).drawables.contains(drawable)) return;
+
+    setState(() {
+      selectedDrawable = drawable;
+    });
+
+    try {
+      await openTextEditor(drawable, isNew);
+    } finally {
       if (mounted) {
         setState(() {
           selectedDrawable = null;
         });
       }
-    });
+    }
   }
 
   /// Opens an editor to edit the text of [drawable].

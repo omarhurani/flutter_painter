@@ -11,6 +11,7 @@ import 'drawables/image_drawable.dart';
 import 'events/events.dart';
 import 'drawables/background/background_drawable.dart';
 import 'drawables/object_drawable.dart';
+import 'drawables/text_drawable.dart';
 import 'settings/settings.dart';
 import '../views/painters/painter.dart';
 
@@ -288,6 +289,16 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// Dispatches a [AddTextPainterEvent] on `events` stream.
   void addText() {
     _eventsSteamController.add(const AddTextPainterEvent());
+  }
+
+  /// Selects [drawable] and opens it in the attached painter's text editor.
+  ///
+  /// If [drawable] is not owned by this controller, this method does nothing.
+  void editTextDrawable(TextDrawable drawable) {
+    if (!value.drawables.contains(drawable)) return;
+
+    selectObjectDrawable(drawable);
+    _eventsSteamController.add(EditTextPainterEvent(drawable));
   }
 
   @override

@@ -152,6 +152,14 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
             return AppBar(
               title: child,
               actions: [
+                // Edit the selected text drawable
+                IconButton(
+                  tooltip: "Edit selected text",
+                  icon: const Icon(Icons.edit),
+                  onPressed: controller.selectedObjectDrawable is TextDrawable
+                      ? editSelectedTextDrawable
+                      : null,
+                ),
                 // Delete the selected drawable
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
@@ -651,6 +659,13 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   void removeSelectedDrawable() {
     final selectedDrawable = controller.selectedObjectDrawable;
     if (selectedDrawable != null) controller.removeDrawable(selectedDrawable);
+  }
+
+  void editSelectedTextDrawable() {
+    final selectedDrawable = controller.selectedObjectDrawable;
+    if (selectedDrawable is TextDrawable) {
+      controller.editTextDrawable(selectedDrawable);
+    }
   }
 
   void flipSelectedImageDrawable() {

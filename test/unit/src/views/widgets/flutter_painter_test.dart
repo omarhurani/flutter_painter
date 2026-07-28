@@ -100,6 +100,34 @@ void main() {
     expect(find.byType(InteractiveViewer), findsOneWidget);
   });
 
+  testWidgets('controller opens an existing text drawable for editing', (
+    tester,
+  ) async {
+    final drawable = TextDrawable(
+      text: 'Edit me',
+      position: const Offset(150, 150),
+    );
+    final controller = PainterController(drawables: [drawable]);
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(buildPainter(controller));
+    await tester.pumpAndSettle();
+
+    controller.editTextDrawable(drawable);
+    controller.editTextDrawable(drawable);
+    await tester.pumpAndSettle();
+
+    expect(controller.selectedObjectDrawable, same(drawable));
+    expect(find.byType(TextField), findsOneWidget);
+    final textField = tester.widget<TextField>(find.byType(TextField));
+    expect(textField.controller?.text, 'Edit me');
+    expect(textField.focusNode?.hasFocus, isTrue);
+
+    textField.focusNode?.unfocus();
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsNothing);
+  });
+
   testWidgets('free-style callbacks report the complete drawing lifecycle', (
     tester,
   ) async {
