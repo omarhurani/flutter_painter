@@ -198,6 +198,17 @@ class _FlutterPainterWidget extends StatelessWidget {
     this.onFreeStyleDrawingCanceled,
   });
 
+  static EdgeInsets _boundaryMarginFor(Size size, double minScale) {
+    if (minScale >= 1 || !size.isFinite) return EdgeInsets.zero;
+
+    // Give InteractiveViewer exactly enough finite space to reach minScale.
+    final marginFactor = (1 / minScale - 1) / 2;
+    return EdgeInsets.symmetric(
+      horizontal: size.width * marginFactor,
+      vertical: size.height * marginFactor,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Navigator(
@@ -246,19 +257,31 @@ class _FlutterPainterWidget extends StatelessWidget {
                   );
                 }
 
-                return InteractiveViewer(
-                  transformationController: controller.transformationController,
-                  minScale: controller.settings.scale.enabled
-                      ? controller.settings.scale.minScale
-                      : 1,
-                  maxScale: controller.settings.scale.enabled
-                      ? controller.settings.scale.maxScale
-                      : 1,
-                  panEnabled:
-                      controller.settings.scale.enabled &&
-                      (controller.freeStyleSettings.mode == FreeStyleMode.none),
-                  scaleEnabled: controller.settings.scale.enabled,
-                  child: painter,
+                final scaleEnabled = controller.settings.scale.enabled;
+                final minScale = scaleEnabled
+                    ? controller.settings.scale.minScale
+                    : 1.0;
+                final maxScale = scaleEnabled
+                    ? controller.settings.scale.maxScale
+                    : 1.0;
+
+                return LayoutBuilder(
+                  builder: (context, constraints) => InteractiveViewer(
+                    transformationController:
+                        controller.transformationController,
+                    boundaryMargin: _boundaryMarginFor(
+                      constraints.biggest,
+                      minScale,
+                    ),
+                    minScale: minScale,
+                    maxScale: maxScale,
+                    panEnabled:
+                        scaleEnabled &&
+                        (controller.freeStyleSettings.mode ==
+                            FreeStyleMode.none),
+                    scaleEnabled: scaleEnabled,
+                    child: painter,
+                  ),
                 );
               },
             ),

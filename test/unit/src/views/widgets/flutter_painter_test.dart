@@ -144,6 +144,42 @@ void main() {
     expect(created.single, same(controller.drawables.single));
   });
 
+  testWidgets('scale settings allow zooming below one', (tester) async {
+    final controller = PainterController(
+      settings: const PainterSettings(
+        scale: ScaleSettings(enabled: true, minScale: 0.5, maxScale: 4),
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(buildPainter(controller));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<InteractiveViewer>(find.byType(InteractiveViewer))
+          .boundaryMargin,
+      const EdgeInsets.all(150),
+    );
+
+    final center = tester.getCenter(find.byType(FlutterPainter));
+    final first = await tester.createGesture(pointer: 1);
+    final second = await tester.createGesture(pointer: 2);
+    await first.down(center - const Offset(80, 0));
+    await second.down(center + const Offset(80, 0));
+    await first.moveTo(center - const Offset(20, 0));
+    await second.moveTo(center + const Offset(20, 0));
+    await tester.pump();
+    await first.up();
+    await second.up();
+    await tester.pumpAndSettle();
+
+    expect(
+      controller.transformationController.value.getMaxScaleOnAxis(),
+      closeTo(0.5, 0.01),
+    );
+  });
+
   testWidgets('pinch zoom cancels drawing and leaves the brush responsive', (
     tester,
   ) async {
