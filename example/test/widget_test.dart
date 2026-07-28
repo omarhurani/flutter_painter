@@ -59,6 +59,29 @@ void main() {
     expect(textField.focusNode?.hasFocus, isTrue);
   });
 
+  testWidgets('free style hue slider stays at its right boundary', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.gesture));
+    await tester.pumpAndSettle();
+
+    final hueSlider = find.byWidgetPredicate(
+      (widget) => widget is Slider && widget.min == 0 && widget.max == 359.8,
+    );
+    final slider = tester.widget<Slider>(hueSlider);
+
+    slider.onChanged?.call(slider.max);
+    await tester.pump();
+
+    expect(tester.widget<Slider>(hueSlider).value, closeTo(slider.max, 0.05));
+  });
+
   testWidgets('font size slider stays interactive while editing text', (
     tester,
   ) async {

@@ -36,6 +36,11 @@ class FlutterPainterExample extends StatefulWidget {
 
 class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   static const Color red = Color(0xFFFF0000);
+
+  // Colors quantize channels to 8 bits. Values closer to 360 wrap back to
+  // zero when converted to red, so stop before that rounding boundary.
+  static const double maxHue = 359.8;
+
   FocusNode textFocusNode = FocusNode();
   late PainterController controller;
   ui.Image? backgroundImage;
@@ -261,7 +266,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                     flex: 3,
                                     child: Slider.adaptive(
                                       min: 0,
-                                      max: 359.99,
+                                      max: maxHue,
                                       value: HSVColor.fromColor(
                                         controller.freeStyleColor,
                                       ).hue,
@@ -302,7 +307,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                   flex: 3,
                                   child: Slider.adaptive(
                                     min: 0,
-                                    max: 359.99,
+                                    max: maxHue,
                                     value: HSVColor.fromColor(
                                       controller.textStyle.color ?? red,
                                     ).hue,
@@ -349,7 +354,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                   flex: 3,
                                   child: Slider.adaptive(
                                     min: 0,
-                                    max: 359.99,
+                                    max: maxHue,
                                     value: HSVColor.fromColor(
                                       (controller.shapePaint ?? shapePaint)
                                           .color,
