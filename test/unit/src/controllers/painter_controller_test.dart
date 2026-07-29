@@ -162,6 +162,32 @@ void main() {
     expect(drawable.getSize(), const Size(20, 10));
   });
 
+  test('addBlurredImage stores its source, position, shape, and blur', () {
+    final image = MockImage();
+    when(() => image.width).thenReturn(100);
+    when(() => image.height).thenReturn(50);
+    final controller = PainterController();
+    addTearDown(controller.dispose);
+
+    const crop = Rect.fromLTWH(20, 10, 40, 20);
+    controller.addBlurredImage(
+      image,
+      crop,
+      position: const Offset(70, 40),
+      size: const Size(80, 80),
+      blurSigma: 9,
+      shape: ImageDrawableShape.oval,
+    );
+
+    final drawable = controller.value.drawables.single as ImageDrawable;
+    expect(drawable.sourceRect, crop);
+    expect(drawable.position, const Offset(70, 40));
+    expect(drawable.getSize(), const Size(80, 40));
+    expect(drawable.blurSigma, 9);
+    expect(drawable.shape, ImageDrawableShape.oval);
+    expect(controller.canUndo, isTrue);
+  });
+
   test('addTaggedImage preserves its tag, crop, and fitted size', () {
     final image = MockImage();
     when(() => image.width).thenReturn(100);

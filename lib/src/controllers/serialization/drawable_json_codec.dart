@@ -237,6 +237,8 @@ class DrawableJsonCodec {
         'sourceRect': _rect(image.sourceRect),
         'flipped': image.flipped,
         'opacity': image.opacity,
+        'blurSigma': image.blurSigma,
+        'shape': image.shape.name,
         'erasable': image.erasable,
       });
     }
@@ -435,6 +437,15 @@ class DrawableJsonCodec {
           sourceRect: _decodeRect(data['sourceRect'], '$path.data.sourceRect'),
           flipped: _boolean(data['flipped'], '$path.data.flipped'),
           opacity: _number(data['opacity'], '$path.data.opacity'),
+          blurSigma:
+              _optionalNumber(data['blurSigma'], '$path.data.blurSigma') ?? 0,
+          shape: data['shape'] == null
+              ? ImageDrawableShape.rectangle
+              : _enumValue(
+                  ImageDrawableShape.values,
+                  data['shape'],
+                  '$path.data.shape',
+                ),
           erasable: _boolean(data['erasable'], '$path.data.erasable'),
           position: object.position,
           rotationAngle: object.rotation,

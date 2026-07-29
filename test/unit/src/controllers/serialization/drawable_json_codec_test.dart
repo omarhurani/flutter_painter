@@ -122,6 +122,8 @@ void main() {
             scale: 2,
             flipped: true,
             opacity: 0.75,
+            blurSigma: 6,
+            shape: ImageDrawableShape.oval,
             erasable: false,
             assists: assists,
             assistPaints: assistPaints,
@@ -323,6 +325,27 @@ void main() {
           .having((drawable) => drawable.value, 'value', 7)
           .having((drawable) => drawable.hidden, 'hidden', isTrue),
     );
+  });
+
+  test('restores image JSON written before blur fields were added', () async {
+    final sourceImage = await _createSourceImage();
+    addTearDown(sourceImage.dispose);
+    final codec = DrawableJsonCodec();
+    final encoded = await codec.encode([
+      ImageDrawable(image: sourceImage, position: const Offset(10, 10)),
+    ]);
+    final entries = encoded['drawables']! as List<Map<String, Object?>>;
+    final data = entries.single['data']! as Map<String, Object?>;
+    data
+      ..remove('blurSigma')
+      ..remove('shape');
+
+    final restored = await codec.decode(encoded);
+    addTearDown(() => _disposeDrawableImages(restored));
+    final image = restored.single as ImageDrawable;
+
+    expect(image.blurSigma, 0);
+    expect(image.shape, ImageDrawableShape.rectangle);
   });
 
   test('rejects unsupported custom drawables and invalid adapters', () async {

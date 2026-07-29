@@ -83,7 +83,12 @@ class DottedFreeStyleDrawable extends PathDrawable {
   }
 }
 
-enum _ImageMenuAction { onlineSticker, croppedSample }
+enum _ImageMenuAction {
+  onlineSticker,
+  croppedSample,
+  blurredRectangle,
+  blurredOval,
+}
 
 class FlutterPainterExample extends StatefulWidget {
   const FlutterPainterExample({super.key});
@@ -100,6 +105,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   static const double maxHue = 359.8;
 
   bool updatingImageOpacity = false;
+  bool updatingImageBlur = false;
   bool updatingSelectedShapeColor = false;
   bool updatingSelectedAngle = false;
   FocusNode textFocusNode = FocusNode();
@@ -530,15 +536,47 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                 ),
                               ],
                             ),
+                            Row(
+                              children: [
+                                const Expanded(flex: 1, child: Text("Blur")),
+                                Expanded(
+                                  flex: 3,
+                                  child: Slider.adaptive(
+                                    min: 0,
+                                    max: 30,
+                                    value: imageDrawable.blurSigma > 30
+                                        ? 30
+                                        : imageDrawable.blurSigma,
+                                    onChangeStart: startImageBlurUpdate,
+                                    onChanged: setSelectedImageBlur,
+                                    onChangeEnd: endImageBlurUpdate,
+                                  ),
+                                ),
+                              ],
+                            ),
                             Align(
                               alignment: Alignment.centerRight,
-                              child: OutlinedButton(
-                                onPressed: toggleSelectedImageCrop,
-                                child: Text(
-                                  imageDrawable.isCropped
-                                      ? "Reset Crop"
-                                      : "Crop Center",
-                                ),
+                              child: Wrap(
+                                spacing: 8,
+                                children: [
+                                  OutlinedButton(
+                                    onPressed: toggleSelectedImageShape,
+                                    child: Text(
+                                      imageDrawable.shape ==
+                                              ImageDrawableShape.rectangle
+                                          ? "Use Oval"
+                                          : "Use Rectangle",
+                                    ),
+                                  ),
+                                  OutlinedButton(
+                                    onPressed: toggleSelectedImageCrop,
+                                    child: Text(
+                                      imageDrawable.isCropped
+                                          ? "Reset Crop"
+                                          : "Crop Center",
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -659,7 +697,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                 ),
               ),
             ),
-            // Add a network sticker or an offline cropped sample.
+            // Add a network sticker, crop, or source-image redaction.
             PopupMenuButton<_ImageMenuAction>(
               tooltip: "Add image",
               icon: const Icon(Icons.emoji_emotions_outlined),
@@ -672,6 +710,14 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                   value: _ImageMenuAction.croppedSample,
                   child: Text("Add cropped sample"),
                 ),
+                PopupMenuItem(
+                  value: _ImageMenuAction.blurredRectangle,
+                  child: Text("Add blurred rectangle"),
+                ),
+                PopupMenuItem(
+                  value: _ImageMenuAction.blurredOval,
+                  child: Text("Add blurred oval"),
+                ),
               ],
               onSelected: (action) {
                 switch (action) {
@@ -679,6 +725,10 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                     addSticker();
                   case _ImageMenuAction.croppedSample:
                     addCroppedSample();
+                  case _ImageMenuAction.blurredRectangle:
+                    addBlurredSample(ImageDrawableShape.rectangle);
+                  case _ImageMenuAction.blurredOval:
+                    addBlurredSample(ImageDrawableShape.oval);
                 }
               },
             ),
@@ -842,6 +892,30 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     controller.selectObjectDrawable(drawable);
   }
 
+  void addBlurredSample(ImageDrawableShape shape) {
+    final image = backgroundImage;
+    final painterSize = controller.painterKey.currentContext?.size;
+    if (image == null || painterSize == null) return;
+
+    final sourceSize = Size(image.width.toDouble(), image.height.toDouble());
+    final cropRect = Rect.fromCenter(
+      center: Offset(sourceSize.width / 2, sourceSize.height / 2),
+      width: sourceSize.width * 0.35,
+      height: sourceSize.height * 0.22,
+    );
+    final scale = painterSize.width / sourceSize.width;
+    controller.addBlurredImage(
+      image,
+      cropRect,
+      position: Offset(cropRect.center.dx * scale, cropRect.center.dy * scale),
+      size: cropRect.size * scale,
+      blurSigma: 16,
+      shape: shape,
+    );
+    final drawable = controller.drawables.last as ImageDrawable;
+    controller.selectObjectDrawable(drawable);
+  }
+
   void setFreeStyleStrokeWidth(double value) {
     controller.freeStyleStrokeWidth = value;
   }
@@ -934,6 +1008,26 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     updatingImageOpacity = false;
   }
 
+  void startImageBlurUpdate(double _) {
+    updatingImageBlur = false;
+  }
+
+  void setSelectedImageBlur(double blurSigma) {
+    final selectedDrawable = controller.selectedObjectDrawable;
+    if (selectedDrawable is! ImageDrawable) return;
+
+    final replaced = controller.replaceDrawable(
+      selectedDrawable,
+      selectedDrawable.copyWith(blurSigma: blurSigma),
+      newAction: !updatingImageBlur,
+    );
+    if (replaced) updatingImageBlur = true;
+  }
+
+  void endImageBlurUpdate(double _) {
+    updatingImageBlur = false;
+  }
+
   void startSelectedShapeColorUpdate(double _) {
     updatingSelectedShapeColor = false;
   }
@@ -1005,6 +1099,20 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
             fullRect.height * 0.6,
           );
     controller.cropImageDrawable(imageDrawable, sourceRect);
+  }
+
+  void toggleSelectedImageShape() {
+    final imageDrawable = controller.selectedObjectDrawable;
+    if (imageDrawable is! ImageDrawable) return;
+
+    controller.replaceDrawable(
+      imageDrawable,
+      imageDrawable.copyWith(
+        shape: imageDrawable.shape == ImageDrawableShape.rectangle
+            ? ImageDrawableShape.oval
+            : ImageDrawableShape.rectangle,
+      ),
+    );
   }
 
   void toggleSelectedShapeLabel() {

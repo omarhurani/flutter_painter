@@ -361,6 +361,30 @@ instead, replace its `ImageDrawable` with
 
 The background can also be assigned from the constructor of `PainterController` directly.
 
+### Blurring sensitive image regions
+
+Blur real source-image pixels and clip the result as a rectangle or oval. The
+result remains movable, scalable, rotatable, undoable, and JSON-persisted:
+
+```dart
+controller.addBlurredImage(
+  sourceImage,
+  const Rect.fromLTWH(120, 80, 240, 100), // Source pixel coordinates.
+  position: const Offset(240, 130),       // Painter coordinates.
+  size: const Size(240, 100),
+  blurSigma: 16,
+  shape: ImageDrawableShape.oval,
+);
+```
+
+For a redaction overlay, map the source crop to the matching position and size
+used by the painter background. The caller retains ownership of `sourceImage`
+and must keep it alive while the drawable uses it.
+
+Blur is visual obfuscation, not destructive source removal. Share the result of
+`renderImage` when you need a flattened image; `DrawableJsonCodec` embeds the
+original source pixels and must not be treated as a sanitized redacted file.
+
 ### Drawables
 
 All the drawables drawn on `FlutterPainter` are stored and controller by the `PainterController`. On most use cases, you won't need to interact with the drawables directly. However, you may add, insert, replace or remove drawables from the code (without the user actually drawing them).

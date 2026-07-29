@@ -411,13 +411,48 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     _addImage(image, size, sourceRect: sourceRect);
   }
 
-  void _addImage(ui.Image image, Size? size, {Rect? sourceRect, String? tag}) {
+  /// Adds a blurred source-image region as a movable rectangle or oval.
+  ///
+  /// [sourceRect] uses source-image pixel coordinates. [position] uses painter
+  /// coordinates and defaults to the painter center. If [size] is provided,
+  /// the cropped source is scaled to fit that size while preserving its aspect
+  /// ratio. The caller retains ownership of [image]. This visually obscures
+  /// rendered output but does not remove pixels from the source image.
+  void addBlurredImage(
+    ui.Image image,
+    Rect sourceRect, {
+    Offset? position,
+    Size? size,
+    double blurSigma = 12,
+    ImageDrawableShape shape = ImageDrawableShape.rectangle,
+  }) {
+    _addImage(
+      image,
+      size,
+      sourceRect: sourceRect,
+      position: position,
+      blurSigma: blurSigma,
+      shape: shape,
+    );
+  }
+
+  void _addImage(
+    ui.Image image,
+    Size? size, {
+    Rect? sourceRect,
+    String? tag,
+    Offset? position,
+    double blurSigma = 0,
+    ImageDrawableShape shape = ImageDrawableShape.rectangle,
+  }) {
     // Calculate the center of the painter
     final renderBox =
         painterKey.currentContext?.findRenderObject() as RenderBox?;
-    final center = renderBox == null
-        ? Offset.zero
-        : Offset(renderBox.size.width / 2, renderBox.size.height / 2);
+    final center =
+        position ??
+        (renderBox == null
+            ? Offset.zero
+            : Offset(renderBox.size.width / 2, renderBox.size.height / 2));
 
     final ImageDrawable drawable;
 
@@ -427,6 +462,8 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
         tag: tag,
         position: center,
         sourceRect: sourceRect,
+        blurSigma: blurSigma,
+        shape: shape,
       );
     } else {
       drawable = ImageDrawable.fittedToSize(
@@ -435,6 +472,8 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
         position: center,
         size: size,
         sourceRect: sourceRect,
+        blurSigma: blurSigma,
+        shape: shape,
       );
     }
 

@@ -23,13 +23,15 @@ void main() {
     when(() => image.height).thenReturn(50);
   });
 
-  test('copyWith preserves and updates image opacity', () {
+  test('copyWith preserves and updates image appearance', () {
     final assistPaint = Paint()..color = const Color(0xFF123456);
     final drawable = ImageDrawable(
       image: image,
       position: Offset.zero,
       tag: 'star',
       opacity: 0.75,
+      blurSigma: 8,
+      shape: ImageDrawableShape.oval,
       assistPaints: {ObjectDrawableAssist.horizontal: assistPaint},
     );
 
@@ -37,6 +39,13 @@ void main() {
     expect(drawable.copyWith(tag: 'heart').tag, 'heart');
     expect(drawable.copyWith().opacity, 0.75);
     expect(drawable.copyWith(opacity: 0.25).opacity, 0.25);
+    expect(drawable.copyWith().blurSigma, 8);
+    expect(drawable.copyWith(blurSigma: 4).blurSigma, 4);
+    expect(drawable.copyWith().shape, ImageDrawableShape.oval);
+    expect(
+      drawable.copyWith(shape: ImageDrawableShape.rectangle).shape,
+      ImageDrawableShape.rectangle,
+    );
     expect(
       drawable.copyWith().assistPaints[ObjectDrawableAssist.horizontal],
       same(assistPaint),
@@ -148,6 +157,43 @@ void main() {
     expect(bytes.getUint8(3), 255);
   });
 
+  test('blurs source pixels and clips them to an oval', () async {
+    final sourceRecorder = PictureRecorder();
+    final sourceCanvas = Canvas(sourceRecorder);
+    sourceCanvas.drawRect(
+      const Rect.fromLTWH(0, 0, 30, 20),
+      Paint()..color = const Color(0xFFFF0000),
+    );
+    sourceCanvas.drawRect(
+      const Rect.fromLTWH(30, 0, 30, 20),
+      Paint()..color = const Color(0xFF0000FF),
+    );
+    final sourceImage = await sourceRecorder.endRecording().toImage(60, 20);
+    addTearDown(sourceImage.dispose);
+    final drawable = ImageDrawable(
+      image: sourceImage,
+      position: const Offset(30, 10),
+      blurSigma: 5,
+      shape: ImageDrawableShape.oval,
+    );
+
+    final outputRecorder = PictureRecorder();
+    drawable.drawObject(Canvas(outputRecorder), const Size(60, 20));
+    final outputImage = await outputRecorder.endRecording().toImage(60, 20);
+    addTearDown(outputImage.dispose);
+    final bytes = await outputImage.toByteData(format: ImageByteFormat.rawRgba);
+
+    expect(bytes, isNotNull);
+    int channelAt(int x, int y, int channel) {
+      return bytes!.getUint8((y * 60 + x) * 4 + channel);
+    }
+
+    expect(channelAt(0, 0, 3), 0);
+    expect(channelAt(30, 10, 3), 255);
+    expect(channelAt(30, 10, 0), inInclusiveRange(40, 220));
+    expect(channelAt(30, 10, 2), inInclusiveRange(40, 220));
+  });
+
   test('rejects source crops outside the image bounds', () {
     expect(
       () => ImageDrawable(
@@ -162,6 +208,18 @@ void main() {
         image: image,
         position: Offset.zero,
         sourceRect: Rect.zero,
+      ),
+      throwsArgumentError,
+    );
+    expect(
+      () => ImageDrawable(image: image, position: Offset.zero, blurSigma: -1),
+      throwsArgumentError,
+    );
+    expect(
+      () => ImageDrawable(
+        image: image,
+        position: Offset.zero,
+        blurSigma: double.infinity,
       ),
       throwsArgumentError,
     );

@@ -159,6 +159,48 @@ void main() {
     expect(rendered.height, 200);
   });
 
+  testWidgets('renders and restores a blurred rectangle redaction', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add image'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add blurred rectangle'));
+    await tester.pumpAndSettle();
+
+    final painter = tester.widget<FlutterPainter>(find.byType(FlutterPainter));
+    final original = painter.controller.selectedObjectDrawable as ImageDrawable;
+    expect(original.isCropped, isTrue);
+    expect(original.blurSigma, 16);
+    expect(original.shape, ImageDrawableShape.rectangle);
+
+    final rendered = await painter.controller.renderImage(
+      const Size(1280, 720),
+    );
+    addTearDown(rendered.dispose);
+    expect(rendered.width, 1280);
+    expect(rendered.height, 720);
+
+    final codec = DrawableJsonCodec();
+    final restored = await codec.decodeJson(
+      await codec.encodeJson(painter.controller.drawables),
+    );
+    final restoredImage = restored.single as ImageDrawable;
+    addTearDown(restoredImage.image.dispose);
+    expect(restoredImage.blurSigma, 16);
+    expect(restoredImage.shape, ImageDrawableShape.rectangle);
+
+    final restoredController = PainterController(drawables: restored);
+    addTearDown(restoredController.dispose);
+    final restoredRender = await restoredController.renderImage(
+      const Size(1280, 720),
+    );
+    addTearDown(restoredRender.dispose);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('saves, clears, restores, and exports drawable JSON', (
     tester,
   ) async {

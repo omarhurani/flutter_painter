@@ -180,6 +180,36 @@ void main() {
     );
   });
 
+  testWidgets('blurred oval sample can change blur and clipping shape', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add image'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add blurred oval'));
+    await tester.pumpAndSettle();
+
+    final painter = tester.widget<FlutterPainter>(find.byType(FlutterPainter));
+    final blurred = painter.controller.selectedObjectDrawable as ImageDrawable;
+    expect(blurred.isCropped, isTrue);
+    expect(blurred.blurSigma, 16);
+    expect(blurred.shape, ImageDrawableShape.oval);
+
+    await tester.tap(find.text('Use Rectangle'));
+    await tester.pumpAndSettle();
+    expect(
+      (painter.controller.selectedObjectDrawable as ImageDrawable).shape,
+      ImageDrawableShape.rectangle,
+    );
+  });
+
   testWidgets('labeled shape can be drawn and its text updated', (
     tester,
   ) async {

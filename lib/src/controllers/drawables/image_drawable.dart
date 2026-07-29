@@ -2,6 +2,15 @@ import 'dart:ui';
 
 import 'object_drawable.dart';
 
+/// The clipping shape used by an [ImageDrawable].
+enum ImageDrawableShape {
+  /// Clips the image to its rectangular bounds.
+  rectangle,
+
+  /// Clips the image to an oval inscribed in its bounds.
+  oval,
+}
+
 /// A drawable of an image as an object.
 class ImageDrawable extends ObjectDrawable {
   /// The image to be drawn.
@@ -28,6 +37,16 @@ class ImageDrawable extends ObjectDrawable {
   /// The opacity used to draw the image, between 0 (transparent) and 1 (opaque).
   final double opacity;
 
+  /// The standard deviation of the image blur in logical pixels.
+  ///
+  /// A value of zero disables blur. Use a cropped [sourceRect] and position the
+  /// drawable over the matching background area to obscure source-image
+  /// pixels in rendered output.
+  final double blurSigma;
+
+  /// The shape used to clip this image.
+  final ImageDrawableShape shape;
+
   /// Whether free-style erasing can affect this image.
   ///
   /// Non-erasable images remain selectable and movable in erase mode.
@@ -48,9 +67,12 @@ class ImageDrawable extends ObjectDrawable {
     Rect? sourceRect,
     this.flipped = false,
     double opacity = 1,
+    double blurSigma = 0,
+    this.shape = ImageDrawableShape.rectangle,
     this.erasable = true,
   }) : assert(opacity.isFinite && opacity >= 0 && opacity <= 1),
        opacity = opacity.isFinite ? opacity.clamp(0.0, 1.0) : 1,
+       blurSigma = _validateBlurSigma(blurSigma),
        sourceRect = _validateSourceRect(image, sourceRect);
 
   /// Creates an [ImageDrawable] with the given [image], and calculates the scale based on the given [size].
@@ -72,6 +94,8 @@ class ImageDrawable extends ObjectDrawable {
     Rect? sourceRect,
     bool flipped = false,
     double opacity = 1,
+    double blurSigma = 0,
+    ImageDrawableShape shape = ImageDrawableShape.rectangle,
     bool erasable = true,
   }) : this(
          position: position,
@@ -87,6 +111,8 @@ class ImageDrawable extends ObjectDrawable {
          sourceRect: sourceRect,
          flipped: flipped,
          opacity: opacity,
+         blurSigma: blurSigma,
+         shape: shape,
          erasable: erasable,
          hidden: hidden,
          locked: locked,
@@ -106,6 +132,8 @@ class ImageDrawable extends ObjectDrawable {
     Rect? sourceRect,
     bool? flipped,
     double? opacity,
+    double? blurSigma,
+    ImageDrawableShape? shape,
     bool? erasable,
     bool? locked,
   }) {
@@ -125,6 +153,8 @@ class ImageDrawable extends ObjectDrawable {
       sourceRect: nextSourceRect,
       flipped: flipped ?? this.flipped,
       opacity: opacity ?? this.opacity,
+      blurSigma: blurSigma ?? this.blurSigma,
+      shape: shape ?? this.shape,
       erasable: erasable ?? this.erasable,
       locked: locked ?? this.locked,
     );
@@ -135,16 +165,34 @@ class ImageDrawable extends ObjectDrawable {
   void drawObject(Canvas canvas, Size size) {
     final scaledSize = Offset(sourceRect.width, sourceRect.height) * scale;
     final position = this.position.scale(flipped ? -1 : 1, 1);
+    final destinationRect = Rect.fromPoints(
+      position - scaledSize / 2,
+      position + scaledSize / 2,
+    );
 
     if (flipped) canvas.scale(-1, 1);
 
-    // Draw the image onto the canvas.
-    canvas.drawImageRect(
-      image,
-      sourceRect,
-      Rect.fromPoints(position - scaledSize / 2, position + scaledSize / 2),
-      Paint()..color = Color.fromRGBO(255, 255, 255, opacity),
-    );
+    canvas.save();
+    switch (shape) {
+      case ImageDrawableShape.rectangle:
+        canvas.clipRect(destinationRect);
+      case ImageDrawableShape.oval:
+        canvas.clipPath(Path()..addOval(destinationRect));
+    }
+
+    final paint = Paint()..color = Color.fromRGBO(255, 255, 255, opacity);
+    if (blurSigma > 0) {
+      paint
+        ..filterQuality = FilterQuality.high
+        ..imageFilter = ImageFilter.blur(
+          sigmaX: blurSigma,
+          sigmaY: blurSigma,
+          tileMode: TileMode.clamp,
+        );
+    }
+
+    canvas.drawImageRect(image, sourceRect, destinationRect, paint);
+    canvas.restore();
   }
 
   /// Calculates the size of the rendered object.
@@ -200,5 +248,16 @@ class ImageDrawable extends ObjectDrawable {
       );
     }
     return rect;
+  }
+
+  static double _validateBlurSigma(double blurSigma) {
+    if (!blurSigma.isFinite || blurSigma < 0) {
+      throw ArgumentError.value(
+        blurSigma,
+        'blurSigma',
+        'must be finite and non-negative',
+      );
+    }
+    return blurSigma;
   }
 }
