@@ -5,21 +5,33 @@ import 'package:flutter/material.dart';
 
 /// Adds a method to get a [ui.Image] object from any [ImageProvider].
 extension ImageProviderUiImageGetter on ImageProvider {
-  /// Returns an [ui.Image] object containing the image data from `this` object.
+  /// Returns an owned [ui.Image] containing the first frame from this provider.
+  ///
+  /// The image-stream listener is removed after the first image or error. The
+  /// caller must dispose the returned image when it is no longer needed.
   Future<ui.Image> get image async {
-    // Used to convert listener callback to future
     final completer = Completer<ui.Image>();
+    final stream = resolve(ImageConfiguration.empty);
+    late final ImageStreamListener listener;
 
-    // Resolve the image as an [ImageStream] and listen to the stream
-    resolve(ImageConfiguration.empty).addListener(
-      ImageStreamListener((info, _) {
-        // Assign the [ui.Image] from the image information streamed as the completer value
-        // When the image from the stream arrives, the completer is completed
+    listener = ImageStreamListener(
+      (info, _) {
+        stream.removeListener(listener);
+        if (completer.isCompleted) {
+          info.dispose();
+          return;
+        }
         completer.complete(info.image);
-      }),
+      },
+      onError: (Object error, StackTrace? stackTrace) {
+        stream.removeListener(listener);
+        if (!completer.isCompleted) {
+          completer.completeError(error, stackTrace ?? StackTrace.current);
+        }
+      },
     );
+    stream.addListener(listener);
 
-    // Wait for the image data from the completer to arrive from the callback
-    return await completer.future;
+    return completer.future;
   }
 }

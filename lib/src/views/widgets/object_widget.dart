@@ -98,34 +98,22 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   bool cancelControlsAnimation = false;
 
   @override
-  void initState() {
-    super.initState();
-
-    // Listen to the stream of events from the paint controller
-    WidgetsBinding.instance.addPostFrameCallback((timestamp) {
-      controllerEventSubscription = PainterController.of(context).events.listen((
-        event,
-      ) {
-        // When an [RemoveDrawableEvent] event is received and removed drawable is the selected object
-        // cancel the animation.
-        if (event is SelectedObjectDrawableRemovedEvent) {
-          setState(() {
-            cancelControlsAnimation = true;
-          });
-        }
-      });
-
-      // Listen to transformation changes of [InteractiveViewer].
-      PainterController.of(
-        context,
-      ).transformationController.addListener(onTransformUpdated);
-    });
-  }
-
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    controller = PainterController.of(context);
+    final nextController = PainterController.of(context);
+    if (identical(controller, nextController)) return;
+
+    controllerEventSubscription?.cancel();
+    controller?.transformationController.removeListener(onTransformUpdated);
+    controller = nextController;
+    controllerEventSubscription = nextController.events.listen((event) {
+      if (event is SelectedObjectDrawableRemovedEvent) {
+        setState(() {
+          cancelControlsAnimation = true;
+        });
+      }
+    });
+    nextController.transformationController.addListener(onTransformUpdated);
   }
 
   @override
@@ -133,6 +121,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     // Cancel subscription to events from painter controller
     controllerEventSubscription?.cancel();
     controller?.transformationController.removeListener(onTransformUpdated);
+    controller = null;
     super.dispose();
   }
 

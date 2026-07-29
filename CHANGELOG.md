@@ -19,6 +19,7 @@
 * Preserve application-defined image tags and count tagged sticker types ([Issue #56](https://github.com/omarhurani/flutter_painter/issues/56)).
 * Add versioned JSON export and restoration for built-in drawables, embedded images, and custom adapters ([Issue #34](https://github.com/omarhurani/flutter_painter/issues/34), [Issue #71](https://github.com/omarhurani/flutter_painter/issues/71), [Issue #79](https://github.com/omarhurani/flutter_painter/issues/79)).
 * Add transformable object groups with undoable grouping, ungrouping, and JSON persistence ([Issue #81](https://github.com/omarhurani/flutter_painter/issues/81)).
+* Release image-provider stream listeners after resolving an image, rebind painter widget subscriptions when controllers change, and document independent PageView controller/image ownership ([Issue #32](https://github.com/omarhurani/flutter_painter/issues/32), [Issue #36](https://github.com/omarhurani/flutter_painter/issues/36)).
 
 ## [2.0.0] - 2026-07-28
 

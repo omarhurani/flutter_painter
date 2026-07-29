@@ -242,4 +242,108 @@ void main() {
     expect(rendered.width, 220);
     expect(rendered.height, 180);
   });
+
+  testWidgets(
+    'retains independent PageView drawings without live image leaks',
+    (tester) async {
+      Future<ui.Image> createImage(Color color) async {
+        final recorder = ui.PictureRecorder();
+        ui.Canvas(recorder).drawRect(
+          const Rect.fromLTWH(0, 0, 40, 30),
+          ui.Paint()..color = color,
+        );
+        return recorder.endRecording().toImage(40, 30);
+      }
+
+      final firstImage = await createImage(Colors.indigo);
+      final secondImage = await createImage(Colors.amber);
+      addTearDown(firstImage.dispose);
+      addTearDown(secondImage.dispose);
+      final controllers = [
+        PainterController(background: firstImage.backgroundDrawable),
+        PainterController(background: secondImage.backgroundDrawable),
+      ];
+      addTearDown(() {
+        for (final controller in controllers) {
+          controller.dispose();
+        }
+      });
+
+      final imageData = await firstImage.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+      final imageBytes = imageData!.buffer.asUint8List();
+      final initialLiveImages =
+          PaintingBinding.instance.imageCache.liveImageCount;
+      for (var index = 0; index < 20; index++) {
+        final resolvedImage = await MemoryImage(imageBytes).image;
+        resolvedImage.dispose();
+      }
+      await tester.pump();
+      expect(
+        PaintingBinding.instance.imageCache.liveImageCount,
+        initialLiveImages,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 240,
+              height: 180,
+              child: PageView.builder(
+                itemCount: controllers.length,
+                itemBuilder: (context, index) =>
+                    FlutterPainter(controller: controllers[index]),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      controllers.first.addText();
+      await tester.pump();
+      await tester.enterText(find.byType(TextField), 'first page');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      await tester.drag(find.byType(PageView), const Offset(-300, 0));
+      await tester.pumpAndSettle();
+      controllers.last.addText();
+      await tester.pump();
+      await tester.enterText(find.byType(TextField), 'second page');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      expect(controllers.first.drawables, hasLength(1));
+      expect(
+        (controllers.first.drawables.single as TextDrawable).text,
+        'first page',
+      );
+      expect(controllers.last.drawables, hasLength(1));
+      expect(
+        (controllers.last.drawables.single as TextDrawable).text,
+        'second page',
+      );
+
+      await tester.drag(find.byType(PageView), const Offset(300, 0));
+      await tester.pumpAndSettle();
+      final firstRendered = await controllers.first.renderImage(
+        const Size(200, 150),
+      );
+      final secondRendered = await controllers.last.renderImage(
+        const Size(200, 150),
+      );
+      addTearDown(firstRendered.dispose);
+      addTearDown(secondRendered.dispose);
+      expect(firstRendered.width, 200);
+      expect(secondRendered.width, 200);
+      expect(tester.takeException(), isNull);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

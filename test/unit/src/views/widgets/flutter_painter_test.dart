@@ -218,6 +218,89 @@ void main() {
     expect(find.byType(TextField), findsNothing);
   });
 
+  testWidgets('controller subscriptions rebind when the painter changes', (
+    tester,
+  ) async {
+    final firstController = PainterController();
+    final secondController = PainterController();
+    addTearDown(firstController.dispose);
+    addTearDown(secondController.dispose);
+
+    await tester.pumpWidget(buildPainter(firstController));
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(buildPainter(secondController));
+    await tester.pumpAndSettle();
+
+    firstController.addText();
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsNothing);
+
+    secondController.addText();
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsOneWidget);
+
+    firstController.transformationController.value = Matrix4.translationValues(
+      20,
+      10,
+      0,
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('PageView painters retain independent drawings', (tester) async {
+    final controllers = [
+      PainterController(
+        background: const ColorBackgroundDrawable(color: Colors.white),
+      ),
+      PainterController(
+        background: const ColorBackgroundDrawable(color: Colors.black),
+      ),
+    ];
+    for (final controller in controllers) {
+      addTearDown(controller.dispose);
+    }
+    final pageController = PageController();
+    addTearDown(pageController.dispose);
+
+    await tester.pumpWidget(
+      testbed.simpleWrap(
+        child: SizedBox(
+          width: 300,
+          height: 300,
+          child: PageView.builder(
+            controller: pageController,
+            itemCount: controllers.length,
+            itemBuilder: (context, index) =>
+                FlutterPainter(controller: controllers[index]),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final firstDrawing = TextDrawable(
+      text: 'First page',
+      position: const Offset(100, 100),
+    );
+    controllers.first.addDrawables([firstDrawing]);
+    await tester.drag(find.byType(PageView), const Offset(-300, 0));
+    await tester.pumpAndSettle();
+
+    final secondDrawing = TextDrawable(
+      text: 'Second page',
+      position: const Offset(180, 160),
+    );
+    controllers.last.addDrawables([secondDrawing]);
+    await tester.drag(find.byType(PageView), const Offset(300, 0));
+    await tester.pumpAndSettle();
+
+    expect(controllers.first.drawables, [same(firstDrawing)]);
+    expect(controllers.last.drawables, [same(secondDrawing)]);
+    expect(pageController.page, closeTo(0, 0.01));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('free-style callbacks report the complete drawing lifecycle', (
     tester,
   ) async {

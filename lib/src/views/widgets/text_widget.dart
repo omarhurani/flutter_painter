@@ -21,22 +21,22 @@ class _TextWidgetState extends State<_TextWidget> {
   /// This is used to listen to new text events to create new text drawables.
   StreamSubscription<PainterEvent>? controllerEventSubscription;
 
-  @override
-  void initState() {
-    super.initState();
+  PainterController? controller;
 
-    // Listen to the stream of events from the paint controller
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      controllerEventSubscription = PainterController.of(context).events.listen(
-        (event) {
-          // Handle controller requests to add or edit text drawables.
-          if (event is AddTextPainterEvent) {
-            createDrawable();
-          } else if (event is EditTextPainterEvent) {
-            editDrawable(event.drawable);
-          }
-        },
-      );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final nextController = PainterController.of(context);
+    if (identical(controller, nextController)) return;
+
+    controllerEventSubscription?.cancel();
+    controller = nextController;
+    controllerEventSubscription = nextController.events.listen((event) {
+      if (event is AddTextPainterEvent) {
+        createDrawable();
+      } else if (event is EditTextPainterEvent) {
+        editDrawable(event.drawable);
+      }
     });
   }
 
@@ -44,6 +44,7 @@ class _TextWidgetState extends State<_TextWidget> {
   void dispose() {
     // Cancel subscription to events from painter controller
     controllerEventSubscription?.cancel();
+    controller = null;
     super.dispose();
   }
 

@@ -279,6 +279,44 @@ void setBackground() async {
 }
 ```
 
+The `image` getter removes its image-stream listener after the first frame and
+returns an owned `ui.Image`. Dispose that image when the controller no longer
+uses it.
+
+#### Multiple image pages
+
+Keep one controller and one resolved image for each page so every page retains
+its own drawings:
+
+```dart
+final images = await Future.wait(imageProviders.map((provider) => provider.image));
+final controllers = images
+    .map((image) => PainterController(background: image.backgroundDrawable))
+    .toList();
+
+PageView.builder(
+  itemCount: controllers.length,
+  itemBuilder: (context, index) =>
+      FlutterPainter(controller: controllers[index]),
+);
+
+@override
+void dispose() {
+  for (final controller in controllers) {
+    controller.dispose();
+  }
+  for (final image in images) {
+    image.dispose();
+  }
+  super.dispose();
+}
+```
+
+`PainterController.dispose()` does not dispose application-owned images because
+the same `ui.Image` may be shared by multiple controllers or drawables.
+Keep a page's controller alive while that page must retain its drawing; dispose
+the controller and its owned image only when the page is permanently removed.
+
 To preserve the image aspect ratio and show a color around it, configure an
 `ImageBackgroundDrawable` directly. `BoxFit.fill` remains the default for
 backward compatibility.
