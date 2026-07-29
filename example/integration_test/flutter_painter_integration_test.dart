@@ -243,6 +243,60 @@ void main() {
     expect(rendered.height, 180);
   });
 
+  testWidgets('draws, edits, restores, and exports a reflex angle', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add shape'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Angle'));
+    await tester.pumpAndSettle();
+
+    final painterFinder = find.byType(FlutterPainter);
+    final painter = tester.widget<FlutterPainter>(painterFinder);
+    final start = tester.getTopLeft(painterFinder) + const Offset(220, 180);
+    final gesture = await tester.startGesture(start);
+    await gesture.moveBy(const Offset(-20, -30));
+    await tester.pump();
+    await gesture.moveBy(const Offset(-100, -142.8));
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    final original = painter.controller.drawables.single as AngleDrawable;
+    expect(original.sweepAngleDegrees, closeTo(235, 0.1));
+
+    painter.controller.selectObjectDrawable(original);
+    await tester.pumpAndSettle();
+    final angleSlider = find.byWidgetPredicate(
+      (widget) => widget is Slider && widget.max == 360,
+    );
+    final slider = tester.widget<Slider>(angleSlider);
+    slider.onChangeStart?.call(slider.value);
+    slider.onChanged?.call(120);
+    slider.onChangeEnd?.call(120);
+    await tester.pumpAndSettle();
+
+    final updated = painter.controller.selectedObjectDrawable as AngleDrawable;
+    expect(updated.sweepAngleDegrees, closeTo(120, 0.0001));
+
+    final codec = DrawableJsonCodec();
+    final restored = await codec.decodeJson(
+      await codec.encodeJson(painter.controller.drawables),
+    );
+    final restoredController = PainterController(drawables: restored);
+    addTearDown(restoredController.dispose);
+    final restoredAngle = restored.single as AngleDrawable;
+    expect(restoredAngle.sweepAngleDegrees, closeTo(120, 0.0001));
+
+    final rendered = await restoredController.renderImage(const Size(240, 180));
+    addTearDown(rendered.dispose);
+    expect(rendered.width, 240);
+    expect(rendered.height, 180);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'retains independent PageView drawings without live image leaks',
     (tester) async {

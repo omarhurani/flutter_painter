@@ -101,6 +101,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 
   bool updatingImageOpacity = false;
   bool updatingSelectedShapeColor = false;
+  bool updatingSelectedAngle = false;
   FocusNode textFocusNode = FocusNode();
   late PainterController controller;
   ui.Image? backgroundImage;
@@ -565,6 +566,26 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                 ),
                               ],
                             ),
+                            if (shapeDrawable is AngleDrawable)
+                              Row(
+                                children: [
+                                  const Expanded(flex: 1, child: Text("Angle")),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Slider.adaptive(
+                                      min: 0,
+                                      max: 360,
+                                      divisions: 360,
+                                      label:
+                                          "${shapeDrawable.sweepAngleDegrees.round()}°",
+                                      value: shapeDrawable.sweepAngleDegrees,
+                                      onChangeStart: startSelectedAngleUpdate,
+                                      onChanged: setSelectedAngle,
+                                      onChangeEnd: endSelectedAngleUpdate,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             if (shapeDrawable is LabeledShapeDrawable)
                               Align(
                                 alignment: Alignment.centerRight,
@@ -667,6 +688,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                 tooltip: "Add shape",
                 itemBuilder: (context) =>
                     <ShapeFactory, String>{
+                          const AngleFactory(): "Angle",
                           LineFactory(): "Line",
                           ArrowFactory(): "Arrow",
                           DoubleArrowFactory(): "Double Arrow",
@@ -738,6 +760,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
     if (shapeFactory is LabeledShapeFactory) {
       return getShapeIcon(shapeFactory.factory);
     }
+    if (shapeFactory is AngleFactory) return Icons.square_foot;
     if (shapeFactory is LineFactory) return Icons.horizontal_rule;
     if (shapeFactory is ArrowFactory) return Icons.arrow_outward;
     if (shapeFactory is DoubleArrowFactory) {
@@ -929,6 +952,26 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 
   void endSelectedShapeColorUpdate(double _) {
     updatingSelectedShapeColor = false;
+  }
+
+  void startSelectedAngleUpdate(double _) {
+    updatingSelectedAngle = false;
+  }
+
+  void setSelectedAngle(double degrees) {
+    final selectedDrawable = controller.selectedObjectDrawable;
+    if (selectedDrawable is! AngleDrawable) return;
+
+    final replaced = controller.setAngleDegrees(
+      selectedDrawable,
+      degrees,
+      newAction: !updatingSelectedAngle,
+    );
+    if (replaced) updatingSelectedAngle = true;
+  }
+
+  void endSelectedAngleUpdate(double _) {
+    updatingSelectedAngle = false;
   }
 
   void editSelectedTextDrawable() {

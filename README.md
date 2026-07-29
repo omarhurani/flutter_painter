@@ -13,7 +13,7 @@ Flutter Painter provides you with a widget that can be used to draw on it. Right
 - **Free-style drawing**: Scribble anything you want with any width and color.
 - **Objects** that you can move, scale and rotate in an easy and familiar way, such as:
   - **Text** with any `TextStyle`.
-  - **Shapes** such as lines, arrows, ovals, rectangles and triangles with any `Paint`.
+  - **Shapes** such as angles, lines, arrows, ovals, rectangles and triangles with any `Paint`.
   - **Images** that can be flipped.
 - **Free-style eraser** to erase any part of a drawing or object you don't want on the painter.[*](#erasing)
 
@@ -212,6 +212,29 @@ controller.freeStyleMode = FreeStyleMode.draw;
 
 Set `controller.freeStyleFactory = null` to restore the built-in brush. Custom
 factories do not affect erase mode.
+
+### Angles
+
+Use `AngleFactory` to draw two-ray angles. The gesture starts at the vertex;
+the first ray points horizontally and the drag direction defines a clockwise
+sweep from 0 to 360 degrees, including reflex angles:
+
+```dart
+controller.shapeFactory = const AngleFactory();
+```
+
+Angle objects can be moved, scaled, and rotated like other object drawables.
+Change the selected angle later in degrees while preserving undo and redo:
+
+```dart
+final selected = controller.selectedObjectDrawable;
+if (selected is AngleDrawable) {
+  controller.setAngleDegrees(selected, 235);
+}
+```
+
+For programmatic construction, `AngleDrawable.sweepAngle` uses radians and
+`sweepAngleDegrees` exposes its normalized degree value.
 
 ### Labeled shapes
 

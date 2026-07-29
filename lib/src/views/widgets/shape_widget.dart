@@ -52,7 +52,17 @@ class _ShapeWidgetState extends State<_ShapeWidget> {
 
     if (shapeDrawable == null) return;
 
-    if (shapeDrawable is Sized1DDrawable) {
+    if (shapeDrawable is AngleDrawable) {
+      final ray = details.localFocalPoint - shapeDrawable.position;
+      if (ray.distance == 0) return;
+
+      final newDrawable = shapeDrawable.copyWith(
+        radius: ray.distance,
+        sweepAngle: ray.direction - shapeDrawable.rotationAngle,
+      );
+      currentShapeDrawable = newDrawable;
+      updateDrawable(shapeDrawable, newDrawable);
+    } else if (shapeDrawable is Sized1DDrawable) {
       final sized1DDrawable = (shapeDrawable as Sized1DDrawable);
       final length = sized1DDrawable.length;
       final startingPosition =

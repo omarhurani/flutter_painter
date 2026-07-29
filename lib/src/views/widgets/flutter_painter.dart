@@ -8,6 +8,7 @@ import '../../controllers/helpers/renderer_check/renderer_check.dart';
 import '../../controllers/drawables/drawable.dart';
 import '../../controllers/notifications/notifications.dart';
 import '../../controllers/drawables/sized1ddrawable.dart';
+import '../../controllers/drawables/shape/angle_drawable.dart';
 import '../../controllers/drawables/shape/shape_drawable.dart';
 import '../../controllers/drawables/sized2ddrawable.dart';
 import '../../controllers/drawables/object_drawable.dart';

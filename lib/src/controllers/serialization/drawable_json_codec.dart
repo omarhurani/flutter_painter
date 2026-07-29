@@ -12,6 +12,7 @@ import '../drawables/object_drawable.dart';
 import '../drawables/object_group_drawable.dart';
 import '../drawables/path/erase_drawable.dart';
 import '../drawables/path/free_style_drawable.dart';
+import '../drawables/shape/angle_drawable.dart';
 import '../drawables/shape/arrow_drawable.dart';
 import '../drawables/shape/double_arrow_drawable.dart';
 import '../drawables/shape/labeled_shape_drawable.dart';
@@ -58,6 +59,7 @@ class DrawableJsonCodec {
     'text',
     'image',
     'line',
+    'angle',
     'arrow',
     'doubleArrow',
     'rectangle',
@@ -243,6 +245,16 @@ class DrawableJsonCodec {
       return _entry('line', {
         ..._object(shape, path),
         'length': shape.length,
+        'paint': _paint(shape.paint, '$path.paint'),
+      });
+    }
+    if (drawable.runtimeType == AngleDrawable) {
+      final shape = drawable as AngleDrawable;
+      return _entry('angle', {
+        ..._object(shape, path),
+        'radius': shape.radius,
+        'sweepAngle': shape.sweepAngle,
+        'arcRadius': shape.arcRadius,
         'paint': _paint(shape.paint, '$path.paint'),
       });
     }
@@ -436,6 +448,21 @@ class DrawableJsonCodec {
         final object = _decodeObject(data, '$path.data');
         return LineDrawable(
           length: _number(data['length'], '$path.data.length'),
+          paint: _decodePaint(data['paint'], '$path.data.paint'),
+          position: object.position,
+          rotationAngle: object.rotation,
+          scale: object.scale,
+          assists: object.assists,
+          assistPaints: object.assistPaints,
+          locked: object.locked,
+          hidden: object.hidden,
+        );
+      case 'angle':
+        final object = _decodeObject(data, '$path.data');
+        return AngleDrawable(
+          radius: _number(data['radius'], '$path.data.radius'),
+          sweepAngle: _number(data['sweepAngle'], '$path.data.sweepAngle'),
+          arcRadius: _number(data['arcRadius'], '$path.data.arcRadius'),
           paint: _decodePaint(data['paint'], '$path.data.paint'),
           position: object.position,
           rotationAngle: object.rotation,

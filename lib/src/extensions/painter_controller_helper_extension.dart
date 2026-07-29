@@ -81,6 +81,22 @@ extension PainterControllerHelper on PainterController {
     );
   }
 
+  /// Replaces [drawable] with a copy using a clockwise sweep in [degrees].
+  ///
+  /// Values outside one turn wrap into the range from 0 to 360. The
+  /// replacement preserves selection and participates in undo and redo.
+  bool setAngleDegrees(
+    AngleDrawable drawable,
+    double degrees, {
+    bool newAction = true,
+  }) {
+    return replaceDrawable(
+      drawable,
+      drawable.copyWith(sweepAngle: AngleDrawable.degreesToRadians(degrees)),
+      newAction: newAction,
+    );
+  }
+
   /// The object settings directly from the painter settings.
   ObjectSettings get objectSettings => settings.object;
 

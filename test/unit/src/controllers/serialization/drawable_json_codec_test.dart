@@ -243,6 +243,15 @@ void main() {
         scale: 1.15,
         locked: true,
       ),
+      AngleDrawable(
+        radius: 42,
+        sweepAngle: AngleDrawable.degreesToRadians(235),
+        arcRadius: 14,
+        position: const Offset(175, 55),
+        rotationAngle: 0.3,
+        scale: 0.8,
+        paint: shapePaint,
+      ),
     ];
     final codec = DrawableJsonCodec();
 
@@ -262,6 +271,11 @@ void main() {
     expect(restored[8], isA<LabeledSized1DShapeDrawable>());
     expect(restored[9], isA<LabeledSized2DShapeDrawable>());
     expect(restored[10], isA<ObjectGroupDrawable>());
+    expect(restored[11], isA<AngleDrawable>());
+    expect(
+      (restored[11] as AngleDrawable).sweepAngleDegrees,
+      closeTo(235, 0.0001),
+    );
     final movedLine = (restored[2] as LineDrawable).copyWith(
       position: const Offset(90, 90),
     );

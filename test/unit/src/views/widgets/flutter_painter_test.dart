@@ -941,6 +941,37 @@ void main() {
     expect(drawable.position, const Offset(120, 115));
     expect(drawable.size, const Size(100, 90));
   });
+
+  testWidgets('angle factory draws a reflex clockwise sweep', (tester) async {
+    final controller = PainterController(
+      settings: const PainterSettings(
+        shape: ShapeSettings(factory: AngleFactory()),
+      ),
+    );
+    addTearDown(controller.dispose);
+    final created = <Drawable>[];
+
+    await tester.pumpWidget(
+      buildPainter(controller, onDrawableCreated: created.add),
+    );
+    await tester.pumpAndSettle();
+
+    final start =
+        tester.getTopLeft(find.byType(FlutterPainter)) + const Offset(160, 160);
+    final gesture = await tester.startGesture(start);
+    await gesture.moveBy(const Offset(-20, -20));
+    await tester.pump();
+    await gesture.moveBy(const Offset(-80, -80));
+    await gesture.up();
+    await tester.pump();
+
+    final drawable = controller.drawables.single as AngleDrawable;
+    expect(drawable.position.dx, greaterThan(0));
+    expect(drawable.position.dy, greaterThan(0));
+    expect(drawable.radius, closeTo(113.14, 0.01));
+    expect(drawable.sweepAngleDegrees, closeTo(225, 0.01));
+    expect(created, [same(drawable)]);
+  });
 }
 
 Future<ui.Image> _createTestImage() {

@@ -221,6 +221,62 @@ void main() {
     );
   });
 
+  testWidgets('angle can be drawn and changed to a reflex sweep', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add shape'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Angle'));
+    await tester.pumpAndSettle();
+
+    final painter = tester.widget<FlutterPainter>(find.byType(FlutterPainter));
+    final start =
+        tester.getTopLeft(find.byType(FlutterPainter)) + const Offset(300, 250);
+    final gesture = await tester.startGesture(start);
+    await gesture.moveBy(const Offset(-20, -30));
+    await tester.pump();
+    await gesture.moveBy(const Offset(-100, -142.8));
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    final original = painter.controller.drawables.single as AngleDrawable;
+    expect(original.sweepAngleDegrees, closeTo(235, 0.1));
+
+    painter.controller.selectObjectDrawable(original);
+    await tester.pumpAndSettle();
+    final angleSlider = find.byWidgetPredicate(
+      (widget) => widget is Slider && widget.max == 360,
+    );
+    expect(angleSlider, findsOneWidget);
+
+    tester.widget<Slider>(angleSlider).onChanged?.call(120);
+    await tester.pumpAndSettle();
+
+    final updated = painter.controller.selectedObjectDrawable as AngleDrawable;
+    expect(updated.sweepAngleDegrees, closeTo(120, 0.0001));
+
+    painter.controller.undo();
+    expect(
+      (painter.controller.selectedObjectDrawable as AngleDrawable)
+          .sweepAngleDegrees,
+      closeTo(235, 0.1),
+    );
+    painter.controller.redo();
+    expect(
+      (painter.controller.selectedObjectDrawable as AngleDrawable)
+          .sweepAngleDegrees,
+      closeTo(120, 0.0001),
+    );
+  });
+
   testWidgets('font size slider stays interactive while editing text', (
     tester,
   ) async {

@@ -110,4 +110,45 @@ void main() {
       expect(controller.selectedObjectDrawable, same(redone));
     });
   });
+
+  group('PainterControllerHelper.setAngleDegrees', () {
+    test('updates a reflex angle and preserves undo and selection', () {
+      final drawable = AngleDrawable(
+        position: Offset.zero,
+        radius: 40,
+        sweepAngle: AngleDrawable.degreesToRadians(45),
+      );
+      final controller = PainterController(drawables: [drawable]);
+      addTearDown(controller.dispose);
+      controller.selectObjectDrawable(drawable);
+
+      expect(controller.setAngleDegrees(drawable, 235), isTrue);
+
+      final updated = controller.drawables.single as AngleDrawable;
+      expect(updated.sweepAngleDegrees, closeTo(235, 0.0001));
+      expect(controller.selectedObjectDrawable, same(updated));
+
+      controller.undo();
+      expect(controller.drawables.single, same(drawable));
+      expect(controller.selectedObjectDrawable, same(drawable));
+
+      controller.redo();
+      final redone = controller.drawables.single as AngleDrawable;
+      expect(redone.sweepAngleDegrees, closeTo(235, 0.0001));
+      expect(controller.selectedObjectDrawable, same(redone));
+    });
+
+    test('returns false when the drawable is not owned by the controller', () {
+      final drawable = AngleDrawable(
+        position: Offset.zero,
+        radius: 40,
+        sweepAngle: 0,
+      );
+      final controller = PainterController();
+      addTearDown(controller.dispose);
+
+      expect(controller.setAngleDegrees(drawable, 90), isFalse);
+      expect(controller.drawables, isEmpty);
+    });
+  });
 }
