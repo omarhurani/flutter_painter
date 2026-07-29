@@ -56,6 +56,7 @@ class LineDrawable extends Sized1DDrawable implements ShapeDrawable {
     return LineDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
+      assistPaints: assistPaints,
       position: position ?? this.position,
       rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,

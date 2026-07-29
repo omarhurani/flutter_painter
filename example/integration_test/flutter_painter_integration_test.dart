@@ -118,4 +118,62 @@ void main() {
     expect(rendered.width, 200);
     expect(rendered.height, 200);
   });
+
+  testWidgets('saves, clears, restores, and exports drawable JSON', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    final recorder = ui.PictureRecorder();
+    ui.Canvas(
+      recorder,
+    ).drawCircle(const Offset(10, 10), 10, ui.Paint()..color = Colors.purple);
+    final stickerImage = await recorder.endRecording().toImage(20, 20);
+    addTearDown(stickerImage.dispose);
+
+    final painter = tester.widget<FlutterPainter>(find.byType(FlutterPainter));
+    final controller = painter.controller;
+    controller.addTaggedImage(
+      stickerImage,
+      tag: 'saved-sticker',
+      size: const Size(40, 40),
+    );
+    controller.addDrawables([
+      TextDrawable(
+        text: 'Restored text',
+        position: const Offset(80, 80),
+        style: const TextStyle(fontSize: 18, color: Colors.blue),
+      ),
+      LineDrawable(
+        length: 80,
+        position: const Offset(120, 120),
+        paint: Paint()
+          ..color = Colors.red
+          ..strokeWidth = 4,
+      ),
+    ]);
+    await tester.pumpAndSettle();
+
+    final codec = DrawableJsonCodec();
+    final savedJson = await codec.encodeJson(controller.drawables);
+    expect(savedJson, contains('"schemaVersion":1'));
+
+    controller.clearDrawables();
+    final restored = await codec.decodeJson(savedJson);
+    final restoredImage = restored.whereType<ImageDrawable>().single.image;
+    addTearDown(restoredImage.dispose);
+    controller.addDrawables(restored, newAction: false);
+    await tester.pumpAndSettle();
+
+    expect(controller.drawables, hasLength(3));
+    expect(controller.imageDrawableCountsByTag, {'saved-sticker': 1});
+    expect(controller.drawables.whereType<TextDrawable>(), hasLength(1));
+    expect(controller.drawables.whereType<LineDrawable>(), hasLength(1));
+
+    final rendered = await controller.renderImage(const Size(200, 200));
+    addTearDown(rendered.dispose);
+    expect(rendered.width, 200);
+    expect(rendered.height, 200);
+  });
 }

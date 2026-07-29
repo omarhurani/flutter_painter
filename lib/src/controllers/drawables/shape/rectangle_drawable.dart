@@ -72,6 +72,7 @@ class RectangleDrawable extends Sized2DDrawable implements ShapeDrawable {
     return RectangleDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
+      assistPaints: assistPaints,
       position: position ?? this.position,
       rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,

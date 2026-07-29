@@ -60,6 +60,7 @@ class OvalDrawable extends Sized2DDrawable implements ShapeDrawable {
     return OvalDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
+      assistPaints: assistPaints,
       position: position ?? this.position,
       rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,

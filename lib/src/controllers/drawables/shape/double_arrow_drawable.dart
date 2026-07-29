@@ -90,6 +90,7 @@ class DoubleArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
     return DoubleArrowDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
+      assistPaints: assistPaints,
       position: position ?? this.position,
       rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,

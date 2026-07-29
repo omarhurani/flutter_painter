@@ -33,6 +33,7 @@ class TextDrawable extends ObjectDrawable {
     super.locked,
     super.hidden,
     super.assists,
+    super.assistPaints,
   }) : textPainter = TextPainter(
          text: TextSpan(text: text, style: style),
          textAlign: textAlign,
@@ -60,6 +61,7 @@ class TextDrawable extends ObjectDrawable {
   TextDrawable copyWith({
     bool? hidden,
     Set<ObjectDrawableAssist>? assists,
+    Map<ObjectDrawableAssist, Paint>? assistPaints,
     String? text,
     Offset? position,
     double? rotation,
@@ -78,6 +80,7 @@ class TextDrawable extends ObjectDrawable {
       direction: direction ?? this.direction,
       textAlign: textAlign ?? this.textAlign,
       assists: assists ?? this.assists,
+      assistPaints: assistPaints ?? this.assistPaints,
       hidden: hidden ?? this.hidden,
       locked: locked ?? this.locked,
     );

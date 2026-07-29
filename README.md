@@ -321,6 +321,38 @@ void addMyDrawables(List<Drawable> drawables){
 }
 ```
 
+### Saving and restoring drawables
+
+`DrawableJsonCodec` converts all built-in drawable types to versioned JSON,
+including nested erase groups, text styles, shape labels, transformations, and
+tagged images. Image pixels are embedded as PNG data, so encoding and decoding
+are asynchronous:
+
+```dart
+final codec = DrawableJsonCodec();
+
+// Save this string with a file, database, preferences, or cloud API.
+final savedJson = await codec.encodeJson(controller.drawables);
+
+// Restore into a new controller on the next app session.
+final restored = await codec.decodeJson(savedJson);
+final restoredController = PainterController(drawables: restored);
+```
+
+To replace the contents of an existing controller as one undoable operation:
+
+```dart
+controller.clearDrawables();
+controller.addDrawables(restored, newAction: false);
+```
+
+The codec stores drawables only; persist the painter background separately when
+needed. Custom drawable classes require a `DrawableJsonAdapter`. Paint shaders
+and filters are rejected unless a custom adapter handles that drawable, so
+unsupported visual state is never silently discarded. Applications own decoded
+image resources and should dispose them when the restored drawing is no longer
+used.
+
 ### Selected Object Drawable
 `PainterController` also provides the currently-selected `ObjectDrawable` from the getter field `PainterController.selectedObjectDrawable`. This value stays up-to-date for any changes from the UI (the user selecting a new object drawable, for example). You can also programatically select and de-select an object drawable, granted it is in the list of drawables of the controller.
 
