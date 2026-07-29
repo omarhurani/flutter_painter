@@ -254,6 +254,18 @@ void main() {
         scale: 0.8,
         paint: shapePaint,
       ),
+      FloodFillDrawable(
+        seed: const Offset(20, 20),
+        color: const Color(0xFF00897B),
+        tolerance: 6,
+        pixelWidth: 12,
+        pixelHeight: 10,
+        coordinateSize: const Size(240, 200),
+        spans: const <FloodFillSpan>[
+          FloodFillSpan(y: 2, startX: 1, endX: 4),
+          FloodFillSpan(y: 3, startX: 1, endX: 5),
+        ],
+      ),
     ];
     final codec = DrawableJsonCodec();
 
@@ -274,6 +286,7 @@ void main() {
     expect(restored[9], isA<LabeledSized2DShapeDrawable>());
     expect(restored[10], isA<ObjectGroupDrawable>());
     expect(restored[11], isA<AngleDrawable>());
+    expect(restored[12], isA<FloodFillDrawable>());
     expect(
       (restored[11] as AngleDrawable).sweepAngleDegrees,
       closeTo(235, 0.0001),
@@ -346,6 +359,27 @@ void main() {
 
     expect(image.blurSigma, 0);
     expect(image.shape, ImageDrawableShape.rectangle);
+  });
+
+  test('rejects flood-fill spans outside their sampled raster', () async {
+    final codec = DrawableJsonCodec();
+    final encoded = await codec.encode([
+      FloodFillDrawable(
+        seed: Offset.zero,
+        color: Colors.blue,
+        pixelWidth: 2,
+        pixelHeight: 2,
+        coordinateSize: const Size(2, 2),
+        spans: const <FloodFillSpan>[FloodFillSpan(y: 0, startX: 0, endX: 1)],
+      ),
+    ]);
+    final entries = encoded['drawables']! as List<Map<String, Object?>>;
+    final data = entries.single['data']! as Map<String, Object?>;
+    data['spans'] = <List<int>>[
+      <int>[0, 0, 2],
+    ];
+
+    await expectLater(codec.decode(encoded), throwsFormatException);
   });
 
   test('rejects unsupported custom drawables and invalid adapters', () async {

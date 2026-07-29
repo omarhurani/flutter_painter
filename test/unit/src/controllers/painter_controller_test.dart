@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter_painter/src/controllers/drawables/background/image_background_drawable.dart';
 import 'package:flutter_painter/src/controllers/drawables/image_drawable.dart';
 import 'package:flutter_painter/src/controllers/drawables/object_group_drawable.dart';
 import 'package:flutter_painter/src/controllers/drawables/shape/oval_drawable.dart';
@@ -187,6 +188,88 @@ void main() {
     expect(drawable.shape, ImageDrawableShape.oval);
     expect(controller.canUndo, isTrue);
   });
+
+  test('addFloodFill respects image boundaries and supports undo', () async {
+    final recorder = PictureRecorder();
+    final canvas = Canvas(recorder);
+    canvas.drawRect(
+      const Rect.fromLTWH(0, 0, 20, 10),
+      Paint()..color = const Color(0xFFFFFFFF),
+    );
+    canvas.drawRect(
+      const Rect.fromLTWH(10, 0, 1, 10),
+      Paint()..color = const Color(0xFF000000),
+    );
+    final image = await recorder.endRecording().toImage(20, 10);
+    addTearDown(image.dispose);
+    final controller = PainterController(
+      background: ImageBackgroundDrawable(image: image),
+    );
+    addTearDown(controller.dispose);
+
+    final fill = await controller.addFloodFill(
+      const Offset(5, 5),
+      color: const Color(0xFF0000FF),
+      tolerance: 0,
+      size: const Size(20, 10),
+    );
+
+    expect(fill, isNotNull);
+    expect(fill!.spans, hasLength(10));
+    expect(fill.spans.every((span) => span.endX == 9), isTrue);
+    expect(controller.value.drawables.single, same(fill));
+    expect(controller.canUndo, isTrue);
+
+    final rendered = await controller.renderImage(const Size(20, 10));
+    addTearDown(rendered.dispose);
+    final bytes = await rendered.toByteData(format: ImageByteFormat.rawRgba);
+    int channelAt(int x, int y, int channel) {
+      return bytes!.getUint8((y * 20 + x) * 4 + channel);
+    }
+
+    expect(channelAt(5, 5, 2), 255);
+    expect(channelAt(10, 5, 0), 0);
+    expect(channelAt(15, 5, 0), 255);
+
+    controller.undo();
+    expect(controller.value.drawables, isEmpty);
+  });
+
+  test(
+    'createFloodFill validates size, bounds, tolerance, and safety',
+    () async {
+      final controller = PainterController();
+      addTearDown(controller.dispose);
+
+      await expectLater(
+        controller.createFloodFill(Offset.zero),
+        throwsStateError,
+      );
+      await expectLater(
+        controller.createFloodFill(
+          const Offset(20, 20),
+          size: const Size(10, 10),
+        ),
+        completion(isNull),
+      );
+      await expectLater(
+        controller.createFloodFill(
+          Offset.zero,
+          size: const Size(10, 10),
+          tolerance: 101,
+        ),
+        throwsRangeError,
+      );
+      await expectLater(
+        controller.createFloodFill(
+          Offset.zero,
+          size: const Size(10, 10),
+          maxPixels: 99,
+        ),
+        throwsStateError,
+      );
+    },
+  );
 
   test('addTaggedImage preserves its tag, crop, and fitted size', () {
     final image = MockImage();

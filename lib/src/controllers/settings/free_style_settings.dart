@@ -19,8 +19,14 @@ class FreeStyleSettings {
   /// The optional factory used to create custom free-style drawables.
   ///
   /// When `null`, drawing creates the built-in [FreeStyleDrawable]. The
-  /// factory is ignored in erase mode.
+  /// factory is ignored in erase and fill modes.
   final FreeStyleFactory? factory;
+
+  /// The per-channel flood-fill tolerance as a percentage from 0 to 100.
+  ///
+  /// Zero fills only pixels matching the tapped pixel exactly. Higher values
+  /// include nearby color shades.
+  final int fillTolerance;
 
   /// Creates a [FreeStyleSettings] with the given [color]
   /// and [strokeWidth], [mode], and [factory] values.
@@ -29,7 +35,11 @@ class FreeStyleSettings {
     this.color = Colors.black,
     this.strokeWidth = 1,
     this.factory,
-  });
+    this.fillTolerance = 8,
+  }) : assert(
+         fillTolerance >= 0 && fillTolerance <= 100,
+         'fillTolerance must be between 0 and 100',
+       );
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   FreeStyleSettings copyWith({
@@ -37,11 +47,13 @@ class FreeStyleSettings {
     Color? color,
     double? strokeWidth,
     FreeStyleFactory? factory = _NoFreeStyleFactory.instance,
+    int? fillTolerance,
   }) {
     return FreeStyleSettings(
       mode: mode ?? this.mode,
       color: color ?? this.color,
       strokeWidth: strokeWidth ?? this.strokeWidth,
+      fillTolerance: fillTolerance ?? this.fillTolerance,
       factory: identical(factory, _NoFreeStyleFactory.instance)
           ? this.factory
           : factory,
@@ -75,4 +87,8 @@ enum FreeStyleMode {
 
   /// Free-style painting is enabled in erasing mode; used to erase drawings.
   erase,
+
+  /// Paint-bucket mode; tapping fills a connected region of the composed
+  /// painter using [FreeStyleSettings.color].
+  fill,
 }

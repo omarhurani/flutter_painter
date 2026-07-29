@@ -139,6 +139,33 @@ void main() {
     expect(painter.controller.drawables.single, isA<DottedFreeStyleDrawable>());
   });
 
+  testWidgets('paint-bucket mode exposes configurable tolerance', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Flood fill'));
+    await tester.pumpAndSettle();
+
+    final painter = tester.widget<FlutterPainter>(find.byType(FlutterPainter));
+    expect(painter.controller.freeStyleMode, FreeStyleMode.fill);
+    expect(find.text('Tolerance'), findsOneWidget);
+
+    final toleranceSlider = tester.widget<Slider>(
+      find.byWidgetPredicate((widget) => widget is Slider && widget.max == 100),
+    );
+    toleranceSlider.onChanged?.call(20);
+    await tester.pump();
+
+    expect(painter.controller.fillTolerance, 20);
+  });
+
   testWidgets('cropped image sample can reset and reapply its crop', (
     tester,
   ) async {

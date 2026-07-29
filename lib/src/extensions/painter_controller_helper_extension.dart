@@ -207,6 +207,9 @@ extension PainterControllerHelper on PainterController {
   /// The color used for free-style drawing from `value.settings.freeStyle` directly.
   Color get freeStyleColor => value.settings.freeStyle.color;
 
+  /// The tolerance percentage used by flood fills.
+  int get fillTolerance => value.settings.freeStyle.fillTolerance;
+
   /// The factory used to create custom free-style drawables.
   FreeStyleFactory? get freeStyleFactory => value.settings.freeStyle.factory;
 
@@ -340,6 +343,15 @@ extension PainterControllerHelper on PainterController {
   set freeStyleColor(Color color) => value = value.copyWith(
     settings: value.settings.copyWith(
       freeStyle: value.settings.freeStyle.copyWith(color: color),
+    ),
+  );
+
+  /// The per-channel tolerance percentage used by flood fills.
+  ///
+  /// Values must be between 0 and 100.
+  set fillTolerance(int tolerance) => value = value.copyWith(
+    settings: value.settings.copyWith(
+      freeStyle: value.settings.freeStyle.copyWith(fillTolerance: tolerance),
     ),
   );
 

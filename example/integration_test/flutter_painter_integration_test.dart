@@ -109,6 +109,59 @@ void main() {
     }
   });
 
+  testWidgets('fills, restores, renders, and undoes a coloring region', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Flood fill'));
+    await tester.pumpAndSettle();
+
+    final painterFinder = find.byType(FlutterPainter);
+    final painter = tester.widget<FlutterPainter>(painterFinder);
+    await tester.tapAt(tester.getCenter(painterFinder));
+    for (
+      var attempt = 0;
+      attempt < 100 &&
+          painter.controller.drawables.whereType<FloodFillDrawable>().isEmpty;
+      attempt++
+    ) {
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+    }
+
+    final fill = painter.controller.drawables.single as FloodFillDrawable;
+    expect(fill.color, const Color(0xFFFF0000));
+    expect(fill.tolerance, 8);
+    expect(fill.spans, isNotEmpty);
+
+    final rendered = await painter.controller.renderImage(
+      const Size(1280, 720),
+    );
+    addTearDown(rendered.dispose);
+    final pixels = await rendered.toByteData(
+      format: ui.ImageByteFormat.rawRgba,
+    );
+    final centerOffset = (360 * 1280 + 640) * 4;
+    expect(pixels!.getUint8(centerOffset), greaterThan(240));
+    expect(pixels.getUint8(centerOffset + 1), lessThan(20));
+    expect(pixels.getUint8(centerOffset + 2), lessThan(20));
+
+    final codec = DrawableJsonCodec();
+    final restored = await codec.decodeJson(
+      await codec.encodeJson(painter.controller.drawables),
+    );
+    final restoredFill = restored.single as FloodFillDrawable;
+    expect(restoredFill.spans.length, fill.spans.length);
+    expect(restoredFill.coordinateSize, fill.coordinateSize);
+
+    painter.controller.undo();
+    await tester.pumpAndSettle();
+    expect(painter.controller.drawables, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('counts sticker tags after replacement and export', (
     tester,
   ) async {

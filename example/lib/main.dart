@@ -182,6 +182,16 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         Color(0xFFFFCC80),
       ]);
     canvas.drawRect(bounds, paint);
+    final regionCenter = Offset(imageSize.width / 2, imageSize.height / 2);
+    canvas.drawCircle(regionCenter, 150, Paint()..color = Colors.white);
+    canvas.drawCircle(
+      regionCenter,
+      150,
+      Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 14,
+    );
     final image = await recorder.endRecording().toImage(
       imageSize.width.toInt(),
       imageSize.height.toInt(),
@@ -328,25 +338,28 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                               FreeStyleMode.none) ...[
                             const Divider(),
                             const Text("Free Style Settings"),
-                            // Control free style stroke width
-                            Row(
-                              children: [
-                                const Expanded(
-                                  flex: 1,
-                                  child: Text("Stroke Width"),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Slider.adaptive(
-                                    min: 2,
-                                    max: 25,
-                                    value: controller.freeStyleStrokeWidth,
-                                    onChanged: setFreeStyleStrokeWidth,
+                            if (controller.freeStyleMode != FreeStyleMode.fill)
+                              // Control free style stroke width
+                              Row(
+                                children: [
+                                  const Expanded(
+                                    flex: 1,
+                                    child: Text("Stroke Width"),
                                   ),
-                                ),
-                              ],
-                            ),
-                            if (controller.freeStyleMode == FreeStyleMode.draw)
+                                  Expanded(
+                                    flex: 3,
+                                    child: Slider.adaptive(
+                                      min: 2,
+                                      max: 25,
+                                      value: controller.freeStyleStrokeWidth,
+                                      onChanged: setFreeStyleStrokeWidth,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            if (controller.freeStyleMode ==
+                                    FreeStyleMode.draw ||
+                                controller.freeStyleMode == FreeStyleMode.fill)
                               Column(
                                 children: [
                                   Row(
@@ -371,17 +384,40 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                       ),
                                     ],
                                   ),
-                                  Material(
-                                    type: MaterialType.transparency,
-                                    child: SwitchListTile.adaptive(
-                                      contentPadding: EdgeInsets.zero,
-                                      title: const Text("Dotted brush"),
-                                      value:
-                                          controller.freeStyleFactory
-                                              is DottedFreeStyleFactory,
-                                      onChanged: setDottedBrushEnabled,
+                                  if (controller.freeStyleMode ==
+                                      FreeStyleMode.draw)
+                                    Material(
+                                      type: MaterialType.transparency,
+                                      child: SwitchListTile.adaptive(
+                                        contentPadding: EdgeInsets.zero,
+                                        title: const Text("Dotted brush"),
+                                        value:
+                                            controller.freeStyleFactory
+                                                is DottedFreeStyleFactory,
+                                        onChanged: setDottedBrushEnabled,
+                                      ),
                                     ),
-                                  ),
+                                  if (controller.freeStyleMode ==
+                                      FreeStyleMode.fill)
+                                    Row(
+                                      children: [
+                                        const Expanded(
+                                          flex: 1,
+                                          child: Text("Tolerance"),
+                                        ),
+                                        Expanded(
+                                          flex: 3,
+                                          child: Slider.adaptive(
+                                            min: 0,
+                                            max: 100,
+                                            divisions: 100,
+                                            value: controller.fillTolerance
+                                                .toDouble(),
+                                            onChanged: setFillTolerance,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                 ],
                               ),
                           ],
@@ -668,6 +704,17 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
               ),
               onPressed: toggleFreeStyleDraw,
             ),
+            // Paint-bucket fill
+            IconButton(
+              tooltip: "Flood fill",
+              icon: Icon(
+                Icons.format_color_fill,
+                color: controller.freeStyleMode == FreeStyleMode.fill
+                    ? Theme.of(context).colorScheme.secondary
+                    : null,
+              ),
+              onPressed: toggleFreeStyleFill,
+            ),
             // Add text
             PopupMenuButton<TextAlign>(
               tooltip: "Add text",
@@ -842,6 +889,12 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         : FreeStyleMode.none;
   }
 
+  void toggleFreeStyleFill() {
+    controller.freeStyleMode = controller.freeStyleMode != FreeStyleMode.fill
+        ? FreeStyleMode.fill
+        : FreeStyleMode.none;
+  }
+
   void addText() {
     if (controller.freeStyleMode != FreeStyleMode.none) {
       controller.freeStyleMode = FreeStyleMode.none;
@@ -922,6 +975,10 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 
   void setFreeStyleColor(double hue) {
     controller.freeStyleColor = HSVColor.fromAHSV(1, hue, 1, 1).toColor();
+  }
+
+  void setFillTolerance(double tolerance) {
+    controller.fillTolerance = tolerance.round();
   }
 
   void setDottedBrushEnabled(bool enabled) {

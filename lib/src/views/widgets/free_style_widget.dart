@@ -17,6 +17,8 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
   /// The current drawable being drawn.
   PathDrawable? drawable;
 
+  bool _fillInProgress = false;
+
   @override
   Widget build(BuildContext context) {
     if (settings.mode == FreeStyleMode.none || shapeSettings.factory != null) {
@@ -53,6 +55,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
       PainterController.of(context).value.settings.shape;
 
   bool _shouldAcceptPointer(PointerDownEvent event) {
+    if (settings.mode == FreeStyleMode.fill && _fillInProgress) return false;
     if (settings.mode != FreeStyleMode.erase) return true;
 
     final renderBox = context.findRenderObject() as RenderBox;
@@ -121,6 +124,16 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
 
       // Keep protected drawables above the erase layer.
       controller.insertDrawables(1, [drawable], newAction: false);
+    } else if (settings.mode == FreeStyleMode.fill) {
+      final renderBox = context.findRenderObject() as RenderBox;
+      drawable = FloodFillDrawable(
+        seed: _globalToLocal(globalPosition),
+        color: settings.color,
+        tolerance: settings.fillTolerance,
+        pixelWidth: renderBox.size.width.ceil(),
+        pixelHeight: renderBox.size.height.ceil(),
+        coordinateSize: renderBox.size,
+      );
     } else {
       return;
     }
@@ -138,6 +151,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
     final drawable = this.drawable;
     // If there is no current drawable, ignore user input
     if (drawable == null) return;
+    if (drawable is FloodFillDrawable) return;
 
     // Add the new point to a copy of the current drawable
     final newDrawable = drawable.copyWith(
@@ -161,6 +175,13 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
     final completedDrawable = drawable;
     if (completedDrawable == null) return;
 
+    if (completedDrawable is FloodFillDrawable) {
+      drawable = null;
+      _fillInProgress = true;
+      unawaited(_completeFloodFill(completedDrawable));
+      return;
+    }
+
     FreeStyleDrawingNotification(
       completedDrawable,
       FreeStyleDrawingPhase.ended,
@@ -176,6 +197,15 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
     final canceledDrawable = drawable;
     if (canceledDrawable == null) return;
 
+    if (canceledDrawable is FloodFillDrawable) {
+      drawable = null;
+      FreeStyleDrawingNotification(
+        canceledDrawable,
+        FreeStyleDrawingPhase.canceled,
+      ).dispatch(context);
+      return;
+    }
+
     final controller = PainterController.of(context);
     // The gesture's add, erase-grouping and update actions are merged into one
     // undo entry. Undo and discard that entry so cancellation restores the
@@ -189,6 +219,50 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
       canceledDrawable,
       FreeStyleDrawingPhase.canceled,
     ).dispatch(context);
+  }
+
+  Future<void> _completeFloodFill(FloodFillDrawable pending) async {
+    final controller = PainterController.of(context);
+    try {
+      final completed = await controller.createFloodFill(
+        pending.seed,
+        color: pending.color,
+        tolerance: pending.tolerance,
+      );
+      if (!mounted || PainterController.of(context) != controller) return;
+
+      if (completed == null) {
+        FreeStyleDrawingNotification(
+          pending,
+          FreeStyleDrawingPhase.canceled,
+        ).dispatch(context);
+        return;
+      }
+
+      controller.addDrawables(<Drawable>[completed]);
+      FreeStyleDrawingNotification(
+        completed,
+        FreeStyleDrawingPhase.ended,
+      ).dispatch(context);
+      DrawableCreatedNotification(completed).dispatch(context);
+    } catch (error, stackTrace) {
+      if (mounted) {
+        FreeStyleDrawingNotification(
+          pending,
+          FreeStyleDrawingPhase.canceled,
+        ).dispatch(context);
+      }
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stackTrace,
+          library: 'flutter_painter',
+          context: ErrorDescription('while creating a flood fill'),
+        ),
+      );
+    } finally {
+      _fillInProgress = false;
+    }
   }
 
   Offset _globalToLocal(Offset globalPosition) {

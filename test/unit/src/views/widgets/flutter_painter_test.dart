@@ -345,6 +345,53 @@ void main() {
     expect(created.single, same(controller.drawables.single));
   });
 
+  testWidgets('paint-bucket gesture cancels cleanly when a pinch starts', (
+    tester,
+  ) async {
+    final controller = PainterController(
+      settings: const PainterSettings(
+        freeStyle: FreeStyleSettings(
+          mode: FreeStyleMode.fill,
+          color: Colors.red,
+          fillTolerance: 0,
+        ),
+        scale: ScaleSettings(enabled: true, minScale: 1, maxScale: 4),
+      ),
+    );
+    addTearDown(controller.dispose);
+    final drawingStates = <bool>[];
+    final started = <PathDrawable>[];
+    final canceled = <PathDrawable>[];
+
+    await tester.pumpWidget(
+      buildPainter(
+        controller,
+        onIsDrawingStateChanged: drawingStates.add,
+        onFreeStyleDrawingStarted: started.add,
+        onFreeStyleDrawingCanceled: canceled.add,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final center = tester.getCenter(find.byType(FlutterPainter));
+    final first = await tester.createGesture(pointer: 1);
+    final second = await tester.createGesture(pointer: 2);
+    await first.down(center - const Offset(30, 0));
+    await second.down(center + const Offset(30, 0));
+    await first.moveTo(center - const Offset(80, 0));
+    await second.moveTo(center + const Offset(80, 0));
+    await tester.pump();
+    await first.up();
+    await second.up();
+    await tester.pumpAndSettle();
+
+    expect(drawingStates, [true, false]);
+    expect(started.single, isA<FloodFillDrawable>());
+    expect(canceled.single, same(started.single));
+    expect(controller.drawables, isEmpty);
+    expect(controller.canUndo, isFalse);
+  });
+
   testWidgets('free-style factory creates and updates a custom drawable', (
     tester,
   ) async {

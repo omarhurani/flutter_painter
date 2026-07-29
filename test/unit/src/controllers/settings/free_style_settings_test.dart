@@ -32,4 +32,11 @@ void main() {
     expect(settings.copyWith(factory: replacement).factory, same(replacement));
     expect(settings.copyWith(factory: null).factory, isNull);
   });
+
+  test('copyWith preserves and updates flood-fill tolerance', () {
+    const settings = FreeStyleSettings(fillTolerance: 12);
+
+    expect(settings.copyWith().fillTolerance, 12);
+    expect(settings.copyWith(fillTolerance: 25).fillTolerance, 25);
+  });
 }

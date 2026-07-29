@@ -211,7 +211,32 @@ controller.freeStyleMode = FreeStyleMode.draw;
 ```
 
 Set `controller.freeStyleFactory = null` to restore the built-in brush. Custom
-factories do not affect erase mode.
+factories do not affect erase or fill modes.
+
+### Paint-bucket flood fill
+
+Enable paint-bucket mode to fill the four-connected region under the next tap.
+The current background and drawables are sampled together, while the result is
+stored as a compact, undoable `FloodFillDrawable`:
+
+```dart
+controller.freeStyleColor = Colors.amber;
+controller.fillTolerance = 8; // Per-channel percentage from 0 to 100.
+controller.freeStyleMode = FreeStyleMode.fill;
+```
+
+For programmatic fills, use painter coordinates:
+
+```dart
+final fill = await controller.addFloodFill(const Offset(120, 80));
+```
+
+If the controller has not been laid out, pass its intended coordinate size
+with `size: const Size(width, height)`. The pixel scan runs through Flutter's
+background-compute helper and rejects rasters above the configurable
+`maxPixels` safety limit. Existing black outlines or other contrasting pixels
+act as boundaries; increase tolerance only when nearby shades should be part of
+the same region.
 
 ### Angles
 

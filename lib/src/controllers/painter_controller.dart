@@ -3,11 +3,14 @@ import 'dart:collection';
 import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'events/selected_object_drawable_removed_event.dart';
+import 'helpers/flood_fill.dart';
 import '../views/widgets/painter_controller_widget.dart';
 import 'actions/actions.dart';
 import 'drawables/image_drawable.dart';
+import 'drawables/path/flood_fill_drawable.dart';
 import 'events/events.dart';
 import 'drawables/background/background_drawable.dart';
 import 'drawables/object_drawable.dart';
@@ -23,6 +26,9 @@ import 'drawables/drawable.dart';
 /// * IMPORTANT: *
 /// Each [FlutterPainter] should have its own controller.
 class PainterController extends ValueNotifier<PainterControllerValue> {
+  /// Default upper bound for the sampled flood-fill raster.
+  static const int defaultMaxFloodFillPixels = 16000000;
+
   /// A controller for an event stream which widgets will listen to.
   ///
   /// This will dispatch events that represent actions, such as adding a new text drawable.
@@ -496,6 +502,137 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
       drawable.copyWith(sourceRect: sourceRect),
       newAction: newAction,
     );
+  }
+
+  /// Samples the composed painter and creates a connected flood-fill region.
+  ///
+  /// [position] is expressed in painter coordinates. [tolerance] is a
+  /// per-channel percentage from 0 to 100 and defaults to the active
+  /// free-style setting. When this controller has not been laid out, [size]
+  /// must provide its intended painter coordinate size.
+  ///
+  /// The scanline search runs through Flutter's [compute] helper. Returns
+  /// `null` when [position] is outside the painter.
+  Future<FloodFillDrawable?> createFloodFill(
+    Offset position, {
+    Color? color,
+    int? tolerance,
+    Size? size,
+    int maxPixels = defaultMaxFloodFillPixels,
+  }) async {
+    final effectiveTolerance =
+        tolerance ?? value.settings.freeStyle.fillTolerance;
+    if (effectiveTolerance < 0 || effectiveTolerance > 100) {
+      throw RangeError.range(effectiveTolerance, 0, 100, 'tolerance');
+    }
+    if (maxPixels <= 0) {
+      throw RangeError.value(
+        maxPixels,
+        'maxPixels',
+        'must be greater than zero',
+      );
+    }
+
+    final coordinateSize = painterKey.currentContext?.size ?? size;
+    if (coordinateSize == null) {
+      throw StateError(
+        'A painter size is required before the controller is laid out.',
+      );
+    }
+    if (!coordinateSize.isFinite || coordinateSize.isEmpty) {
+      throw ArgumentError.value(
+        coordinateSize,
+        'size',
+        'must be finite and non-empty',
+      );
+    }
+    if (!position.dx.isFinite ||
+        !position.dy.isFinite ||
+        !Rect.fromLTWH(
+          0,
+          0,
+          coordinateSize.width,
+          coordinateSize.height,
+        ).contains(position)) {
+      return null;
+    }
+
+    final pixelWidth = coordinateSize.width.ceil();
+    final pixelHeight = coordinateSize.height.ceil();
+    final pixelCount = pixelWidth * pixelHeight;
+    if (pixelCount > maxPixels) {
+      throw StateError(
+        'Flood fill requires $pixelCount pixels, exceeding the '
+        '$maxPixels-pixel safety limit.',
+      );
+    }
+
+    final image = await renderImage(
+      Size(pixelWidth.toDouble(), pixelHeight.toDouble()),
+    );
+    final ByteData? byteData;
+    try {
+      byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    } finally {
+      image.dispose();
+    }
+    if (byteData == null) {
+      throw StateError('Could not read painter pixels for flood fill.');
+    }
+
+    final seedX = (position.dx / coordinateSize.width * pixelWidth).floor();
+    final seedY = (position.dy / coordinateSize.height * pixelHeight).floor();
+    final rawSpans = await compute(
+      findFloodFillSpans,
+      FloodFillRequest(
+        pixels: byteData.buffer.asUint8List(
+          byteData.offsetInBytes,
+          byteData.lengthInBytes,
+        ),
+        width: pixelWidth,
+        height: pixelHeight,
+        seedX: seedX,
+        seedY: seedY,
+        channelTolerance: (255 * effectiveTolerance / 100).round(),
+      ),
+    );
+    if (rawSpans.isEmpty) return null;
+
+    return FloodFillDrawable(
+      seed: position,
+      color: color ?? value.settings.freeStyle.color,
+      tolerance: effectiveTolerance,
+      pixelWidth: pixelWidth,
+      pixelHeight: pixelHeight,
+      coordinateSize: coordinateSize,
+      spans: <FloodFillSpan>[
+        for (var index = 0; index < rawSpans.length; index += 3)
+          FloodFillSpan(
+            y: rawSpans[index],
+            startX: rawSpans[index + 1],
+            endX: rawSpans[index + 2],
+          ),
+      ],
+    );
+  }
+
+  /// Creates and adds a flood fill as one undoable controller action.
+  Future<FloodFillDrawable?> addFloodFill(
+    Offset position, {
+    Color? color,
+    int? tolerance,
+    Size? size,
+    int maxPixels = defaultMaxFloodFillPixels,
+  }) async {
+    final drawable = await createFloodFill(
+      position,
+      color: color,
+      tolerance: tolerance,
+      size: size,
+      maxPixels: maxPixels,
+    );
+    if (drawable != null) addDrawables(<Drawable>[drawable]);
+    return drawable;
   }
 
   /// Renders the background and all other drawables to a [ui.Image] object.

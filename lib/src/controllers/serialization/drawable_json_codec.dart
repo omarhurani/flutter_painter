@@ -11,6 +11,7 @@ import '../drawables/image_drawable.dart';
 import '../drawables/object_drawable.dart';
 import '../drawables/object_group_drawable.dart';
 import '../drawables/path/erase_drawable.dart';
+import '../drawables/path/flood_fill_drawable.dart';
 import '../drawables/path/free_style_drawable.dart';
 import '../drawables/shape/angle_drawable.dart';
 import '../drawables/shape/arrow_drawable.dart';
@@ -54,6 +55,7 @@ class DrawableJsonCodec {
   static const Set<String> _builtInTypes = {
     'group',
     'objectGroup',
+    'floodFill',
     'freeStyle',
     'erase',
     'text',
@@ -191,6 +193,21 @@ class DrawableJsonCodec {
       return _entry('objectGroup', {
         ..._object(group, path),
         'drawables': children,
+      });
+    }
+    if (drawable.runtimeType == FloodFillDrawable) {
+      final fill = drawable as FloodFillDrawable;
+      return _entry('floodFill', {
+        'hidden': fill.hidden,
+        'seed': _offset(fill.seed),
+        'color': _color(fill.color),
+        'tolerance': fill.tolerance,
+        'pixelWidth': fill.pixelWidth,
+        'pixelHeight': fill.pixelHeight,
+        'coordinateSize': _size(fill.coordinateSize),
+        'spans': <List<int>>[
+          for (final span in fill.spans) <int>[span.y, span.startX, span.endX],
+        ],
       });
     }
     if (drawable.runtimeType == FreeStyleDrawable) {
@@ -383,6 +400,29 @@ class DrawableJsonCodec {
           locked: object.locked,
           hidden: object.hidden,
         );
+      case 'floodFill':
+        try {
+          return FloodFillDrawable(
+            seed: _decodeOffset(data['seed'], '$path.data.seed'),
+            color: _decodeColor(data['color'], '$path.data.color'),
+            tolerance: _integer(data['tolerance'], '$path.data.tolerance'),
+            pixelWidth: _integer(data['pixelWidth'], '$path.data.pixelWidth'),
+            pixelHeight: _integer(
+              data['pixelHeight'],
+              '$path.data.pixelHeight',
+            ),
+            coordinateSize: _decodeSize(
+              data['coordinateSize'],
+              '$path.data.coordinateSize',
+            ),
+            spans: _decodeFloodFillSpans(data['spans'], '$path.data.spans'),
+            hidden: _boolean(data['hidden'], '$path.data.hidden'),
+          );
+        } on ArgumentError catch (error) {
+          throw FormatException(
+            'Invalid flood fill at $path: ${error.message}',
+          );
+        }
       case 'freeStyle':
         return FreeStyleDrawable(
           path: _decodeOffsets(data['path'], '$path.data.path'),
@@ -695,7 +735,7 @@ class DrawableJsonCodec {
 
   static Paint _decodePaint(Object? value, String path) {
     final data = _map(value, path);
-    return Paint()
+    final paint = Paint()
       ..color = _decodeColor(data['color'], '$path.color')
       ..blendMode = _enumValue(
         BlendMode.values,
@@ -714,10 +754,6 @@ class DrawableJsonCodec {
         data['strokeJoin'],
         '$path.strokeJoin',
       )
-      // dart:ui exposes this value relative to its native default, while its
-      // setter subtracts that default before storing it.
-      ..strokeMiterLimit =
-          _number(data['strokeMiterLimit'], '$path.strokeMiterLimit') + 4
       ..isAntiAlias = _boolean(data['isAntiAlias'], '$path.isAntiAlias')
       ..filterQuality = _enumValue(
         FilterQuality.values,
@@ -725,6 +761,21 @@ class DrawableJsonCodec {
         '$path.filterQuality',
       )
       ..invertColors = _boolean(data['invertColors'], '$path.invertColors');
+
+    final strokeMiterLimit = _number(
+      data['strokeMiterLimit'],
+      '$path.strokeMiterLimit',
+    );
+    paint.strokeMiterLimit = strokeMiterLimit;
+
+    // Native dart:ui currently subtracts its default miter limit in the
+    // setter, while web stores the assigned value directly. Correct only when
+    // the engine reports that the first assignment did not preserve the value.
+    final miterDifference = strokeMiterLimit - paint.strokeMiterLimit;
+    if (miterDifference != 0) {
+      paint.strokeMiterLimit = strokeMiterLimit + miterDifference;
+    }
+    return paint;
   }
 
   static Map<String, Object?> _textStyle(TextStyle style, String path) {
@@ -1058,6 +1109,26 @@ class DrawableJsonCodec {
       for (var index = 0; index < values.length; index++)
         _decodeOffset(values[index], '$path[$index]'),
     ];
+  }
+
+  static List<FloodFillSpan> _decodeFloodFillSpans(Object? value, String path) {
+    final values = _list(value, path);
+    return <FloodFillSpan>[
+      for (var index = 0; index < values.length; index++)
+        _decodeFloodFillSpan(values[index], '$path[$index]'),
+    ];
+  }
+
+  static FloodFillSpan _decodeFloodFillSpan(Object? value, String path) {
+    final values = _list(value, path);
+    if (values.length != 3) {
+      throw FormatException('$path must contain y, startX, and endX.');
+    }
+    return FloodFillSpan(
+      y: _integer(values[0], '$path[0]'),
+      startX: _integer(values[1], '$path[1]'),
+      endX: _integer(values[2], '$path[2]'),
+    );
   }
 
   static Map<String, Object?> _size(Size size) {
