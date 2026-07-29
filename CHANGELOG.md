@@ -15,6 +15,7 @@
 * Keep drawable positions, sizes, gestures, and exports aligned when the painter viewport resizes ([Issue #50](https://github.com/omarhurani/flutter_painter/issues/50), [Issue #68](https://github.com/omarhurani/flutter_painter/issues/68)).
 * Support custom free-style drawable factories for textured and specialized brushes ([Issue #55](https://github.com/omarhurani/flutter_painter/issues/55)).
 * Add source cropping for image drawables, including undo-aware controller helpers ([Issue #39](https://github.com/omarhurani/flutter_painter/issues/39)).
+* Add reusable text labels to one- and two-dimensional shape factories ([Issue #45](https://github.com/omarhurani/flutter_painter/issues/45)).
 
 ## [2.0.0] - 2026-07-28
 

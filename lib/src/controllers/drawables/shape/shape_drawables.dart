@@ -5,3 +5,4 @@ export 'rectangle_drawable.dart';
 export 'oval_drawable.dart';
 export 'triangle_drawable.dart';
 export 'double_arrow_drawable.dart';
+export 'labeled_shape_drawable.dart';

@@ -6,3 +6,4 @@ export 'oval_factory.dart';
 export 'rectangle_factory.dart';
 export 'triangle_factory.dart';
 export 'double_arrow_factory.dart';
+export 'labeled_shape_factory.dart';

@@ -565,6 +565,14 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                 ),
                               ],
                             ),
+                            if (shapeDrawable is LabeledShapeDrawable)
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: OutlinedButton(
+                                  onPressed: toggleSelectedShapeLabel,
+                                  child: const Text("Change Label"),
+                                ),
+                              ),
                           ],
                         ],
                       ),
@@ -665,6 +673,17 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                           RectangleFactory(): "Rectangle",
                           OvalFactory(): "Oval",
                           TriangleFactory(): "Triangle",
+                          LabeledShapeFactory(
+                            factory: DoubleArrowFactory(),
+                            label: const ShapeLabel(
+                              text: "120 mm",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ): "Labeled Double Arrow",
                         }.entries
                         .map(
                           (e) => PopupMenuItem(
@@ -673,7 +692,13 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Icon(getShapeIcon(e.key), color: Colors.black),
-                                Text(" ${e.value}"),
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    e.value,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -710,6 +735,9 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   }
 
   static IconData getShapeIcon(ShapeFactory? shapeFactory) {
+    if (shapeFactory is LabeledShapeFactory) {
+      return getShapeIcon(shapeFactory.factory);
+    }
     if (shapeFactory is LineFactory) return Icons.horizontal_rule;
     if (shapeFactory is ArrowFactory) return Icons.arrow_outward;
     if (shapeFactory is DoubleArrowFactory) {
@@ -930,6 +958,14 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
             fullRect.height * 0.6,
           );
     controller.cropImageDrawable(imageDrawable, sourceRect);
+  }
+
+  void toggleSelectedShapeLabel() {
+    final drawable = controller.selectedObjectDrawable;
+    if (drawable is! LabeledShapeDrawable) return;
+
+    final text = drawable.label.text == "120 mm" ? "240 mm" : "120 mm";
+    controller.setShapeLabel(drawable, drawable.label.withText(text));
   }
 }
 

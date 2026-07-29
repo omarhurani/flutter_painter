@@ -720,6 +720,74 @@ void main() {
     expect(created, [same(drawable)]);
   });
 
+  testWidgets('labeled factory preserves a label through a line gesture', (
+    tester,
+  ) async {
+    const label = ShapeLabel(text: '120 mm');
+    final controller = PainterController(
+      settings: PainterSettings(
+        shape: ShapeSettings(
+          factory: LabeledShapeFactory(
+            factory: DoubleArrowFactory(),
+            label: label,
+          ),
+        ),
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(buildPainter(controller));
+    await tester.pumpAndSettle();
+
+    final start =
+        tester.getTopLeft(find.byType(FlutterPainter)) + const Offset(50, 60);
+    final gesture = await tester.startGesture(start);
+    await gesture.moveBy(const Offset(20, 10));
+    await tester.pump();
+    await gesture.moveBy(const Offset(120, 40));
+    await gesture.up();
+    await tester.pump();
+
+    final drawable = controller.drawables.single as LabeledSized1DShapeDrawable;
+    expect(drawable.shape, isA<DoubleArrowDrawable>());
+    expect(drawable.label, same(label));
+    expect(drawable.length, closeTo(126.49, 0.01));
+  });
+
+  testWidgets('labeled factory preserves a label through a box gesture', (
+    tester,
+  ) async {
+    const label = ShapeLabel(text: 'Room A');
+    final controller = PainterController(
+      settings: PainterSettings(
+        shape: ShapeSettings(
+          factory: LabeledShapeFactory(
+            factory: RectangleFactory(),
+            label: label,
+          ),
+        ),
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(buildPainter(controller));
+    await tester.pumpAndSettle();
+
+    final start =
+        tester.getTopLeft(find.byType(FlutterPainter)) + const Offset(160, 160);
+    final gesture = await tester.startGesture(start);
+    await gesture.moveBy(const Offset(-20, -10));
+    await tester.pump();
+    await gesture.moveBy(const Offset(-100, -80));
+    await gesture.up();
+    await tester.pump();
+
+    final drawable = controller.drawables.single as LabeledSized2DShapeDrawable;
+    expect(drawable.shape, isA<RectangleDrawable>());
+    expect(drawable.label, same(label));
+    expect(drawable.size, const Size(100, 80));
+  });
+
   testWidgets('triangle factory draws a sized triangle gesture', (
     tester,
   ) async {

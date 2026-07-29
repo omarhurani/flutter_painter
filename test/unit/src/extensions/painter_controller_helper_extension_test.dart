@@ -81,4 +81,33 @@ void main() {
       expect(controller.drawables.single, same(erase));
     });
   });
+
+  group('PainterControllerHelper.setShapeLabel', () {
+    test('updates a label while preserving selection, undo, and redo', () {
+      const originalLabel = ShapeLabel(text: 'Original');
+      const updatedLabel = ShapeLabel(text: 'Updated');
+      final drawable = LabeledShapeFactory(
+        factory: RectangleFactory(),
+        label: originalLabel,
+      ).create(Offset.zero);
+      final controller = PainterController(drawables: [drawable]);
+      addTearDown(controller.dispose);
+      controller.selectObjectDrawable(drawable);
+
+      expect(controller.setShapeLabel(drawable, updatedLabel), isTrue);
+
+      final updated = controller.drawables.single as LabeledShapeDrawable;
+      expect(updated.label, same(updatedLabel));
+      expect(controller.selectedObjectDrawable, same(updated));
+
+      controller.undo();
+      expect(controller.drawables.single, same(drawable));
+      expect(controller.selectedObjectDrawable, same(drawable));
+
+      controller.redo();
+      final redone = controller.drawables.single as LabeledShapeDrawable;
+      expect(redone.label, same(updatedLabel));
+      expect(controller.selectedObjectDrawable, same(redone));
+    });
+  });
 }

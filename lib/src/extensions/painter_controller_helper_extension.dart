@@ -52,6 +52,21 @@ extension PainterControllerHelper on PainterController {
         replaceDrawable(drawable, coloredDrawable, newAction: newAction);
   }
 
+  /// Replaces the label on a labeled shape.
+  ///
+  /// The replacement participates in undo and redo and preserves selection.
+  bool setShapeLabel(
+    LabeledShapeDrawable drawable,
+    ShapeLabel label, {
+    bool newAction = true,
+  }) {
+    return replaceDrawable(
+      drawable,
+      drawable.copyWithLabel(label),
+      newAction: newAction,
+    );
+  }
+
   /// The object settings directly from the painter settings.
   ObjectSettings get objectSettings => settings.object;
 

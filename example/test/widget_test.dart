@@ -180,6 +180,47 @@ void main() {
     );
   });
 
+  testWidgets('labeled shape can be drawn and its text updated', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add shape'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Labeled Double Arrow'));
+    await tester.pumpAndSettle();
+
+    final painter = tester.widget<FlutterPainter>(find.byType(FlutterPainter));
+    final painterTopLeft = tester.getTopLeft(find.byType(FlutterPainter));
+    await tester.dragFrom(
+      painterTopLeft + const Offset(200, 120),
+      const Offset(240, 0),
+    );
+    await tester.pumpAndSettle();
+
+    final drawable =
+        painter.controller.drawables.single as LabeledSized1DShapeDrawable;
+    expect(drawable.label.text, '120 mm');
+
+    painter.controller.selectObjectDrawable(drawable);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Change Label'));
+    await tester.pumpAndSettle();
+
+    expect(
+      (painter.controller.selectedObjectDrawable as LabeledShapeDrawable)
+          .label
+          .text,
+      '240 mm',
+    );
+  });
+
   testWidgets('font size slider stays interactive while editing text', (
     tester,
   ) async {

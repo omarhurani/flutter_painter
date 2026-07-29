@@ -213,6 +213,41 @@ controller.freeStyleMode = FreeStyleMode.draw;
 Set `controller.freeStyleFactory = null` to restore the built-in brush. Custom
 factories do not affect erase mode.
 
+### Labeled shapes
+
+Wrap any built-in one- or two-dimensional shape factory with
+`LabeledShapeFactory` to keep text attached while the shape is drawn, moved,
+resized, scaled, or rotated:
+
+```dart
+controller.shapeFactory = LabeledShapeFactory(
+  factory: DoubleArrowFactory(),
+  label: const ShapeLabel(
+    text: '120 mm',
+    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    backgroundColor: Colors.white,
+  ),
+);
+```
+
+The label is centered by default. Configure its padding, background, rounded
+corners, direction, alignment, or local `offset` through `ShapeLabel`. Updating
+a label through the controller preserves selection and participates in undo and
+redo:
+
+```dart
+final selected = controller.selectedObjectDrawable;
+if (selected is LabeledShapeDrawable) {
+  controller.setShapeLabel(
+    selected,
+    selected.label.withText('240 mm'),
+  );
+}
+```
+
+Custom factories can also be wrapped when their drawable extends
+`Sized1DDrawable` or `Sized2DDrawable`.
+
 ### Background
 
 
