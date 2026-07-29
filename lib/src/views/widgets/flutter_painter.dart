@@ -38,6 +38,10 @@ typedef FreeStyleDrawingCallback = void Function(PathDrawable drawable);
 typedef FlutterPainterBuilderCallback =
     Widget Function(BuildContext context, Widget painter);
 
+final Expando<Size> _painterCoordinateSpaceSizes = Expando<Size>(
+  'flutter_painter_coordinate_space',
+);
+
 /// Widget that allows user to draw on it
 class FlutterPainter extends StatelessWidget {
   /// The controller for this painter.
@@ -127,7 +131,6 @@ class FlutterPainter extends StatelessWidget {
           return _builder(
             context,
             _FlutterPainterWidget(
-              key: controller.painterKey,
               controller: controller,
               onDrawableCreated: onDrawableCreated,
               onDrawableDeleted: onDrawableDeleted,
@@ -185,7 +188,6 @@ class _FlutterPainterWidget extends StatelessWidget {
 
   /// Creates a [_FlutterPainterWidget] with the given [controller] and optional callbacks.
   const _FlutterPainterWidget({
-    super.key,
     required this.controller,
     this.onDrawableCreated,
     this.onDrawableDeleted,
@@ -222,20 +224,31 @@ class _FlutterPainterWidget extends StatelessWidget {
             child: ValueListenableBuilder<PainterControllerValue>(
               valueListenable: controller,
               builder: (context, value, _) {
-                final painter = _FreeStyleWidget(
-                  child: _TextWidget(
-                    child: _ShapeWidget(
-                      child: _ObjectWidget(
-                        interactionEnabled: true,
-                        child: CustomPaint(
-                          painter: Painter(
-                            drawables: value.drawables,
-                            background: value.background,
+                final painter = Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    CustomPaint(
+                      painter: Painter(
+                        drawables: const [],
+                        background: value.background,
+                      ),
+                    ),
+                    _PainterCoordinateSpace(
+                      controller: controller,
+                      child: _FreeStyleWidget(
+                        child: _TextWidget(
+                          child: _ShapeWidget(
+                            child: _ObjectWidget(
+                              interactionEnabled: true,
+                              child: CustomPaint(
+                                painter: Painter(drawables: value.drawables),
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 );
 
                 // InteractiveViewer always owns scale gestures, even when its
@@ -317,5 +330,43 @@ class _FlutterPainterWidget extends StatelessWidget {
       }
     }
     return true;
+  }
+}
+
+/// Keeps drawables in the coordinate space established by their first layout.
+///
+/// The surrounding viewport can resize independently. [FittedBox] transforms
+/// hit testing as well as painting, so gestures continue to report positions
+/// in the original drawable coordinate space.
+class _PainterCoordinateSpace extends StatelessWidget {
+  const _PainterCoordinateSpace({
+    required this.controller,
+    required this.child,
+  });
+
+  final PainterController controller;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final displaySize = constraints.biggest;
+        if (!displaySize.isFinite || displaySize.isEmpty) {
+          return SizedBox(key: controller.painterKey, child: child);
+        }
+
+        final coordinateSpaceSize = _painterCoordinateSpaceSizes[controller] ??=
+            displaySize;
+        return FittedBox(
+          fit: BoxFit.fill,
+          child: SizedBox.fromSize(
+            key: controller.painterKey,
+            size: coordinateSpaceSize,
+            child: child,
+          ),
+        );
+      },
+    );
   }
 }

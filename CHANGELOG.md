@@ -12,6 +12,7 @@
 * Allow image backgrounds to be fitted and aligned over a background color ([Issue #69](https://github.com/omarhurani/flutter_painter/issues/69)).
 * Add direct, undo-aware removal of the selected object drawable and make failed or empty removals safe no-ops ([Issue #58](https://github.com/omarhurani/flutter_painter/issues/58)).
 * Rotate image backgrounds in quarter turns without rotating or displacing other drawables ([Issue #44](https://github.com/omarhurani/flutter_painter/issues/44)).
+* Keep drawable positions, sizes, gestures, and exports aligned when the painter viewport resizes ([Issue #50](https://github.com/omarhurani/flutter_painter/issues/50), [Issue #68](https://github.com/omarhurani/flutter_painter/issues/68)).
 
 ## [2.0.0] - 2026-07-28
 

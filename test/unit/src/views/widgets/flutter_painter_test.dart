@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -243,6 +244,97 @@ void main() {
     expect(stroke.path.last.dx, closeTo(110, 0.01));
     expect(stroke.path.last.dy, closeTo(120, 0.01));
   });
+
+  testWidgets(
+    'drawables retain relative coordinates when the painter resizes',
+    (tester) async {
+      final background = RecordingBackgroundDrawable();
+      final drawable = RectangleDrawable(
+        position: const Offset(50, 25),
+        size: const Size(20, 10),
+        paint: Paint()
+          ..color = Colors.red
+          ..style = PaintingStyle.fill,
+      );
+      final controller = PainterController(
+        background: background,
+        drawables: [drawable],
+      );
+      addTearDown(controller.dispose);
+      final painterSize = ValueNotifier(const Size(200, 100));
+      addTearDown(painterSize.dispose);
+
+      await tester.pumpWidget(
+        testbed.simpleWrap(
+          child: Center(
+            child: ValueListenableBuilder<Size>(
+              valueListenable: painterSize,
+              builder: (context, size, _) => SizedBox.fromSize(
+                key: const ValueKey('resizable-painter'),
+                size: size,
+                child: FlutterPainter(controller: controller),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(background.sizes.last, const Size(200, 100));
+      expect(controller.painterKey.currentContext?.size, const Size(200, 100));
+      expect(controller.canUndo, isFalse);
+
+      painterSize.value = const Size(400, 100);
+      await tester.pumpAndSettle();
+
+      final painterTopLeft = tester.getTopLeft(
+        find.byKey(const ValueKey('resizable-painter')),
+      );
+      final coordinateBox =
+          controller.painterKey.currentContext!.findRenderObject() as RenderBox;
+      final displayedDrawablePosition = coordinateBox.localToGlobal(
+        drawable.position,
+      );
+
+      expect(background.sizes.last, const Size(400, 100));
+      expect(coordinateBox.size, const Size(200, 100));
+      expect(displayedDrawablePosition, painterTopLeft + const Offset(100, 25));
+      expect(controller.drawables.single, same(drawable));
+      expect(controller.canUndo, isFalse);
+
+      await tester.tapAt(displayedDrawablePosition);
+      await tester.pumpAndSettle();
+      expect(controller.selectedObjectDrawable, same(drawable));
+
+      final gesture = await tester.startGesture(displayedDrawablePosition);
+      await gesture.moveBy(const Offset(20, 10));
+      await tester.pump();
+      await gesture.moveBy(const Offset(20, 10));
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      final movedDrawable =
+          controller.selectedObjectDrawable! as RectangleDrawable;
+      expect(movedDrawable.position, const Offset(60, 35));
+
+      final renderedImage = (await tester.runAsync(
+        () => controller.renderImage(const Size(400, 200)),
+      ))!;
+      addTearDown(renderedImage.dispose);
+      final pixels = await tester.runAsync(
+        () => renderedImage.toByteData(format: ui.ImageByteFormat.rawRgba),
+      );
+      expect(pixels, isNotNull);
+      expect(_alphaAt(pixels!, width: 400, x: 120, y: 70), 255);
+      expect(_alphaAt(pixels, width: 400, x: 60, y: 70), 0);
+
+      controller.undo();
+      expect(
+        (controller.drawables.single as RectangleDrawable).position,
+        drawable.position,
+      );
+    },
+  );
 
   testWidgets('pinch zoom cancels drawing and leaves the brush responsive', (
     tester,
@@ -556,4 +648,22 @@ Future<ui.Image> _createTestImage() {
     Paint()..color = Colors.red,
   );
   return recorder.endRecording().toImage(40, 40);
+}
+
+int _alphaAt(
+  ByteData pixels, {
+  required int width,
+  required int x,
+  required int y,
+}) {
+  return pixels.getUint8(((y * width) + x) * 4 + 3);
+}
+
+class RecordingBackgroundDrawable extends BackgroundDrawable {
+  final List<Size> sizes = [];
+
+  @override
+  void draw(Canvas canvas, Size size) {
+    sizes.add(size);
+  }
 }
