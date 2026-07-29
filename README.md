@@ -2,7 +2,7 @@
 
 [![pub package](https://img.shields.io/pub/v/flutter_painter?label=flutter_painter&color=blue)](https://pub.dev/packages/flutter_painter) <a href="https://www.buymeacoffee.com/omarhurani" target="_blank"><img src="https://i.imgur.com/OUmVzk7.png" alt="Buy Me A Pizza" height=22px/ > </a>
 
-A pure-Flutter package for painting. 
+A pure-Flutter package for painting.
 
 Requires Flutter 3.32 or later and Dart 3.8 or later.
 Active maintenance resumed in 2026, with support for Flutter 3.44.8.
@@ -10,12 +10,17 @@ Active maintenance resumed in 2026, with support for Flutter 3.44.8.
 ## Summary
 
 Flutter Painter provides you with a widget that can be used to draw on it. Right now, it supports:
-- **Free-style drawing**: Scribble anything you want with any width and color.
+- **Free-style drawing** with custom brushes, lifecycle callbacks, erasing, and
+  paint-bucket flood fill.
 - **Objects** that you can move, scale and rotate in an easy and familiar way, such as:
-  - **Text** with any `TextStyle`.
-  - **Shapes** such as angles, lines, arrows, ovals, rectangles and triangles with any `Paint`.
-  - **Images** that can be flipped.
-- **Free-style eraser** to erase any part of a drawing or object you don't want on the painter.[*](#erasing)
+  - **Text** with configurable `TextStyle` and alignment.
+  - **Shapes** such as angles, labeled measurements, lines, arrows, ovals,
+    rectangles, and triangles with any `Paint`.
+  - **Images** with flipping, cropping, opacity, blur, tagging, and captured
+    widget/SVG support.
+  - **Groups** of transformable objects.
+- **Undo and redo**, drawable color editing, JSON save/restore, and image export.
+- **Color or image backgrounds** with fitting, alignment, and quarter-turn rotation.
 
 These are called **drawables**.
 
@@ -91,7 +96,7 @@ class _ExampleWidgetState extends State<ExampleWidget> {
 
 > **NOTE:** `FlutterPainter` does not define its own constraints on its size, so it is advised to use a widget that can provide its child with size constraints, such as `SizedBox` or `AspectRatio` ([more on constraints here](https://flutter.dev/docs/development/ui/layout/constraints)).
 
-> **NOTE:** If mutiple parts of your UI depend on the `PainterController`, you can use a [`ValueListeneableBuilder`](https://api.flutter.dev/flutter/widgets/ValueListenableBuilder-class.html) with the `valueListenable` being your controller, which will re-build automatically whenever the controller updates. This is the approach used in the example project.
+> **NOTE:** If multiple parts of your UI depend on the `PainterController`, you can use a [`ValueListenableBuilder`](https://api.flutter.dev/flutter/widgets/ValueListenableBuilder-class.html) with the `valueListenable` being your controller, which will re-build automatically whenever the controller updates. This is the approach used in the example project.
 
 
 ### Callbacks
@@ -120,7 +125,7 @@ There are currently five types of settings:
 - `freeStyleSettings`: They control the parameters used in drawing scribbles, such as the width and color. It also has a field to enable/disable scribbles, to prevent the user from drawing on the `FlutterPainter`.
 - `textSettings`: They control the `TextStyle` and `TextAlign` of text being drawn. They also include a focus node ([more on focus nodes here](https://flutter.dev/docs/cookbook/forms/focus)) so you can detect when the user starts and stops editing text.
 - `objectSettings`: These settings control objects that can be moved, scaled and rotated. Texts, shapes and images are all considered objects. It controls layout assist, which allows to center objects and rotate them at a right angle, and settings regarding the object controls for scaling, rotating and resizing.
-- `shapeSettings`: These control the paint and shape factory used (Shape Factory is used to create shapes), and whether the shape is drawn once or continiously.
+- `shapeSettings`: These control the paint and shape factory used (Shape Factory is used to create shapes), and whether the shape is drawn once or continuously.
 - `scaleSettings`: These settings control the scaling on the painter (zooming in/out). By default, scaling is disabled.
 
 When scaling and free-style drawing are both enabled, one pointer draws and a

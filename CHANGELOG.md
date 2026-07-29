@@ -1,30 +1,39 @@
 ## Unreleased
 
-* Fix shape gestures under current Flutter: restore drag updates, prevent missing-drawable notifications, and keep draw-once factories active after invalid multi-touch gestures ([Issue #43](https://github.com/omarhurani/flutter_painter/issues/43)).
+## [2.1.0] - 2026-07-29
+
+### Added
+
 * Add free-style drawing state and lifecycle callbacks, including cancellation cleanup ([Issue #52](https://github.com/omarhurani/flutter_painter/issues/52)).
-* Add configurable text alignment for editing and rendered `TextDrawable`s ([Issue #49](https://github.com/omarhurani/flutter_painter/issues/49)).
+* Add configurable text alignment and programmatic editing for existing `TextDrawable`s ([Issue #49](https://github.com/omarhurani/flutter_painter/issues/49)).
 * Add `TriangleDrawable` and `TriangleFactory` support ([Issue #65](https://github.com/omarhurani/flutter_painter/issues/65)).
 * Allow images to opt out of free-style erasing and remain interactive in erase mode ([Issue #85](https://github.com/omarhurani/flutter_painter/issues/85)).
-* Allow two-pointer zooming while free-style mode is active without leaving an accidental stroke, and keep drawing responsive after zooming ([Issue #64](https://github.com/omarhurani/flutter_painter/issues/64), [Issue #72](https://github.com/omarhurani/flutter_painter/issues/72), [Issue #76](https://github.com/omarhurani/flutter_painter/issues/76)).
 * Add configurable opacity to `ImageDrawable` ([Issue #30](https://github.com/omarhurani/flutter_painter/issues/30)).
 * Add undo-aware color updates for existing free-style, shape, and text drawables ([Issue #42](https://github.com/omarhurani/flutter_painter/issues/42), [Issue #66](https://github.com/omarhurani/flutter_painter/issues/66)).
-* Document and cover local drawing coordinates after zooming and panning the painter ([Issue #40](https://github.com/omarhurani/flutter_painter/issues/40)).
 * Allow image backgrounds to be fitted and aligned over a background color ([Issue #69](https://github.com/omarhurani/flutter_painter/issues/69)).
 * Add direct, undo-aware removal of the selected object drawable and make failed or empty removals safe no-ops ([Issue #58](https://github.com/omarhurani/flutter_painter/issues/58)).
 * Rotate image backgrounds in quarter turns without rotating or displacing other drawables ([Issue #44](https://github.com/omarhurani/flutter_painter/issues/44)).
-* Keep drawable positions, sizes, gestures, and exports aligned when the painter viewport resizes ([Issue #50](https://github.com/omarhurani/flutter_painter/issues/50), [Issue #68](https://github.com/omarhurani/flutter_painter/issues/68)).
 * Support custom free-style drawable factories for textured and specialized brushes ([Issue #55](https://github.com/omarhurani/flutter_painter/issues/55)).
 * Add source cropping for image drawables, including undo-aware controller helpers ([Issue #39](https://github.com/omarhurani/flutter_painter/issues/39)).
 * Add reusable text labels to one- and two-dimensional shape factories ([Issue #45](https://github.com/omarhurani/flutter_painter/issues/45)).
 * Preserve application-defined image tags and count tagged sticker types ([Issue #56](https://github.com/omarhurani/flutter_painter/issues/56)).
 * Add versioned JSON export and restoration for built-in drawables, embedded images, and custom adapters ([Issue #34](https://github.com/omarhurani/flutter_painter/issues/34), [Issue #71](https://github.com/omarhurani/flutter_painter/issues/71), [Issue #79](https://github.com/omarhurani/flutter_painter/issues/79)).
 * Add transformable object groups with undoable grouping, ungrouping, and JSON persistence ([Issue #81](https://github.com/omarhurani/flutter_painter/issues/81)).
-* Release image-provider stream listeners after resolving an image, rebind painter widget subscriptions when controllers change, and document independent PageView controller/image ownership ([Issue #32](https://github.com/omarhurani/flutter_painter/issues/32), [Issue #36](https://github.com/omarhurani/flutter_painter/issues/36)).
 * Add drawable, editable, JSON-persisted clockwise angles from 0 to 360 degrees, including reflex angles ([Issue #9](https://github.com/omarhurani/flutter_painter/issues/9)).
-* Bound the drawable save layer to the painter coordinate space instead of `Rect.largest`, preventing early-stroke flicker and lag with Impeller on iOS ([Issue #67](https://github.com/omarhurani/flutter_painter/issues/67)).
 * Add rectangular and oval source-image blur regions for redacting sensitive image content ([Issue #78](https://github.com/omarhurani/flutter_painter/issues/78)).
 * Add asynchronous, undoable paint-bucket flood fills with configurable color tolerance and compact span persistence ([Issue #73](https://github.com/omarhurani/flutter_painter/issues/73)).
 * Capture rendered widgets, including SVG widgets, as editable and undoable image drawables ([Issue #53](https://github.com/omarhurani/flutter_painter/issues/53)).
+
+### Fixed
+
+* Restore shape drag updates, prevent missing-drawable notifications, and keep draw-once factories active after invalid multi-touch gestures ([Issue #43](https://github.com/omarhurani/flutter_painter/issues/43)).
+* Allow two-pointer zooming while free-style mode is active without leaving an accidental stroke, and keep drawing responsive after zooming ([Issue #64](https://github.com/omarhurani/flutter_painter/issues/64), [Issue #72](https://github.com/omarhurani/flutter_painter/issues/72), [Issue #76](https://github.com/omarhurani/flutter_painter/issues/76)).
+* Honor configured canvas scales below one and keep drawing coordinates local after zooming and panning ([Issue #40](https://github.com/omarhurani/flutter_painter/issues/40)).
+* Keep drawable positions, sizes, gestures, and exports aligned when the painter viewport resizes ([Issue #50](https://github.com/omarhurani/flutter_painter/issues/50), [Issue #68](https://github.com/omarhurani/flutter_painter/issues/68)).
+* Release image-provider stream listeners after resolving an image, rebind painter widget subscriptions when controllers change, and preserve independent PageView controller/image ownership ([Issue #32](https://github.com/omarhurani/flutter_painter/issues/32), [Issue #36](https://github.com/omarhurani/flutter_painter/issues/36)).
+* Bound the drawable save layer to the painter coordinate space instead of `Rect.largest`, preventing early-stroke flicker and lag with Impeller on iOS ([Issue #67](https://github.com/omarhurani/flutter_painter/issues/67)).
+* Apply updated text settings during active editing and keep hue sliders stable at their maximum value.
+* Preserve serialized paint miter limits across native and web renderers.
 
 ## [2.0.0] - 2026-07-28
 
