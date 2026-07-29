@@ -24,6 +24,7 @@
 * Bound the drawable save layer to the painter coordinate space instead of `Rect.largest`, preventing early-stroke flicker and lag with Impeller on iOS ([Issue #67](https://github.com/omarhurani/flutter_painter/issues/67)).
 * Add rectangular and oval source-image blur regions for redacting sensitive image content ([Issue #78](https://github.com/omarhurani/flutter_painter/issues/78)).
 * Add asynchronous, undoable paint-bucket flood fills with configurable color tolerance and compact span persistence ([Issue #73](https://github.com/omarhurani/flutter_painter/issues/73)).
+* Capture rendered widgets, including SVG widgets, as editable and undoable image drawables ([Issue #53](https://github.com/omarhurani/flutter_painter/issues/53)).
 
 ## [2.0.0] - 2026-07-28
 

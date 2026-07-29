@@ -386,6 +386,41 @@ instead, replace its `ImageDrawable` with
 
 The background can also be assigned from the constructor of `PainterController` directly.
 
+### Adding rendered widgets and SVGs
+
+Flutter Painter renders canvas drawables, so arbitrary live widgets cannot be
+stored directly. An already-painted widget—including an `SvgPicture` from
+`flutter_svg`—can instead be captured as a movable, scalable, rotatable, and
+undoable image:
+
+```dart
+final svgKey = GlobalKey();
+
+RepaintBoundary(
+  key: svgKey,
+  child: SvgPicture.asset(
+    'assets/logo.svg',
+    width: 120,
+    height: 80,
+  ),
+);
+
+// Call after the RepaintBoundary has completed its first paint.
+final svgDrawable = await controller.addWidgetSnapshot(
+  svgKey,
+  pixelRatio: 3,
+  tag: 'logo',
+);
+```
+
+The snapshot keeps the widget's logical size; `pixelRatio` controls raster
+detail when the object is enlarged. Omitting it uses the device pixel ratio.
+The returned `ImageDrawable` supports normal object interactions and JSON
+persistence. It is a static raster snapshot rather than a live widget, so
+capture it again after the source widget changes. Dispose
+`svgDrawable.image` only after the drawable and its undo history no longer use
+it.
+
 ### Blurring sensitive image regions
 
 Blur real source-image pixels and clip the result as a rectangle or oval. The

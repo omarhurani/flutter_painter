@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart' as material;
 import 'package:flutter_painter/src/controllers/drawables/background/image_background_drawable.dart';
 import 'package:flutter_painter/src/controllers/drawables/image_drawable.dart';
 import 'package:flutter_painter/src/controllers/drawables/object_group_drawable.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_painter/src/controllers/drawables/shape/rectangle_drawab
 import 'package:flutter_painter/src/controllers/painter_controller.dart';
 import 'package:flutter_painter/src/controllers/drawables/text_drawable.dart';
 import 'package:flutter_painter/src/controllers/events/edit_text_painter_event.dart';
+import 'package:flutter_painter/src/views/views.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -290,6 +292,95 @@ void main() {
     expect(drawable.tag, 'sticker/star');
     expect(drawable.sourceRect, crop);
     expect(drawable.getSize(), const Size(20, 10));
+  });
+
+  testWidgets(
+    'addWidgetSnapshot captures a repaint boundary as an undoable image',
+    (tester) async {
+      final boundaryKey = material.GlobalKey();
+      final controller = PainterController();
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        material.MaterialApp(
+          home: material.Column(
+            children: [
+              material.RepaintBoundary(
+                key: boundaryKey,
+                child: const material.SizedBox(
+                  width: 20,
+                  height: 10,
+                  child: material.ColoredBox(color: Color(0xFFEF5350)),
+                ),
+              ),
+              material.SizedBox(
+                width: 100,
+                height: 100,
+                child: FlutterPainter(controller: controller),
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final drawable = (await tester.runAsync(
+        () => controller.addWidgetSnapshot(
+          boundaryKey,
+          pixelRatio: 2,
+          tag: 'external/svg',
+          erasable: false,
+        ),
+      ))!;
+      addTearDown(drawable.image.dispose);
+
+      expect(drawable.image.width, 40);
+      expect(drawable.image.height, 20);
+      expect(drawable.getSize(), const Size(20, 10));
+      expect(drawable.position, const Offset(50, 50));
+      expect(drawable.tag, 'external/svg');
+      expect(drawable.erasable, isFalse);
+      expect(controller.value.drawables.single, same(drawable));
+      expect(controller.canUndo, isTrue);
+
+      final rendered = (await tester.runAsync(
+        () => controller.renderImage(const Size(100, 100)),
+      ))!;
+      addTearDown(rendered.dispose);
+      final pixels = await tester.runAsync(
+        () => rendered.toByteData(format: ImageByteFormat.rawRgba),
+      );
+      final center = (50 * 100 + 50) * 4;
+      expect(pixels!.getUint8(center), greaterThan(230));
+      expect(pixels.getUint8(center + 1), inInclusiveRange(60, 110));
+      expect(pixels.getUint8(center + 2), inInclusiveRange(50, 100));
+
+      controller.undo();
+      expect(controller.value.drawables, isEmpty);
+    },
+  );
+
+  testWidgets('addWidgetSnapshot validates its key and pixel ratio', (
+    tester,
+  ) async {
+    final controller = PainterController();
+    addTearDown(controller.dispose);
+
+    await expectLater(
+      controller.addWidgetSnapshot(material.GlobalKey(), pixelRatio: 0),
+      throwsRangeError,
+    );
+
+    final nonBoundaryKey = material.GlobalKey();
+    await tester.pumpWidget(
+      material.SizedBox(key: nonBoundaryKey, width: 10, height: 10),
+    );
+    await expectLater(
+      controller.addWidgetSnapshot(nonBoundaryKey),
+      throwsStateError,
+    );
+    expect(controller.value.drawables, isEmpty);
+    expect(controller.canUndo, isFalse);
   });
 
   test('groups objects with exact order, selection, undo, and redo', () {

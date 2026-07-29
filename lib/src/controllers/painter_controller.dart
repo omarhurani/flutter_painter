@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
 import 'events/selected_object_drawable_removed_event.dart';
 import 'helpers/flood_fill.dart';
 import '../views/widgets/painter_controller_widget.dart';
@@ -376,6 +377,78 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     super.dispose();
   }
 
+  /// Captures a rendered widget and adds it as an editable [ImageDrawable].
+  ///
+  /// Wrap the widget in a [RepaintBoundary] using [repaintBoundaryKey]. The
+  /// widget must be attached, laid out, and painted before capture. The result
+  /// is a raster snapshot, not a live interactive widget.
+  ///
+  /// When [pixelRatio] is omitted, the boundary's device pixel ratio is used
+  /// while its logical dimensions are preserved. [size] can override the
+  /// drawable's initial logical fit bounds, and [position] defaults to the
+  /// painter center. [tag] and [erasable] behave as they do on
+  /// [ImageDrawable]. The caller owns the captured image and should dispose
+  /// `result.image` after removing the drawable permanently.
+  Future<ImageDrawable> addWidgetSnapshot(
+    GlobalKey repaintBoundaryKey, {
+    double? pixelRatio,
+    Size? size,
+    Offset? position,
+    String? tag,
+    bool erasable = true,
+  }) async {
+    if (pixelRatio != null && (!pixelRatio.isFinite || pixelRatio <= 0)) {
+      throw RangeError.value(
+        pixelRatio,
+        'pixelRatio',
+        'must be finite and greater than zero',
+      );
+    }
+
+    final context = repaintBoundaryKey.currentContext;
+    if (context == null || !context.mounted) {
+      throw StateError(
+        'The repaint boundary must be attached before it can be captured.',
+      );
+    }
+    final renderObject = context.findRenderObject();
+    if (renderObject is! RenderRepaintBoundary) {
+      throw StateError(
+        'repaintBoundaryKey must belong to a RepaintBoundary widget.',
+      );
+    }
+    if (!renderObject.attached || !renderObject.hasSize) {
+      throw StateError(
+        'The repaint boundary must be laid out before it can be captured.',
+      );
+    }
+
+    final logicalSize = size ?? renderObject.size;
+    if (!logicalSize.isFinite || logicalSize.isEmpty) {
+      throw ArgumentError.value(
+        logicalSize,
+        'size',
+        'must be finite and non-empty',
+      );
+    }
+
+    final effectivePixelRatio = pixelRatio ?? View.of(context).devicePixelRatio;
+    final image = await renderObject.toImage(pixelRatio: effectivePixelRatio);
+    try {
+      return _addImage(
+        image,
+        logicalSize,
+        sourceRect: ImageDrawable.fullSourceRect(image),
+        tag: tag,
+        position: position,
+        erasable: erasable,
+      );
+    } catch (_) {
+      image.dispose();
+      rethrow;
+    }
+  }
+
   /// Adds an [ImageDrawable] to the center of the painter.
   ///
   /// If [size] is provided, the drawable will scaled to fit that size.
@@ -442,7 +515,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     );
   }
 
-  void _addImage(
+  ImageDrawable _addImage(
     ui.Image image,
     Size? size, {
     Rect? sourceRect,
@@ -450,6 +523,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     Offset? position,
     double blurSigma = 0,
     ImageDrawableShape shape = ImageDrawableShape.rectangle,
+    bool erasable = true,
   }) {
     // Calculate the center of the painter
     final renderBox =
@@ -470,6 +544,7 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
         sourceRect: sourceRect,
         blurSigma: blurSigma,
         shape: shape,
+        erasable: erasable,
       );
     } else {
       drawable = ImageDrawable.fittedToSize(
@@ -480,10 +555,12 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
         sourceRect: sourceRect,
         blurSigma: blurSigma,
         shape: shape,
+        erasable: erasable,
       );
     }
 
     addDrawables([drawable]);
+    return drawable;
   }
 
   /// Crops an existing [drawable] to [sourceRect].

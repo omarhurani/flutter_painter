@@ -162,6 +162,82 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('captures, restores, renders, and undoes a widget snapshot', (
+    tester,
+  ) async {
+    final boundaryKey = GlobalKey();
+    final controller = PainterController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RepaintBoundary(
+                  key: boundaryKey,
+                  child: const SizedBox(
+                    width: 30,
+                    height: 18,
+                    child: ColoredBox(color: Color(0xFFEF5350)),
+                  ),
+                ),
+                SizedBox(
+                  width: 160,
+                  height: 160,
+                  child: FlutterPainter(controller: controller),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final snapshot = await controller.addWidgetSnapshot(
+      boundaryKey,
+      pixelRatio: 2,
+      position: const Offset(80, 80),
+      tag: 'external/svg',
+      erasable: false,
+    );
+    addTearDown(snapshot.image.dispose);
+
+    expect(snapshot.image.width, 60);
+    expect(snapshot.image.height, 36);
+    expect(snapshot.getSize(), const Size(30, 18));
+    expect(snapshot.tag, 'external/svg');
+    expect(snapshot.erasable, isFalse);
+    expect(controller.drawables.single, same(snapshot));
+
+    final rendered = await controller.renderImage(const Size(160, 160));
+    addTearDown(rendered.dispose);
+    final pixels = await rendered.toByteData(
+      format: ui.ImageByteFormat.rawRgba,
+    );
+    final centerOffset = (80 * 160 + 80) * 4;
+    expect(pixels!.getUint8(centerOffset), greaterThan(230));
+    expect(pixels.getUint8(centerOffset + 1), inInclusiveRange(60, 110));
+    expect(pixels.getUint8(centerOffset + 2), inInclusiveRange(50, 100));
+
+    final codec = DrawableJsonCodec();
+    final restored = await codec.decodeJson(
+      await codec.encodeJson(controller.drawables),
+    );
+    final restoredSnapshot = restored.single as ImageDrawable;
+    addTearDown(restoredSnapshot.image.dispose);
+    expect(restoredSnapshot.tag, snapshot.tag);
+    expect(restoredSnapshot.getSize(), snapshot.getSize());
+
+    controller.undo();
+    await tester.pumpAndSettle();
+    expect(controller.drawables, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('counts sticker tags after replacement and export', (
     tester,
   ) async {
