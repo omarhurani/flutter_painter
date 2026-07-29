@@ -139,6 +139,47 @@ void main() {
     expect(painter.controller.drawables.single, isA<DottedFreeStyleDrawable>());
   });
 
+  testWidgets('cropped image sample can reset and reapply its crop', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add image'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add cropped sample'));
+    await tester.pumpAndSettle();
+
+    final painter = tester.widget<FlutterPainter>(find.byType(FlutterPainter));
+    expect(
+      painter.controller.selectedObjectDrawable,
+      isA<ImageDrawable>().having(
+        (drawable) => drawable.isCropped,
+        'isCropped',
+        isTrue,
+      ),
+    );
+
+    await tester.tap(find.text('Reset Crop'));
+    await tester.pumpAndSettle();
+    expect(
+      (painter.controller.selectedObjectDrawable as ImageDrawable).isCropped,
+      isFalse,
+    );
+
+    await tester.tap(find.text('Crop Center'));
+    await tester.pumpAndSettle();
+    expect(
+      (painter.controller.selectedObjectDrawable as ImageDrawable).isCropped,
+      isTrue,
+    );
+  });
+
   testWidgets('font size slider stays interactive while editing text', (
     tester,
   ) async {

@@ -1,9 +1,17 @@
+import 'dart:ui';
+
+import 'package:flutter_painter/src/controllers/drawables/image_drawable.dart';
 import 'package:flutter_painter/src/controllers/painter_controller.dart';
 import 'package:flutter_painter/src/controllers/drawables/text_drawable.dart';
 import 'package:flutter_painter/src/controllers/events/edit_text_painter_event.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockImage extends Mock implements Image {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('editTextDrawable selects and dispatches the requested text', () async {
     final drawable = TextDrawable(text: 'Edit me', position: Offset.zero);
     final controller = PainterController(drawables: [drawable]);
@@ -99,5 +107,55 @@ void main() {
 
     expect(controller.value.drawables, isEmpty);
     expect(controller.canUndo, isFalse);
+  });
+
+  test('cropImageDrawable supports selection, undo, redo, and reset', () {
+    final image = MockImage();
+    when(() => image.width).thenReturn(100);
+    when(() => image.height).thenReturn(50);
+    final original = ImageDrawable(image: image, position: Offset.zero);
+    final controller = PainterController(drawables: [original]);
+    addTearDown(controller.dispose);
+    controller.selectObjectDrawable(original);
+
+    const crop = Rect.fromLTWH(20, 10, 40, 20);
+    expect(controller.cropImageDrawable(original, crop), isTrue);
+
+    final cropped = controller.value.drawables.single as ImageDrawable;
+    expect(cropped.sourceRect, crop);
+    expect(controller.selectedObjectDrawable, same(cropped));
+
+    controller.undo();
+    expect(controller.value.drawables.single, same(original));
+    expect(controller.selectedObjectDrawable, same(original));
+
+    controller.redo();
+    final redone = controller.value.drawables.single as ImageDrawable;
+    expect(redone.sourceRect, crop);
+    expect(controller.selectedObjectDrawable, same(redone));
+
+    expect(
+      controller.cropImageDrawable(redone, ImageDrawable.fullSourceRect(image)),
+      isTrue,
+    );
+    expect(
+      (controller.value.drawables.single as ImageDrawable).isCropped,
+      isFalse,
+    );
+  });
+
+  test('addCroppedImage fits and stores the requested source pixels', () {
+    final image = MockImage();
+    when(() => image.width).thenReturn(100);
+    when(() => image.height).thenReturn(50);
+    final controller = PainterController();
+    addTearDown(controller.dispose);
+
+    const crop = Rect.fromLTWH(20, 10, 40, 20);
+    controller.addCroppedImage(image, crop, const Size(20, 20));
+
+    final drawable = controller.value.drawables.single as ImageDrawable;
+    expect(drawable.sourceRect, crop);
+    expect(drawable.getSize(), const Size(20, 10));
   });
 }

@@ -7,6 +7,15 @@ class ImageDrawable extends ObjectDrawable {
   /// The image to be drawn.
   final Image image;
 
+  /// The source pixels from [image] that are drawn.
+  ///
+  /// This rectangle is expressed in image pixel coordinates and must be
+  /// finite, non-empty, and contained by [fullSourceRect].
+  final Rect sourceRect;
+
+  /// Whether this drawable renders less than the full source image.
+  bool get isCropped => sourceRect != fullSourceRect(image);
+
   /// Whether the image is flipped or not.
   final bool flipped;
 
@@ -29,11 +38,13 @@ class ImageDrawable extends ObjectDrawable {
     super.locked,
     super.hidden,
     required this.image,
+    Rect? sourceRect,
     this.flipped = false,
     double opacity = 1,
     this.erasable = true,
   }) : assert(opacity.isFinite && opacity >= 0 && opacity <= 1),
-       opacity = opacity.isFinite ? opacity.clamp(0.0, 1.0) : 1;
+       opacity = opacity.isFinite ? opacity.clamp(0.0, 1.0) : 1,
+       sourceRect = _validateSourceRect(image, sourceRect);
 
   /// Creates an [ImageDrawable] with the given [image], and calculates the scale based on the given [size].
   /// The scale will be calculated such that the size of the drawable fits into the provided size.
@@ -50,16 +61,21 @@ class ImageDrawable extends ObjectDrawable {
     bool locked = false,
     bool hidden = false,
     required Image image,
+    Rect? sourceRect,
     bool flipped = false,
     double opacity = 1,
     bool erasable = true,
   }) : this(
          position: position,
          rotationAngle: rotationAngle,
-         scale: _calculateScaleFittedToSize(image, size),
+         scale: _calculateScaleFittedToSize(
+           sourceRect?.size ?? fullSourceRect(image).size,
+           size,
+         ),
          assists: assists,
          assistPaints: assistPaints,
          image: image,
+         sourceRect: sourceRect,
          flipped: flipped,
          opacity: opacity,
          erasable: erasable,
@@ -72,22 +88,30 @@ class ImageDrawable extends ObjectDrawable {
   ImageDrawable copyWith({
     bool? hidden,
     Set<ObjectDrawableAssist>? assists,
+    Map<ObjectDrawableAssist, Paint>? assistPaints,
     Offset? position,
     double? rotation,
     double? scale,
     Image? image,
+    Rect? sourceRect,
     bool? flipped,
     double? opacity,
     bool? erasable,
     bool? locked,
   }) {
+    final nextImage = image ?? this.image;
+    final nextSourceRect =
+        sourceRect ?? (image != null && !isCropped ? null : this.sourceRect);
+
     return ImageDrawable(
       hidden: hidden ?? this.hidden,
       assists: assists ?? this.assists,
+      assistPaints: assistPaints ?? this.assistPaints,
       position: position ?? this.position,
       rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,
-      image: image ?? this.image,
+      image: nextImage,
+      sourceRect: nextSourceRect,
       flipped: flipped ?? this.flipped,
       opacity: opacity ?? this.opacity,
       erasable: erasable ?? this.erasable,
@@ -98,8 +122,7 @@ class ImageDrawable extends ObjectDrawable {
   /// Draws the image on the provided [canvas] of size [size].
   @override
   void drawObject(Canvas canvas, Size size) {
-    final scaledSize =
-        Offset(image.width.toDouble(), image.height.toDouble()) * scale;
+    final scaledSize = Offset(sourceRect.width, sourceRect.height) * scale;
     final position = this.position.scale(flipped ? -1 : 1, 1);
 
     if (flipped) canvas.scale(-1, 1);
@@ -107,10 +130,7 @@ class ImageDrawable extends ObjectDrawable {
     // Draw the image onto the canvas.
     canvas.drawImageRect(
       image,
-      Rect.fromPoints(
-        Offset.zero,
-        Offset(image.width.toDouble(), image.height.toDouble()),
-      ),
+      sourceRect,
       Rect.fromPoints(position - scaledSize / 2, position + scaledSize / 2),
       Paint()..color = Color.fromRGBO(255, 255, 255, opacity),
     );
@@ -119,7 +139,12 @@ class ImageDrawable extends ObjectDrawable {
   /// Calculates the size of the rendered object.
   @override
   Size getSize({double minWidth = 0.0, double maxWidth = double.infinity}) {
-    return Size(image.width * scale, image.height * scale);
+    return sourceRect.size * scale;
+  }
+
+  /// Returns the rectangle containing every pixel in [image].
+  static Rect fullSourceRect(Image image) {
+    return Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
   }
 
   /// Compares two [ImageDrawable]s for equality.
@@ -140,11 +165,29 @@ class ImageDrawable extends ObjectDrawable {
   //     scale,
   //     image);
 
-  static double _calculateScaleFittedToSize(Image image, Size size) {
-    if (image.width >= image.height) {
-      return size.width / image.width;
+  static double _calculateScaleFittedToSize(Size sourceSize, Size size) {
+    if (sourceSize.width >= sourceSize.height) {
+      return size.width / sourceSize.width;
     } else {
-      return size.height / image.height;
+      return size.height / sourceSize.height;
     }
+  }
+
+  static Rect _validateSourceRect(Image image, Rect? sourceRect) {
+    final rect = sourceRect ?? fullSourceRect(image);
+    if (!rect.isFinite ||
+        rect.width <= 0 ||
+        rect.height <= 0 ||
+        rect.left < 0 ||
+        rect.top < 0 ||
+        rect.right > image.width ||
+        rect.bottom > image.height) {
+      throw ArgumentError.value(
+        sourceRect,
+        'sourceRect',
+        'must be a finite, non-empty rectangle inside the image bounds',
+      );
+    }
+    return rect;
   }
 }

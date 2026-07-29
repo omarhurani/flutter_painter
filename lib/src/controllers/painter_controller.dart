@@ -340,6 +340,18 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// }
   /// ```
   void addImage(ui.Image image, [Size? size]) {
+    _addImage(image, size);
+  }
+
+  /// Adds a cropped [ImageDrawable] to the center of the painter.
+  ///
+  /// [sourceRect] uses source-image pixel coordinates. If [size] is provided,
+  /// the cropped area is scaled to fit that size.
+  void addCroppedImage(ui.Image image, Rect sourceRect, [Size? size]) {
+    _addImage(image, size, sourceRect);
+  }
+
+  void _addImage(ui.Image image, Size? size, [Rect? sourceRect]) {
     // Calculate the center of the painter
     final renderBox =
         painterKey.currentContext?.findRenderObject() as RenderBox?;
@@ -350,16 +362,39 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     final ImageDrawable drawable;
 
     if (size == null) {
-      drawable = ImageDrawable(image: image, position: center);
+      drawable = ImageDrawable(
+        image: image,
+        position: center,
+        sourceRect: sourceRect,
+      );
     } else {
       drawable = ImageDrawable.fittedToSize(
         image: image,
         position: center,
         size: size,
+        sourceRect: sourceRect,
       );
     }
 
     addDrawables([drawable]);
+  }
+
+  /// Crops an existing [drawable] to [sourceRect].
+  ///
+  /// The crop participates in undo and redo. Returns `false` if [drawable]
+  /// does not belong to this controller. Use
+  /// `ImageDrawable.fullSourceRect(drawable.image)` to reset the crop.
+  bool cropImageDrawable(
+    ImageDrawable drawable,
+    Rect sourceRect, {
+    bool newAction = true,
+  }) {
+    if (!value.drawables.contains(drawable)) return false;
+    return replaceDrawable(
+      drawable,
+      drawable.copyWith(sourceRect: sourceRect),
+      newAction: newAction,
+    );
   }
 
   /// Renders the background and all other drawables to a [ui.Image] object.

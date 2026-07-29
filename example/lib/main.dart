@@ -83,6 +83,8 @@ class DottedFreeStyleDrawable extends PathDrawable {
   }
 }
 
+enum _ImageMenuAction { onlineSticker, croppedSample }
+
 class FlutterPainterExample extends StatefulWidget {
   const FlutterPainterExample({super.key});
 
@@ -527,6 +529,17 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                                 ),
                               ],
                             ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: OutlinedButton(
+                                onPressed: toggleSelectedImageCrop,
+                                child: Text(
+                                  imageDrawable.isCropped
+                                      ? "Reset Crop"
+                                      : "Crop Center",
+                                ),
+                              ),
+                            ),
                           ],
                           if (controller.selectedObjectDrawable
                               case final ShapeDrawable shapeDrawable) ...[
@@ -617,10 +630,28 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                 ),
               ),
             ),
-            // Add sticker image
-            IconButton(
+            // Add a network sticker or an offline cropped sample.
+            PopupMenuButton<_ImageMenuAction>(
+              tooltip: "Add image",
               icon: const Icon(Icons.emoji_emotions_outlined),
-              onPressed: addSticker,
+              itemBuilder: (context) => const [
+                PopupMenuItem(
+                  value: _ImageMenuAction.onlineSticker,
+                  child: Text("Add online sticker"),
+                ),
+                PopupMenuItem(
+                  value: _ImageMenuAction.croppedSample,
+                  child: Text("Add cropped sample"),
+                ),
+              ],
+              onSelected: (action) {
+                switch (action) {
+                  case _ImageMenuAction.onlineSticker:
+                    addSticker();
+                  case _ImageMenuAction.croppedSample:
+                    addCroppedSample();
+                }
+              },
             ),
             // Add shapes
             if (controller.shapeFactory == null)
@@ -738,6 +769,22 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         const SnackBar(content: Text("Unable to download this sticker.")),
       );
     }
+  }
+
+  void addCroppedSample() {
+    final image = backgroundImage;
+    if (image == null) return;
+
+    final fullRect = ImageDrawable.fullSourceRect(image);
+    final cropRect = Rect.fromLTWH(
+      fullRect.width * 0.2,
+      fullRect.height * 0.2,
+      fullRect.width * 0.6,
+      fullRect.height * 0.6,
+    );
+    controller.addCroppedImage(image, cropRect, const Size(180, 100));
+    final drawable = controller.drawables.last as ImageDrawable;
+    controller.selectObjectDrawable(drawable);
   }
 
   void setFreeStyleStrokeWidth(double value) {
@@ -867,6 +914,22 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
       imageDrawable,
       imageDrawable.copyWith(flipped: !imageDrawable.flipped),
     );
+  }
+
+  void toggleSelectedImageCrop() {
+    final imageDrawable = controller.selectedObjectDrawable;
+    if (imageDrawable is! ImageDrawable) return;
+
+    final fullRect = ImageDrawable.fullSourceRect(imageDrawable.image);
+    final sourceRect = imageDrawable.isCropped
+        ? fullRect
+        : Rect.fromLTWH(
+            fullRect.width * 0.2,
+            fullRect.height * 0.2,
+            fullRect.width * 0.6,
+            fullRect.height * 0.6,
+          );
+    controller.cropImageDrawable(imageDrawable, sourceRect);
   }
 }
 

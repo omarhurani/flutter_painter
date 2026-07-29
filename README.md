@@ -350,6 +350,39 @@ final stroke = controller.drawables.whereType<FreeStyleDrawable>().first;
 controller.setDrawableColor(stroke, Colors.red);
 ```
 
+### Cropping images
+
+`ImageDrawable.sourceRect` selects the source-image pixels that are rendered.
+The cropped bounds are used consistently for painting, object controls, hit
+testing, transforms, and exported images:
+
+```dart
+const crop = Rect.fromLTWH(120, 80, 400, 300);
+controller.addCroppedImage(image, crop, const Size(200, 150));
+
+final selected = controller.selectedObjectDrawable;
+if (selected is ImageDrawable) {
+  controller.cropImageDrawable(
+    selected,
+    const Rect.fromLTWH(40, 40, 240, 180),
+  );
+}
+```
+
+`cropImageDrawable` participates in undo and redo. Reset an image to its full
+bounds with:
+
+```dart
+controller.cropImageDrawable(
+  imageDrawable,
+  ImageDrawable.fullSourceRect(imageDrawable.image),
+);
+```
+
+Crop rectangles use source-image pixel coordinates and must remain inside the
+image. Applications can provide any crop-selection UI without adding a cropper
+dependency to Flutter Painter.
+
 ### Rendering Image
 
 From the `PainterController`, you can render the contents of `FlutterPainter` as a PNG-encoded `ui.Image` object. In order to do that, you need to provide the size of the output image. All the drawings will be scaled according to that size.
