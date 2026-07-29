@@ -96,11 +96,18 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
     // Create a new free-style drawable representing the current drawing
     final PathDrawable drawable;
     if (settings.mode == FreeStyleMode.draw) {
-      drawable = FreeStyleDrawable(
-        path: [_globalToLocal(globalPosition)],
-        color: settings.color,
-        strokeWidth: settings.strokeWidth,
-      );
+      final path = [_globalToLocal(globalPosition)];
+      drawable =
+          settings.factory?.create(
+            path: path,
+            color: settings.color,
+            strokeWidth: settings.strokeWidth,
+          ) ??
+          FreeStyleDrawable(
+            path: path,
+            color: settings.color,
+            strokeWidth: settings.strokeWidth,
+          );
 
       // Add the drawable to the controller's drawables
       PainterController.of(context).addDrawables([drawable]);

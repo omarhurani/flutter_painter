@@ -27,6 +27,62 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class DottedFreeStyleFactory extends FreeStyleFactory<DottedFreeStyleDrawable> {
+  const DottedFreeStyleFactory();
+
+  @override
+  DottedFreeStyleDrawable create({
+    required List<Offset> path,
+    required Color color,
+    required double strokeWidth,
+  }) {
+    return DottedFreeStyleDrawable(
+      path: path,
+      color: color,
+      strokeWidth: strokeWidth,
+    );
+  }
+}
+
+class DottedFreeStyleDrawable extends PathDrawable {
+  final Color color;
+
+  DottedFreeStyleDrawable({
+    required super.path,
+    required this.color,
+    super.strokeWidth,
+    super.hidden,
+  });
+
+  @override
+  DottedFreeStyleDrawable copyWith({
+    bool? hidden,
+    List<Offset>? path,
+    double? strokeWidth,
+    Color? color,
+  }) {
+    return DottedFreeStyleDrawable(
+      path: path ?? this.path,
+      color: color ?? this.color,
+      strokeWidth: strokeWidth ?? this.strokeWidth,
+      hidden: hidden ?? this.hidden,
+    );
+  }
+
+  @override
+  Paint get paint => Paint()
+    ..color = color
+    ..style = PaintingStyle.fill;
+
+  @override
+  void draw(Canvas canvas, Size size) {
+    final dotPaint = paint;
+    for (final point in path) {
+      canvas.drawCircle(point, strokeWidth / 2, dotPaint);
+    }
+  }
+}
+
 class FlutterPainterExample extends StatefulWidget {
   const FlutterPainterExample({super.key});
 
@@ -282,20 +338,39 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                               ],
                             ),
                             if (controller.freeStyleMode == FreeStyleMode.draw)
-                              Row(
+                              Column(
                                 children: [
-                                  const Expanded(flex: 1, child: Text("Color")),
-                                  // Control free style color hue
-                                  Expanded(
-                                    flex: 3,
-                                    child: Slider.adaptive(
-                                      min: 0,
-                                      max: maxHue,
-                                      value: HSVColor.fromColor(
-                                        controller.freeStyleColor,
-                                      ).hue,
-                                      activeColor: controller.freeStyleColor,
-                                      onChanged: setFreeStyleColor,
+                                  Row(
+                                    children: [
+                                      const Expanded(
+                                        flex: 1,
+                                        child: Text("Color"),
+                                      ),
+                                      // Control free style color hue
+                                      Expanded(
+                                        flex: 3,
+                                        child: Slider.adaptive(
+                                          min: 0,
+                                          max: maxHue,
+                                          value: HSVColor.fromColor(
+                                            controller.freeStyleColor,
+                                          ).hue,
+                                          activeColor:
+                                              controller.freeStyleColor,
+                                          onChanged: setFreeStyleColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Material(
+                                    type: MaterialType.transparency,
+                                    child: SwitchListTile.adaptive(
+                                      contentPadding: EdgeInsets.zero,
+                                      title: const Text("Dotted brush"),
+                                      value:
+                                          controller.freeStyleFactory
+                                              is DottedFreeStyleFactory,
+                                      onChanged: setDottedBrushEnabled,
                                     ),
                                   ),
                                 ],
@@ -671,6 +746,12 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 
   void setFreeStyleColor(double hue) {
     controller.freeStyleColor = HSVColor.fromAHSV(1, hue, 1, 1).toColor();
+  }
+
+  void setDottedBrushEnabled(bool enabled) {
+    controller.freeStyleFactory = enabled
+        ? const DottedFreeStyleFactory()
+        : null;
   }
 
   void setTextFontSize(double size) {

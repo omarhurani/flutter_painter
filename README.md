@@ -152,6 +152,67 @@ void setStrokeWidth(double value){
 
 > **NOTE:** If you're not using the extensions library, note that all of the settings objects are immutable and cannot be modified, so in order to change some settings, you'll have to create a copy of your current settings and apply the changes you need (this is similar to how you would copy [`ThemeData`](https://api.flutter.dev/flutter/material/ThemeData-class.html)).
 
+### Custom free-style brushes
+
+Set `FreeStyleSettings.factory` (or `controller.freeStyleFactory`) to create a
+custom `PathDrawable` for each drawing gesture. Override `draw` for textured,
+stamped, or image-based brushes, and make sure `copyWith` returns the same
+custom drawable type as points are appended:
+
+```dart
+class DotFactory extends FreeStyleFactory<DotDrawable> {
+  const DotFactory();
+
+  @override
+  DotDrawable create({
+    required List<Offset> path,
+    required Color color,
+    required double strokeWidth,
+  }) => DotDrawable(path: path, color: color, strokeWidth: strokeWidth);
+}
+
+class DotDrawable extends PathDrawable {
+  DotDrawable({
+    required super.path,
+    required this.color,
+    super.strokeWidth,
+    super.hidden,
+  });
+
+  final Color color;
+
+  @override
+  Paint get paint => Paint()..color = color;
+
+  @override
+  void draw(Canvas canvas, Size size) {
+    final dotPaint = paint;
+    for (final point in path) {
+      canvas.drawCircle(point, strokeWidth / 2, dotPaint);
+    }
+  }
+
+  @override
+  DotDrawable copyWith({
+    bool? hidden,
+    List<Offset>? path,
+    double? strokeWidth,
+    Color? color,
+  }) => DotDrawable(
+    path: path ?? this.path,
+    color: color ?? this.color,
+    strokeWidth: strokeWidth ?? this.strokeWidth,
+    hidden: hidden ?? this.hidden,
+  );
+}
+
+controller.freeStyleFactory = const DotFactory();
+controller.freeStyleMode = FreeStyleMode.draw;
+```
+
+Set `controller.freeStyleFactory = null` to restore the built-in brush. Custom
+factories do not affect erase mode.
+
 ### Background
 
 

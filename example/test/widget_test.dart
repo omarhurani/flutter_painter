@@ -109,6 +109,36 @@ void main() {
     expect(tester.widget<Slider>(hueSlider).value, closeTo(slider.max, 0.05));
   });
 
+  testWidgets('dotted brush creates a custom free-style drawable', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.gesture));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dotted brush'));
+    await tester.pumpAndSettle();
+
+    final painter = tester.widget<FlutterPainter>(find.byType(FlutterPainter));
+    expect(painter.controller.freeStyleFactory, isA<DottedFreeStyleFactory>());
+
+    final painterCenter = tester.getCenter(find.byType(FlutterPainter));
+    final gesture = await tester.startGesture(
+      painterCenter - const Offset(300, 0),
+    );
+    await gesture.moveBy(const Offset(30, 20));
+    await gesture.up();
+    await tester.pump();
+
+    expect(painter.controller.drawables.single, isA<DottedFreeStyleDrawable>());
+  });
+
   testWidgets('font size slider stays interactive while editing text', (
     tester,
   ) async {

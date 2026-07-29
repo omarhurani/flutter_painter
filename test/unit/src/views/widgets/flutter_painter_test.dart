@@ -8,6 +8,54 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../widget_test_utils.dart';
 
+class TestFreeStyleFactory extends FreeStyleFactory<TestFreeStyleDrawable> {
+  const TestFreeStyleFactory();
+
+  @override
+  TestFreeStyleDrawable create({
+    required List<Offset> path,
+    required Color color,
+    required double strokeWidth,
+  }) {
+    return TestFreeStyleDrawable(
+      path: path,
+      color: color,
+      strokeWidth: strokeWidth,
+    );
+  }
+}
+
+class TestFreeStyleDrawable extends PathDrawable {
+  final Color color;
+
+  TestFreeStyleDrawable({
+    required super.path,
+    required this.color,
+    super.strokeWidth,
+    super.hidden,
+  });
+
+  @override
+  TestFreeStyleDrawable copyWith({
+    bool? hidden,
+    List<Offset>? path,
+    double? strokeWidth,
+    Color? color,
+  }) {
+    return TestFreeStyleDrawable(
+      path: path ?? this.path,
+      color: color ?? this.color,
+      strokeWidth: strokeWidth ?? this.strokeWidth,
+      hidden: hidden ?? this.hidden,
+    );
+  }
+
+  @override
+  Paint get paint => Paint()
+    ..color = color
+    ..style = PaintingStyle.fill;
+}
+
 void main() {
   final testbed = WidgetTestbed();
 
@@ -171,6 +219,67 @@ void main() {
     expect(controller.drawables, hasLength(1));
     expect(ended.single, same(controller.drawables.single));
     expect(created.single, same(controller.drawables.single));
+  });
+
+  testWidgets('free-style factory creates and updates a custom drawable', (
+    tester,
+  ) async {
+    const color = Color(0xFF7B1FA2);
+    final controller = PainterController(
+      settings: const PainterSettings(
+        freeStyle: FreeStyleSettings(
+          mode: FreeStyleMode.draw,
+          color: color,
+          strokeWidth: 7,
+          factory: TestFreeStyleFactory(),
+        ),
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(buildPainter(controller));
+    await tester.pumpAndSettle();
+
+    final start = tester.getCenter(find.byType(FlutterPainter));
+    final gesture = await tester.startGesture(start);
+    await gesture.moveBy(const Offset(20, 10));
+    await gesture.moveBy(const Offset(15, 5));
+    await gesture.up();
+    await tester.pump();
+
+    final drawable = controller.drawables.single as TestFreeStyleDrawable;
+    expect(drawable.color, color);
+    expect(drawable.strokeWidth, 7);
+    expect(drawable.path, hasLength(3));
+  });
+
+  testWidgets('free-style factory does not replace the erase drawable', (
+    tester,
+  ) async {
+    final controller = PainterController(
+      settings: const PainterSettings(
+        freeStyle: FreeStyleSettings(
+          mode: FreeStyleMode.erase,
+          factory: TestFreeStyleFactory(),
+        ),
+      ),
+      drawables: [
+        FreeStyleDrawable(path: const [Offset(20, 20), Offset(40, 40)]),
+      ],
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(buildPainter(controller));
+    await tester.pumpAndSettle();
+
+    final center = tester.getCenter(find.byType(FlutterPainter));
+    final gesture = await tester.startGesture(center);
+    await gesture.moveBy(const Offset(20, 10));
+    await gesture.up();
+    await tester.pump();
+
+    expect(controller.drawables.whereType<EraseDrawable>(), hasLength(1));
+    expect(controller.drawables.whereType<TestFreeStyleDrawable>(), isEmpty);
   });
 
   testWidgets('scale settings allow zooming below one', (tester) async {

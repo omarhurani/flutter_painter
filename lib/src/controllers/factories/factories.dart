@@ -1,3 +1,4 @@
+export 'free_style_factory.dart';
 export 'shape_factory.dart';
 export 'line_factory.dart';
 export 'arrow_factory.dart';

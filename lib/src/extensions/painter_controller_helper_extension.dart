@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import '../controllers/factories/free_style_factory.dart';
 import '../controllers/factories/shape_factory.dart';
 
 import '../controllers/painter_controller.dart';
@@ -161,6 +162,9 @@ extension PainterControllerHelper on PainterController {
   /// The color used for free-style drawing from `value.settings.freeStyle` directly.
   Color get freeStyleColor => value.settings.freeStyle.color;
 
+  /// The factory used to create custom free-style drawables.
+  FreeStyleFactory? get freeStyleFactory => value.settings.freeStyle.factory;
+
   /// The paint used to draw shapes from `value.settings.shape` directly.
   Paint? get shapePaint => value.settings.shape.paint;
 
@@ -291,6 +295,16 @@ extension PainterControllerHelper on PainterController {
   set freeStyleColor(Color color) => value = value.copyWith(
     settings: value.settings.copyWith(
       freeStyle: value.settings.freeStyle.copyWith(color: color),
+    ),
+  );
+
+  /// The factory used to create custom free-style drawables.
+  ///
+  /// Set this to `null` to restore the built-in free-style drawable. Setting
+  /// this value notifies the listeners of this [PainterController].
+  set freeStyleFactory(FreeStyleFactory? factory) => value = value.copyWith(
+    settings: value.settings.copyWith(
+      freeStyle: value.settings.freeStyle.copyWith(factory: factory),
     ),
   );
 
