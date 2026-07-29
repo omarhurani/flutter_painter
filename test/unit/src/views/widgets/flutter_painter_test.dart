@@ -149,6 +149,47 @@ void main() {
     expect(find.byType(InteractiveViewer), findsOneWidget);
   });
 
+  testWidgets('object groups can be selected, moved, and ungrouped', (
+    tester,
+  ) async {
+    final rectangle = RectangleDrawable(
+      size: const Size(50, 35),
+      position: const Offset(110, 130),
+    );
+    final oval = OvalDrawable(
+      size: const Size(40, 50),
+      position: const Offset(180, 160),
+    );
+    final controller = PainterController(drawables: [rectangle, oval]);
+    addTearDown(controller.dispose);
+    final group = controller.groupObjectDrawables([rectangle, oval]);
+
+    await tester.pumpWidget(buildPainter(controller));
+    await tester.pumpAndSettle();
+
+    expect(group, isNotNull);
+    expect(controller.selectedObjectDrawable, same(group));
+    final painterTopLeft = tester.getTopLeft(find.byType(FlutterPainter));
+    final gesture = await tester.startGesture(painterTopLeft + group!.position);
+    await gesture.moveBy(const Offset(20, 10));
+    await tester.pump();
+    await gesture.moveBy(const Offset(30, 20));
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    final movedGroup =
+        controller.selectedObjectDrawable! as ObjectGroupDrawable;
+    expect(movedGroup.position, group.position + const Offset(30, 20));
+
+    final children = controller.ungroupSelectedObjectDrawable();
+    await tester.pumpAndSettle();
+
+    expect(children, hasLength(2));
+    expect(controller.drawables, children);
+    expect(controller.selectedObjectDrawable, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('controller opens an existing text drawable for editing', (
     tester,
   ) async {

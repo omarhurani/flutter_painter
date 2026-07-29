@@ -226,6 +226,23 @@ void main() {
         paint: shapePaint,
         hidden: true,
       ),
+      ObjectGroupDrawable.fromDrawables(
+        drawables: [
+          RectangleDrawable(
+            size: const Size(24, 18),
+            position: const Offset(35, 210),
+            paint: shapePaint,
+          ),
+          OvalDrawable(
+            size: const Size(20, 28),
+            position: const Offset(75, 215),
+            paint: shapePaint,
+          ),
+        ],
+        rotationAngle: 0.35,
+        scale: 1.15,
+        locked: true,
+      ),
     ];
     final codec = DrawableJsonCodec();
 
@@ -244,6 +261,7 @@ void main() {
     expect(restored[7], isA<TriangleDrawable>());
     expect(restored[8], isA<LabeledSized1DShapeDrawable>());
     expect(restored[9], isA<LabeledSized2DShapeDrawable>());
+    expect(restored[10], isA<ObjectGroupDrawable>());
     final movedLine = (restored[2] as LineDrawable).copyWith(
       position: const Offset(90, 90),
     );
@@ -374,6 +392,8 @@ void _disposeDrawableImages(Iterable<Drawable> drawables) {
       if (drawable is ImageDrawable) {
         images.add(drawable.image);
       } else if (drawable is GroupedDrawable) {
+        collect(drawable.drawables);
+      } else if (drawable is ObjectGroupDrawable) {
         collect(drawable.drawables);
       }
     }

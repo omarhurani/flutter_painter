@@ -176,4 +176,70 @@ void main() {
     expect(rendered.width, 200);
     expect(rendered.height, 200);
   });
+
+  testWidgets('groups, moves, restores, and ungroups a shape and sticker', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    final recorder = ui.PictureRecorder();
+    ui.Canvas(recorder).drawRect(
+      const Rect.fromLTWH(0, 0, 20, 20),
+      ui.Paint()..color = Colors.teal,
+    );
+    final stickerImage = await recorder.endRecording().toImage(20, 20);
+    addTearDown(stickerImage.dispose);
+
+    final painterFinder = find.byType(FlutterPainter);
+    final painter = tester.widget<FlutterPainter>(painterFinder);
+    final controller = painter.controller;
+    final rectangle = RectangleDrawable(
+      size: const Size(60, 40),
+      position: const Offset(90, 120),
+      paint: Paint()..color = Colors.orange,
+    );
+    final sticker = ImageDrawable(
+      image: stickerImage,
+      tag: 'grouped-sticker',
+      position: const Offset(170, 140),
+      scale: 2,
+    );
+    controller.addDrawables([rectangle, sticker]);
+    final group = controller.groupObjectDrawables([rectangle, sticker]);
+    await tester.pumpAndSettle();
+
+    expect(group, isNotNull);
+    expect(controller.drawables.single, same(group));
+    expect(controller.selectedObjectDrawable, same(group));
+
+    final start = tester.getTopLeft(painterFinder) + group!.position;
+    final gesture = await tester.startGesture(start);
+    await gesture.moveBy(const Offset(20, 10));
+    await tester.pump();
+    await gesture.moveBy(const Offset(40, 20));
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    final movedGroup =
+        controller.selectedObjectDrawable! as ObjectGroupDrawable;
+    expect(movedGroup.position, group.position + const Offset(40, 20));
+
+    controller.undo();
+    await tester.pumpAndSettle();
+    expect(controller.selectedObjectDrawable, same(group));
+    controller.redo();
+    await tester.pumpAndSettle();
+    expect(controller.selectedObjectDrawable, isA<ObjectGroupDrawable>());
+
+    final restored = controller.ungroupSelectedObjectDrawable();
+    await tester.pumpAndSettle();
+    expect(restored, hasLength(2));
+    expect(restored!.whereType<ImageDrawable>().single.tag, 'grouped-sticker');
+
+    final rendered = await controller.renderImage(const Size(220, 180));
+    addTearDown(rendered.dispose);
+    expect(rendered.width, 220);
+    expect(rendered.height, 180);
+  });
 }

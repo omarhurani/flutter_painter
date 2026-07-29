@@ -368,6 +368,29 @@ void deselectObjectDrawable(){
 
 The selected object drawable will also be automatically update if it is replaced or removed from the controller.
 
+### Grouping objects
+
+Two or more top-level object drawables can be combined into one selectable
+`ObjectGroupDrawable`. Shapes, text, images, stickers, and nested object groups
+can then be moved, scaled, or rotated together:
+
+```dart
+final group = controller.groupObjectDrawables([
+  firstShape,
+  sticker,
+]);
+
+if (group != null) {
+  // Restore the transformed children as individual top-level objects.
+  final children = controller.ungroupObjectDrawable(group);
+}
+```
+
+The application chooses which objects to group, so this works with custom
+multi-selection interfaces. Group and ungroup operations participate in undo
+and redo, preserve child paint order, and are supported by
+`DrawableJsonCodec`.
+
 To remove one known drawable, pass it to `removeDrawable`. For an object the
 user selected, call `removeSelectedObjectDrawable` directly. Both operations
 participate in undo and redo.

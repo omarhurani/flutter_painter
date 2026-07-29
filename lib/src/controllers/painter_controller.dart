@@ -11,6 +11,7 @@ import 'drawables/image_drawable.dart';
 import 'events/events.dart';
 import 'drawables/background/background_drawable.dart';
 import 'drawables/object_drawable.dart';
+import 'drawables/object_group_drawable.dart';
 import 'drawables/text_drawable.dart';
 import 'settings/settings.dart';
 import '../views/painters/painter.dart';
@@ -247,6 +248,52 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     final action = MergeDrawablesAction(erasableOnly: true);
     action.perform(this);
     _addAction(action, newAction);
+  }
+
+  /// Groups [drawables] into one selectable, transformable object.
+  ///
+  /// Every drawable must be a top-level object owned by this controller and
+  /// at least two distinct drawables are required. The group takes the
+  /// z-order position of the highest selected drawable.
+  ///
+  /// Returns the new group, or `null` when the request is invalid.
+  ObjectGroupDrawable? groupObjectDrawables(
+    Iterable<ObjectDrawable> drawables, {
+    bool selectGroup = true,
+    bool newAction = true,
+  }) {
+    final action = GroupObjectDrawablesAction(
+      drawables,
+      selectGroup: selectGroup,
+      maxWidth: painterKey.currentContext?.size?.width ?? double.infinity,
+    );
+    final group = action.perform(this);
+    if (group != null) _addAction(action, newAction);
+    return group;
+  }
+
+  /// Replaces [group] with its transformed child objects.
+  ///
+  /// Returns the restored child objects, or `null` when [group] is not a
+  /// top-level drawable owned by this controller.
+  List<ObjectDrawable>? ungroupObjectDrawable(
+    ObjectGroupDrawable group, {
+    bool newAction = true,
+  }) {
+    final action = UngroupObjectDrawableAction(group);
+    final drawables = action.perform(this);
+    if (drawables != null) _addAction(action, newAction);
+    return drawables;
+  }
+
+  /// Ungroups the currently selected object when it is a group.
+  ///
+  /// Returns the restored child objects, or `null` when the current selection
+  /// is not an [ObjectGroupDrawable].
+  List<ObjectDrawable>? ungroupSelectedObjectDrawable({bool newAction = true}) {
+    final selected = selectedObjectDrawable;
+    if (selected is! ObjectGroupDrawable) return null;
+    return ungroupObjectDrawable(selected, newAction: newAction);
   }
 
   void _addAction(ControllerAction action, bool newAction) {

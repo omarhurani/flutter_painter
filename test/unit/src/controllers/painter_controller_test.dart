@@ -1,6 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter_painter/src/controllers/drawables/image_drawable.dart';
+import 'package:flutter_painter/src/controllers/drawables/object_group_drawable.dart';
+import 'package:flutter_painter/src/controllers/drawables/shape/oval_drawable.dart';
+import 'package:flutter_painter/src/controllers/drawables/shape/rectangle_drawable.dart';
 import 'package:flutter_painter/src/controllers/painter_controller.dart';
 import 'package:flutter_painter/src/controllers/drawables/text_drawable.dart';
 import 'package:flutter_painter/src/controllers/events/edit_text_painter_event.dart';
@@ -179,4 +182,128 @@ void main() {
     expect(drawable.sourceRect, crop);
     expect(drawable.getSize(), const Size(20, 10));
   });
+
+  test('groups objects with exact order, selection, undo, and redo', () {
+    final rectangle = RectangleDrawable(
+      size: const Size(40, 30),
+      position: const Offset(30, 40),
+    );
+    final untouched = TextDrawable(
+      text: 'Untouched',
+      position: const Offset(100, 100),
+    );
+    final oval = OvalDrawable(
+      size: const Size(20, 50),
+      position: const Offset(70, 60),
+    );
+    final controller = PainterController(
+      drawables: [rectangle, untouched, oval],
+    );
+    addTearDown(controller.dispose);
+    controller.selectObjectDrawable(rectangle);
+
+    final group = controller.groupObjectDrawables([oval, rectangle]);
+
+    expect(group, isNotNull);
+    expect(controller.value.drawables, [untouched, same(group)]);
+    expect(group!.drawables, [isA<RectangleDrawable>(), isA<OvalDrawable>()]);
+    expect(controller.selectedObjectDrawable, same(group));
+    expect(controller.canUndo, isTrue);
+
+    controller.undo();
+    expect(controller.value.drawables, [rectangle, untouched, oval]);
+    expect(controller.selectedObjectDrawable, same(rectangle));
+
+    controller.redo();
+    expect(controller.value.drawables, [untouched, same(group)]);
+    expect(controller.selectedObjectDrawable, same(group));
+  });
+
+  test('rejects invalid object groups without recording an action', () {
+    final owned = TextDrawable(text: 'Owned', position: Offset.zero);
+    final foreign = TextDrawable(
+      text: 'Foreign',
+      position: const Offset(20, 20),
+    );
+    final controller = PainterController(drawables: [owned]);
+    addTearDown(controller.dispose);
+
+    expect(controller.groupObjectDrawables([owned]), isNull);
+    expect(controller.groupObjectDrawables([owned, foreign]), isNull);
+    expect(controller.value.drawables, [owned]);
+    expect(controller.canUndo, isFalse);
+  });
+
+  test('ungroups transformed objects and supports undo and redo', () async {
+    final rectangle = RectangleDrawable(
+      size: const Size(30, 20),
+      position: const Offset(40, 50),
+      rotationAngle: 0.2,
+      scale: 1.1,
+      paint: Paint()..color = const Color(0xFF1565C0),
+    );
+    final oval = OvalDrawable(
+      size: const Size(25, 35),
+      position: const Offset(80, 70),
+      rotationAngle: 0.4,
+      paint: Paint()..color = const Color(0xFFEF6C00),
+    );
+    final transformedGroup = ObjectGroupDrawable.fromDrawables(
+      drawables: [rectangle, oval],
+    ).copyWith(position: const Offset(110, 95), rotation: 0.6, scale: 1.4);
+    final controller = PainterController(drawables: [transformedGroup]);
+    addTearDown(controller.dispose);
+    controller.selectObjectDrawable(transformedGroup);
+    final groupedRender = await controller.renderImage(const Size(220, 180));
+    addTearDown(groupedRender.dispose);
+
+    final ungrouped = controller.ungroupSelectedObjectDrawable();
+
+    expect(ungrouped, hasLength(2));
+    expect(controller.value.drawables, ungrouped);
+    expect(controller.selectedObjectDrawable, isNull);
+    final ungroupedRender = await controller.renderImage(const Size(220, 180));
+    addTearDown(ungroupedRender.dispose);
+    final pixelDifference = _pixelDifference(
+      await _rawPixels(groupedRender),
+      await _rawPixels(ungroupedRender),
+    );
+    expect(pixelDifference, {
+      'differentChannels': 0,
+      'maximumDelta': 0,
+      'totalDelta': 0,
+    });
+
+    controller.undo();
+    expect(controller.value.drawables, [same(transformedGroup)]);
+    expect(controller.selectedObjectDrawable, same(transformedGroup));
+
+    controller.redo();
+    expect(controller.value.drawables, ungrouped);
+    expect(controller.selectedObjectDrawable, isNull);
+  });
+}
+
+Future<List<int>> _rawPixels(Image image) async {
+  final data = await image.toByteData(format: ImageByteFormat.rawRgba);
+  if (data == null) throw StateError('Could not read rendered pixels.');
+  return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+}
+
+Map<String, int> _pixelDifference(List<int> first, List<int> second) {
+  var differentChannels = 0;
+  var maximumDelta = 0;
+  var totalDelta = 0;
+  for (var index = 0; index < first.length; index++) {
+    final delta = (first[index] - second[index]).abs();
+    if (delta == 0) continue;
+    differentChannels++;
+    totalDelta += delta;
+    if (delta > maximumDelta) maximumDelta = delta;
+  }
+  return {
+    'differentChannels': differentChannels,
+    'maximumDelta': maximumDelta,
+    'totalDelta': totalDelta,
+  };
 }

@@ -18,6 +18,7 @@
 * Add reusable text labels to one- and two-dimensional shape factories ([Issue #45](https://github.com/omarhurani/flutter_painter/issues/45)).
 * Preserve application-defined image tags and count tagged sticker types ([Issue #56](https://github.com/omarhurani/flutter_painter/issues/56)).
 * Add versioned JSON export and restoration for built-in drawables, embedded images, and custom adapters ([Issue #34](https://github.com/omarhurani/flutter_painter/issues/34), [Issue #71](https://github.com/omarhurani/flutter_painter/issues/71), [Issue #79](https://github.com/omarhurani/flutter_painter/issues/79)).
+* Add transformable object groups with undoable grouping, ungrouping, and JSON persistence ([Issue #81](https://github.com/omarhurani/flutter_painter/issues/81)).
 
 ## [2.0.0] - 2026-07-28
 

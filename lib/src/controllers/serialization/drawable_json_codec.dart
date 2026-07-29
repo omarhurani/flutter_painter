@@ -9,6 +9,7 @@ import '../drawables/drawable.dart';
 import '../drawables/grouped_drawable.dart';
 import '../drawables/image_drawable.dart';
 import '../drawables/object_drawable.dart';
+import '../drawables/object_group_drawable.dart';
 import '../drawables/path/erase_drawable.dart';
 import '../drawables/path/free_style_drawable.dart';
 import '../drawables/shape/arrow_drawable.dart';
@@ -51,6 +52,7 @@ class DrawableJsonCodec {
 
   static const Set<String> _builtInTypes = {
     'group',
+    'objectGroup',
     'freeStyle',
     'erase',
     'text',
@@ -172,6 +174,22 @@ class DrawableJsonCodec {
         );
       }
       return _entry('group', {'hidden': group.hidden, 'drawables': children});
+    }
+    if (drawable.runtimeType == ObjectGroupDrawable) {
+      final group = drawable as ObjectGroupDrawable;
+      final children = <Map<String, Object?>>[];
+      for (var index = 0; index < group.drawables.length; index++) {
+        children.add(
+          await _encodeDrawable(
+            group.drawables[index],
+            '$path.drawables[$index]',
+          ),
+        );
+      }
+      return _entry('objectGroup', {
+        ..._object(group, path),
+        'drawables': children,
+      });
     }
     if (drawable.runtimeType == FreeStyleDrawable) {
       final stroke = drawable as FreeStyleDrawable;
@@ -320,6 +338,36 @@ class DrawableJsonCodec {
         return GroupedDrawable(
           drawables: drawables,
           hidden: _boolean(data['hidden'], '$path.data.hidden'),
+        );
+      case 'objectGroup':
+        final object = _decodeObject(data, '$path.data');
+        final entries = _list(data['drawables'], '$path.data.drawables');
+        final localDrawables = <ObjectDrawable>[];
+        for (var index = 0; index < entries.length; index++) {
+          final drawable = await _decodeDrawable(
+            _map(entries[index], '$path.data.drawables[$index]'),
+            '$path.data.drawables[$index]',
+            images,
+          );
+          if (drawable is! ObjectDrawable) {
+            throw FormatException(
+              '$path.data.drawables[$index] must decode to an object drawable.',
+            );
+          }
+          localDrawables.add(drawable);
+        }
+        if (localDrawables.isEmpty) {
+          throw FormatException('$path.data.drawables cannot be empty.');
+        }
+        return ObjectGroupDrawable.fromLocalDrawables(
+          drawables: localDrawables,
+          position: object.position,
+          rotationAngle: object.rotation,
+          scale: object.scale,
+          assists: object.assists,
+          assistPaints: object.assistPaints,
+          locked: object.locked,
+          hidden: object.hidden,
         );
       case 'freeStyle':
         return FreeStyleDrawable(

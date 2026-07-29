@@ -6,3 +6,5 @@ export 'merge_drawables_action.dart';
 export 'remove_drawable_action.dart';
 export 'replace_drawable_action.dart';
 export 'grouped_action.dart';
+export 'group_object_drawables_action.dart';
+export 'ungroup_object_drawable_action.dart';
