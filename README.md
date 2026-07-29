@@ -369,6 +369,24 @@ if (imageDrawable is ImageDrawable) {
 }
 ```
 
+To count each sticker type, add images with an application-defined tag. Tags
+remain attached while a sticker is moved, transformed, cropped, or otherwise
+replaced:
+
+```dart
+controller.addTaggedImage(
+  stickerImage,
+  tag: 'star',
+  size: const Size(100, 100),
+);
+
+final counts = controller.imageDrawableCountsByTag;
+final starCount = counts['star'] ?? 0;
+```
+
+The count map omits untagged images and is read-only. Use any stable string,
+such as an asset name, database ID, or sticker URL, as the tag.
+
 ### Updating Drawable Colors
 
 Use `setDrawableColor` to update an existing free-style, shape, or text

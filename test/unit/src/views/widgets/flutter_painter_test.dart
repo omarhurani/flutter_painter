@@ -584,6 +584,7 @@ void main() {
     final imageDrawable = ImageDrawable(
       image: image,
       position: const Offset(150, 150),
+      tag: 'non-erasable-sticker',
       erasable: false,
     );
     final controller = PainterController(
@@ -619,6 +620,7 @@ void main() {
     expect(movedImage, isNot(same(imageDrawable)));
     expect(movedImage!.position, isNot(imageDrawable.position));
     expect(movedImage.erasable, isFalse);
+    expect((movedImage as ImageDrawable).tag, 'non-erasable-sticker');
 
     final eraseY = movedImage.position.dy;
     final eraseGesture = await tester.startGesture(

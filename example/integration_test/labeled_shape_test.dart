@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
@@ -65,5 +67,55 @@ void main() {
     await tester.tap(find.byIcon(Icons.image).last);
     await tester.pumpAndSettle();
     expect(find.text('Rendered Image'), findsOneWidget);
+  });
+
+  testWidgets('counts sticker tags after replacement and export', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    final recorder = ui.PictureRecorder();
+    ui.Canvas(recorder).drawRect(
+      const Rect.fromLTWH(0, 0, 20, 20),
+      ui.Paint()..color = Colors.orange,
+    );
+    final stickerImage = await recorder.endRecording().toImage(20, 20);
+    addTearDown(stickerImage.dispose);
+
+    final painter = tester.widget<FlutterPainter>(find.byType(FlutterPainter));
+    final controller = painter.controller;
+    controller.addTaggedImage(
+      stickerImage,
+      tag: 'star',
+      size: const Size(40, 40),
+    );
+    controller.addTaggedImage(
+      stickerImage,
+      tag: 'star',
+      size: const Size(40, 40),
+    );
+    controller.addTaggedImage(
+      stickerImage,
+      tag: 'heart',
+      size: const Size(40, 40),
+    );
+    controller.addImage(stickerImage, const Size(40, 40));
+    await tester.pumpAndSettle();
+
+    expect(controller.imageDrawableCountsByTag, {'star': 2, 'heart': 1});
+
+    final original = controller.drawables.first as ImageDrawable;
+    controller.replaceDrawable(
+      original,
+      original.copyWith(position: const Offset(80, 80), opacity: 0.5),
+    );
+    await tester.pumpAndSettle();
+    expect(controller.imageDrawableCountsByTag, {'star': 2, 'heart': 1});
+
+    final rendered = await controller.renderImage(const Size(200, 200));
+    addTearDown(rendered.dispose);
+    expect(rendered.width, 200);
+    expect(rendered.height, 200);
   });
 }

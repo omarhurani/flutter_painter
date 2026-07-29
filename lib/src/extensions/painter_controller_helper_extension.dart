@@ -5,6 +5,7 @@ import '../controllers/factories/shape_factory.dart';
 import '../controllers/painter_controller.dart';
 import '../controllers/settings/settings.dart';
 import '../controllers/drawables/drawables.dart';
+import '../controllers/drawables/grouped_drawable.dart';
 import 'paint_copy_extension.dart';
 
 /// Adds extra getters and setters in [PainterController] to make it easier to use.
@@ -19,6 +20,19 @@ extension PainterControllerHelper on PainterController {
 
   /// The unmodifiable list of drawables directly from `value`.
   List<Drawable> get drawables => value.drawables;
+
+  /// Counts tagged image drawables by their application-defined tag.
+  ///
+  /// Untagged images are omitted. The returned map cannot be modified.
+  Map<String, int> get imageDrawableCountsByTag {
+    final counts = <String, int>{};
+    for (final drawable in _imageDrawablesIn(drawables)) {
+      final tag = drawable.tag;
+      if (tag == null) continue;
+      counts.update(tag, (count) => count + 1, ifAbsent: () => 1);
+    }
+    return Map.unmodifiable(counts);
+  }
 
   /// Replaces a color-bearing [drawable] with a copy using [color].
   ///
@@ -394,4 +408,14 @@ extension PainterControllerHelper on PainterController {
       scale: value.settings.scale.copyWith(enabled: enabled),
     ),
   );
+}
+
+Iterable<ImageDrawable> _imageDrawablesIn(Iterable<Drawable> drawables) sync* {
+  for (final drawable in drawables) {
+    if (drawable is ImageDrawable) {
+      yield drawable;
+    } else if (drawable is GroupedDrawable) {
+      yield* _imageDrawablesIn(drawable.drawables);
+    }
+  }
 }

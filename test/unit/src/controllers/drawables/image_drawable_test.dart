@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter_painter/flutter_painter.dart';
+import 'package:flutter_painter/src/controllers/drawables/grouped_drawable.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -27,10 +28,13 @@ void main() {
     final drawable = ImageDrawable(
       image: image,
       position: Offset.zero,
+      tag: 'star',
       opacity: 0.75,
       assistPaints: {ObjectDrawableAssist.horizontal: assistPaint},
     );
 
+    expect(drawable.copyWith().tag, 'star');
+    expect(drawable.copyWith(tag: 'heart').tag, 'heart');
     expect(drawable.copyWith().opacity, 0.75);
     expect(drawable.copyWith(opacity: 0.25).opacity, 0.25);
     expect(
@@ -161,5 +165,34 @@ void main() {
       ),
       throwsArgumentError,
     );
+  });
+
+  test('controller counts tagged image drawables by sticker type', () {
+    final controller = PainterController(
+      drawables: [
+        ImageDrawable(image: image, position: Offset.zero, tag: 'star'),
+        GroupedDrawable(
+          drawables: [
+            ImageDrawable(image: image, position: Offset.zero, tag: 'star'),
+            GroupedDrawable(
+              drawables: [
+                ImageDrawable(
+                  image: image,
+                  position: Offset.zero,
+                  tag: 'heart',
+                ),
+              ],
+            ),
+          ],
+        ),
+        ImageDrawable(image: image, position: Offset.zero),
+      ],
+    );
+    addTearDown(controller.dispose);
+
+    final counts = controller.imageDrawableCountsByTag;
+
+    expect(counts, {'star': 2, 'heart': 1});
+    expect(() => counts['star'] = 0, throwsUnsupportedError);
   });
 }

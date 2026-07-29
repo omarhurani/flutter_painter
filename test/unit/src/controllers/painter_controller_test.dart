@@ -158,4 +158,25 @@ void main() {
     expect(drawable.sourceRect, crop);
     expect(drawable.getSize(), const Size(20, 10));
   });
+
+  test('addTaggedImage preserves its tag, crop, and fitted size', () {
+    final image = MockImage();
+    when(() => image.width).thenReturn(100);
+    when(() => image.height).thenReturn(50);
+    final controller = PainterController();
+    addTearDown(controller.dispose);
+
+    const crop = Rect.fromLTWH(20, 10, 40, 20);
+    controller.addTaggedImage(
+      image,
+      tag: 'sticker/star',
+      size: const Size(20, 20),
+      sourceRect: crop,
+    );
+
+    final drawable = controller.value.drawables.single as ImageDrawable;
+    expect(drawable.tag, 'sticker/star');
+    expect(drawable.sourceRect, crop);
+    expect(drawable.getSize(), const Size(20, 10));
+  });
 }

@@ -343,15 +343,28 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     _addImage(image, size);
   }
 
+  /// Adds a tagged [ImageDrawable] to the center of the painter.
+  ///
+  /// Use [tag] to identify an application-specific image or sticker type.
+  /// [sourceRect] uses source-image pixel coordinates when provided.
+  void addTaggedImage(
+    ui.Image image, {
+    required String tag,
+    Size? size,
+    Rect? sourceRect,
+  }) {
+    _addImage(image, size, sourceRect: sourceRect, tag: tag);
+  }
+
   /// Adds a cropped [ImageDrawable] to the center of the painter.
   ///
   /// [sourceRect] uses source-image pixel coordinates. If [size] is provided,
   /// the cropped area is scaled to fit that size.
   void addCroppedImage(ui.Image image, Rect sourceRect, [Size? size]) {
-    _addImage(image, size, sourceRect);
+    _addImage(image, size, sourceRect: sourceRect);
   }
 
-  void _addImage(ui.Image image, Size? size, [Rect? sourceRect]) {
+  void _addImage(ui.Image image, Size? size, {Rect? sourceRect, String? tag}) {
     // Calculate the center of the painter
     final renderBox =
         painterKey.currentContext?.findRenderObject() as RenderBox?;
@@ -364,12 +377,14 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     if (size == null) {
       drawable = ImageDrawable(
         image: image,
+        tag: tag,
         position: center,
         sourceRect: sourceRect,
       );
     } else {
       drawable = ImageDrawable.fittedToSize(
         image: image,
+        tag: tag,
         position: center,
         size: size,
         sourceRect: sourceRect,

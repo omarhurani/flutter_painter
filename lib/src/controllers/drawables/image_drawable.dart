@@ -7,6 +7,12 @@ class ImageDrawable extends ObjectDrawable {
   /// The image to be drawn.
   final Image image;
 
+  /// An optional application-defined tag for identifying this image.
+  ///
+  /// This is useful for distinguishing sticker types and is preserved when
+  /// the drawable is copied by object interactions.
+  final String? tag;
+
   /// The source pixels from [image] that are drawn.
   ///
   /// This rectangle is expressed in image pixel coordinates and must be
@@ -38,6 +44,7 @@ class ImageDrawable extends ObjectDrawable {
     super.locked,
     super.hidden,
     required this.image,
+    this.tag,
     Rect? sourceRect,
     this.flipped = false,
     double opacity = 1,
@@ -61,6 +68,7 @@ class ImageDrawable extends ObjectDrawable {
     bool locked = false,
     bool hidden = false,
     required Image image,
+    String? tag,
     Rect? sourceRect,
     bool flipped = false,
     double opacity = 1,
@@ -75,6 +83,7 @@ class ImageDrawable extends ObjectDrawable {
          assists: assists,
          assistPaints: assistPaints,
          image: image,
+         tag: tag,
          sourceRect: sourceRect,
          flipped: flipped,
          opacity: opacity,
@@ -93,6 +102,7 @@ class ImageDrawable extends ObjectDrawable {
     double? rotation,
     double? scale,
     Image? image,
+    String? tag,
     Rect? sourceRect,
     bool? flipped,
     double? opacity,
@@ -111,6 +121,7 @@ class ImageDrawable extends ObjectDrawable {
       rotationAngle: rotation ?? rotationAngle,
       scale: scale ?? this.scale,
       image: nextImage,
+      tag: tag ?? this.tag,
       sourceRect: nextSourceRect,
       flipped: flipped ?? this.flipped,
       opacity: opacity ?? this.opacity,

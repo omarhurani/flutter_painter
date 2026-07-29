@@ -16,6 +16,7 @@
 * Support custom free-style drawable factories for textured and specialized brushes ([Issue #55](https://github.com/omarhurani/flutter_painter/issues/55)).
 * Add source cropping for image drawables, including undo-aware controller helpers ([Issue #39](https://github.com/omarhurani/flutter_painter/issues/39)).
 * Add reusable text labels to one- and two-dimensional shape factories ([Issue #45](https://github.com/omarhurani/flutter_painter/issues/45)).
+* Preserve application-defined image tags and count tagged sticker types ([Issue #56](https://github.com/omarhurani/flutter_painter/issues/56)).
 
 ## [2.0.0] - 2026-07-28
 

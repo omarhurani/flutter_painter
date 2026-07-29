@@ -790,7 +790,11 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         image.dispose();
         return;
       }
-      controller.addImage(image, const Size(100, 100));
+      controller.addTaggedImage(
+        image,
+        tag: imageLink,
+        size: const Size(100, 100),
+      );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
