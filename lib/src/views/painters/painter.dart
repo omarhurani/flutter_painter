@@ -45,7 +45,10 @@ class Painter extends CustomPainter {
       );
     }
 
-    canvas.saveLayer(Rect.largest, Paint());
+    // Keep drawables on a separate layer so BlendMode.clear erases drawing
+    // content without clearing the background. A finite bound avoids the
+    // expensive and historically problematic Rect.largest path in Impeller.
+    canvas.saveLayer(Offset.zero & (paintScale ?? size), Paint());
 
     // Draw all the drawables
     for (final drawable in drawables.where(

@@ -69,6 +69,46 @@ void main() {
     expect(find.text('Rendered Image'), findsOneWidget);
   });
 
+  testWidgets('renders each of the first iOS free-style strokes', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.gesture));
+    await tester.pumpAndSettle();
+
+    final painterFinder = find.byType(FlutterPainter);
+    final painter = tester.widget<FlutterPainter>(painterFinder);
+    final painterTopLeft = tester.getTopLeft(painterFinder);
+    var previousRedPixels = 0;
+
+    for (var strokeIndex = 0; strokeIndex < 3; strokeIndex++) {
+      final start = painterTopLeft + Offset(80, 100 + strokeIndex * 35.0);
+      final gesture = await tester.startGesture(start);
+      await gesture.moveBy(const Offset(20, 0));
+      await tester.pump();
+      await gesture.moveBy(const Offset(90, 0));
+      await tester.pump();
+
+      expect(
+        painter.controller.drawables.whereType<FreeStyleDrawable>(),
+        hasLength(strokeIndex + 1),
+      );
+      final rendered = await painter.controller.renderImage(
+        const Size(320, 240),
+      );
+      final redPixels = await _countOpaqueRedPixels(rendered);
+      rendered.dispose();
+      expect(redPixels, greaterThan(previousRedPixels));
+      previousRedPixels = redPixels;
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }
+  });
+
   testWidgets('counts sticker tags after replacement and export', (
     tester,
   ) async {
@@ -400,4 +440,20 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+}
+
+Future<int> _countOpaqueRedPixels(ui.Image image) async {
+  final data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+  if (data == null) return 0;
+
+  var count = 0;
+  for (var index = 0; index < data.lengthInBytes; index += 4) {
+    if (data.getUint8(index) > 230 &&
+        data.getUint8(index + 1) < 40 &&
+        data.getUint8(index + 2) < 40 &&
+        data.getUint8(index + 3) > 200) {
+      count++;
+    }
+  }
+  return count;
 }

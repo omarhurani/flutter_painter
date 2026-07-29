@@ -21,6 +21,7 @@
 * Add transformable object groups with undoable grouping, ungrouping, and JSON persistence ([Issue #81](https://github.com/omarhurani/flutter_painter/issues/81)).
 * Release image-provider stream listeners after resolving an image, rebind painter widget subscriptions when controllers change, and document independent PageView controller/image ownership ([Issue #32](https://github.com/omarhurani/flutter_painter/issues/32), [Issue #36](https://github.com/omarhurani/flutter_painter/issues/36)).
 * Add drawable, editable, JSON-persisted clockwise angles from 0 to 360 degrees, including reflex angles ([Issue #9](https://github.com/omarhurani/flutter_painter/issues/9)).
+* Bound the drawable save layer to the painter coordinate space instead of `Rect.largest`, preventing early-stroke flicker and lag with Impeller on iOS ([Issue #67](https://github.com/omarhurani/flutter_painter/issues/67)).
 
 ## [2.0.0] - 2026-07-28
 

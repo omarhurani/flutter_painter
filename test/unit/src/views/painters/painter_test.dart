@@ -1,8 +1,13 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/src/controllers/drawables/background/background_drawables.dart';
 import 'package:flutter_painter/src/controllers/drawables/grouped_drawable.dart';
 import 'package:flutter_painter/src/controllers/drawables/object_drawable.dart';
+import 'package:flutter_painter/src/controllers/drawables/path/erase_drawable.dart';
+import 'package:flutter_painter/src/controllers/drawables/shape/rectangle_drawable.dart';
 import 'package:flutter_painter/src/views/painters/painter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -23,7 +28,9 @@ void main() {
 
         instance.paint(canvas, Size(10, 10));
 
-        verify(() => canvas.saveLayer(any(), any()));
+        verify(
+          () => canvas.saveLayer(const Rect.fromLTWH(0, 0, 10, 10), any()),
+        );
         expect(verify(() => canvas.restore()).callCount, 1);
         verifyNever(() => canvas.save());
       },
@@ -46,7 +53,7 @@ void main() {
           )
           .storage;
       verify(() => canvas.transform(storage));
-      verify(() => canvas.saveLayer(any(), any()));
+      verify(() => canvas.saveLayer(const Rect.fromLTWH(0, 0, 20, 20), any()));
       expect(verify(() => canvas.restore()).callCount, 2);
     });
 
@@ -102,6 +109,46 @@ void main() {
 
       verifyNever(() => drawable.draw(canvas, size));
     });
+
+    test(
+      'finite drawable layer preserves erasing over the background',
+      () async {
+        final recorder = ui.PictureRecorder();
+        final realCanvas = Canvas(recorder);
+        final instance = Painter(
+          background: ColorBackgroundDrawable(color: Colors.white),
+          drawables: [
+            RectangleDrawable(
+              size: const Size(80, 80),
+              position: const Offset(50, 50),
+              paint: Paint()
+                ..color = Colors.blue
+                ..style = PaintingStyle.fill,
+            ),
+            EraseDrawable(
+              path: const [Offset(50, 25), Offset(50, 75)],
+              strokeWidth: 20,
+            ),
+          ],
+        );
+
+        instance.paint(realCanvas, const Size(100, 100));
+        final image = await recorder.endRecording().toImage(100, 100);
+        addTearDown(image.dispose);
+        final pixels = await image.toByteData(
+          format: ui.ImageByteFormat.rawRgba,
+        );
+
+        expect(
+          _pixelColor(pixels!, width: 100, x: 20, y: 20).toARGB32(),
+          Colors.blue.toARGB32(),
+        );
+        expect(
+          _pixelColor(pixels, width: 100, x: 50, y: 50).toARGB32(),
+          Colors.white.toARGB32(),
+        );
+      },
+    );
   });
 
   group('repaint', () {
@@ -182,6 +229,21 @@ void main() {
       );
     });
   });
+}
+
+Color _pixelColor(
+  ByteData pixels, {
+  required int width,
+  required int x,
+  required int y,
+}) {
+  final offset = (y * width + x) * 4;
+  return Color.fromARGB(
+    pixels.getUint8(offset + 3),
+    pixels.getUint8(offset),
+    pixels.getUint8(offset + 1),
+    pixels.getUint8(offset + 2),
+  );
 }
 
 class _ArrangeBuilder {
