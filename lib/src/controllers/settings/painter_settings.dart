@@ -1,6 +1,6 @@
 export 'free_style_settings.dart';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'settings.dart';
 
 /// Represents all the settings used to create and draw drawables.

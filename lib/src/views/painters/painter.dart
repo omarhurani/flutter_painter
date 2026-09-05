@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_painter/flutter_painter.dart';
 

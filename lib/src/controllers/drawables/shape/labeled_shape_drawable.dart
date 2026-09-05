@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../object_drawable.dart';
 import '../sized1ddrawable.dart';
@@ -37,11 +37,11 @@ class ShapeLabel {
   /// Creates a shape label.
   const ShapeLabel({
     required this.text,
-    this.style = const TextStyle(fontSize: 14, color: Colors.black),
+    this.style = const TextStyle(fontSize: 14, color: Color(0xFF000000)),
     this.direction = TextDirection.ltr,
     this.textAlign = TextAlign.center,
     this.padding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    this.backgroundColor = Colors.white,
+    this.backgroundColor = const Color(0xFFFFFFFF),
     this.borderRadius = const BorderRadius.all(Radius.circular(6)),
     this.offset = Offset.zero,
   });

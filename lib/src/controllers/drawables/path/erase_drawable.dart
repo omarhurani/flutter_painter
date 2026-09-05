@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'path_drawable.dart';
 
 /// Free-style Erase Drawable .

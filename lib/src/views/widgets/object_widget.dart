@@ -198,7 +198,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                   return Container(
                                                     decoration: BoxDecoration(
                                                       border: Border.all(
-                                                        color: Colors.black,
+                                                        color: const Color(
+                                                          0xFF000000,
+                                                        ),
                                                         width:
                                                             selectedBorderWidth,
                                                       ),
@@ -206,7 +208,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     child: Container(
                                                       decoration: BoxDecoration(
                                                         border: Border.all(
-                                                          color: Colors.white,
+                                                          color: const Color(
+                                                            0xFFFFFFFF,
+                                                          ),
                                                           width:
                                                               selectedBorderWidth,
                                                         ),
@@ -217,13 +221,17 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                 return Container(
                                                   decoration: BoxDecoration(
                                                     border: Border.all(
-                                                      color: Colors.white,
+                                                      color: const Color(
+                                                        0xFFFFFFFF,
+                                                      ),
                                                       width:
                                                           selectedBorderWidth,
                                                     ),
                                                     boxShadow: [
                                                       BorderBoxShadow(
-                                                        color: Colors.black,
+                                                        color: const Color(
+                                                          0xFF000000,
+                                                        ),
                                                         blurRadius:
                                                             selectedBlurRadius,
                                                       ),
@@ -271,6 +279,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     active:
                                                         controlsAreActive[0] ??
                                                         false,
+                                                    activeColor: settings
+                                                        .activeControlColor,
                                                   ),
                                                 ),
                                               ),
@@ -311,6 +321,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     active:
                                                         controlsAreActive[1] ??
                                                         false,
+                                                    activeColor: settings
+                                                        .activeControlColor,
                                                   ),
                                                 ),
                                               ),
@@ -355,6 +367,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     active:
                                                         controlsAreActive[2] ??
                                                         false,
+                                                    activeColor: settings
+                                                        .activeControlColor,
                                                   ),
                                                 ),
                                               ),
@@ -395,6 +409,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     active:
                                                         controlsAreActive[3] ??
                                                         false,
+                                                    activeColor: settings
+                                                        .activeControlColor,
                                                   ),
                                                 ),
                                               ),
@@ -440,6 +456,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     active:
                                                         controlsAreActive[4] ??
                                                         false,
+                                                    activeColor: settings
+                                                        .activeControlColor,
                                                   ),
                                                 ),
                                               ),
@@ -482,6 +500,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     active:
                                                         controlsAreActive[5] ??
                                                         false,
+                                                    activeColor: settings
+                                                        .activeControlColor,
                                                   ),
                                                 ),
                                               ),
@@ -524,6 +544,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     active:
                                                         controlsAreActive[6] ??
                                                         false,
+                                                    activeColor: settings
+                                                        .activeControlColor,
                                                   ),
                                                 ),
                                               ),
@@ -566,6 +588,8 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
                                                     active:
                                                         controlsAreActive[7] ??
                                                         false,
+                                                    activeColor: settings
+                                                        .activeControlColor,
                                                   ),
                                                 ),
                                               ),
@@ -1155,23 +1179,26 @@ class _ObjectControlBox extends StatelessWidget {
   /// Whether the box is being used or not.
   final bool active;
 
+  /// The color used to fill the box while [active] is `true`.
+  final Color activeColor;
+
   /// Creates an [_ObjectControlBox] with the given [shape] and [active].
   ///
   /// By default, it will be a [BoxShape.rectangle] shape and not active.
   const _ObjectControlBox({
     this.shape = BoxShape.rectangle,
     this.active = false,
+    required this.activeColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = Theme.of(context).colorScheme.secondary;
     return AnimatedContainer(
       duration: _ObjectWidgetState.controlsTransitionDuration,
       decoration: BoxDecoration(
-        color: active ? activeColor : Colors.white,
+        color: active ? activeColor : const Color(0xFFFFFFFF),
         shape: shape,
-        boxShadow: [BoxShadow(color: Colors.black, blurRadius: 2)],
+        boxShadow: const [BoxShadow(color: Color(0xFF000000), blurRadius: 2)],
       ),
     );
   }

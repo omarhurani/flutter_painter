@@ -1,10 +1,10 @@
 import 'dart:ui' as ui;
 
 import 'package:example/main.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -569,7 +569,7 @@ void main() {
 
       controllers.first.addText();
       await tester.pump();
-      await tester.enterText(find.byType(TextField), 'first page');
+      await tester.enterText(find.byType(EditableText), 'first page');
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pumpAndSettle();
 
@@ -577,7 +577,7 @@ void main() {
       await tester.pumpAndSettle();
       controllers.last.addText();
       await tester.pump();
-      await tester.enterText(find.byType(TextField), 'second page');
+      await tester.enterText(find.byType(EditableText), 'second page');
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pumpAndSettle();
 

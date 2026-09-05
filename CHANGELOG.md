@@ -1,5 +1,12 @@
 ## Unreleased
 
+## [2.2.0] - 2026-09-05
+
+### Changed
+
+* Make package material-agnostic. The text editor now uses `EditableText` instead of `TextField`.
+* Add `ObjectSettings.activeControlColor` to configure the active object-handle color, replacing an implicit `Theme.of(context).colorScheme.secondary` lookup.
+
 ## [2.1.0] - 2026-07-29
 
 ### Added

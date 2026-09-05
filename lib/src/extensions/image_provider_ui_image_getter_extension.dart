@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Adds a method to get a [ui.Image] object from any [ImageProvider].
 extension ImageProviderUiImageGetter on ImageProvider {

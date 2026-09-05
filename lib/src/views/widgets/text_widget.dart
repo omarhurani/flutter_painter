@@ -174,10 +174,10 @@ class EditTextWidget extends StatefulWidget {
 
 class EditTextWidgetState extends State<EditTextWidget>
     with WidgetsBindingObserver {
-  /// Text editing controller for the [TextField].
+  /// Text editing controller for the [EditableText].
   TextEditingController textEditingController = TextEditingController();
 
-  /// The focus node of the [TextField].
+  /// The focus node of the [EditableText].
   ///
   /// The node provided from the [TextSettings] will be used if provided
   /// Otherwise, it will be initialized to an inner [FocusNode].
@@ -254,7 +254,7 @@ class EditTextWidgetState extends State<EditTextWidget>
       // If the border is tapped, un-focus the text field
       onTap: () => textFieldNode.unfocus(),
       child: Container(
-        color: Colors.black38,
+        color: const Color(0x61000000),
         child: Padding(
           padding: EdgeInsets.only(
             bottom: (keyboardHeight - (screenHeight - height - y)).clamp(
@@ -265,22 +265,17 @@ class EditTextWidgetState extends State<EditTextWidget>
           child: ValueListenableBuilder<PainterControllerValue>(
             valueListenable: widget.controller,
             builder: (context, value, child) => Center(
-              child: TextField(
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                  isDense: true,
-                ),
-                cursorColor: Colors.white,
-                buildCounter: buildEmptyCounter,
-                maxLength: 1000,
-                minLines: 1,
-                maxLines: 10,
+              child: EditableText(
                 controller: textEditingController,
                 focusNode: textFieldNode,
                 style: value.settings.text.textStyle,
+                cursorColor: const Color(0xFFFFFFFF),
+                backgroundCursorColor: const Color(0x00000000),
+                keyboardType: TextInputType.multiline,
+                inputFormatters: [LengthLimitingTextInputFormatter(1000)],
+                minLines: 1,
+                maxLines: 10,
                 textAlign: textAlign,
-                textAlignVertical: TextAlignVertical.center,
                 onEditingComplete: onEditingComplete,
               ),
             ),
@@ -353,15 +348,4 @@ class EditTextWidgetState extends State<EditTextWidget>
       newAction: !widget.isNew,
     );
   }
-
-  /// Builds a null widget for the [TextField] counter.
-  ///
-  /// By default, [TextField] shows a character counter if the maxLength attribute
-  /// is used. This is to override the counter and display nothing.
-  Widget? buildEmptyCounter(
-    BuildContext context, {
-    required int currentLength,
-    int? maxLength,
-    required bool isFocused,
-  }) => null;
 }

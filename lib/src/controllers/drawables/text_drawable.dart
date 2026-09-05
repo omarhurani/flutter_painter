@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'object_drawable.dart';
 
@@ -27,7 +27,7 @@ class TextDrawable extends ObjectDrawable {
     required super.position,
     double rotation = 0,
     super.scale,
-    this.style = const TextStyle(fontSize: 14, color: Colors.black),
+    this.style = const TextStyle(fontSize: 14, color: Color(0xFF000000)),
     this.direction = TextDirection.ltr,
     this.textAlign = TextAlign.center,
     super.locked,
