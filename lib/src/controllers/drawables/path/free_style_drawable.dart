@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'path_drawable.dart';
 
@@ -13,7 +13,7 @@ class FreeStyleDrawable extends PathDrawable {
   FreeStyleDrawable({
     required super.path,
     super.strokeWidth,
-    this.color = Colors.black,
+    this.color = const Color(0xFF000000),
     super.hidden,
   }) : // An empty path cannot be drawn, so it is an invalid argument.
        assert(path.isNotEmpty, 'The path cannot be an empty list'),

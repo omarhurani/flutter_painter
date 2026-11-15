@@ -208,14 +208,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(controller.selectedObjectDrawable, same(drawable));
-    expect(find.byType(TextField), findsOneWidget);
-    final textField = tester.widget<TextField>(find.byType(TextField));
-    expect(textField.controller?.text, 'Edit me');
-    expect(textField.focusNode?.hasFocus, isTrue);
+    expect(find.byType(EditableText), findsOneWidget);
+    final editableText = tester.widget<EditableText>(
+      find.byType(EditableText),
+    );
+    expect(editableText.controller.text, 'Edit me');
+    expect(editableText.focusNode.hasFocus, isTrue);
 
-    textField.focusNode?.unfocus();
+    editableText.focusNode.unfocus();
     await tester.pumpAndSettle();
-    expect(find.byType(TextField), findsNothing);
+    expect(find.byType(EditableText), findsNothing);
   });
 
   testWidgets('controller subscriptions rebind when the painter changes', (
@@ -233,11 +235,11 @@ void main() {
 
     firstController.addText();
     await tester.pumpAndSettle();
-    expect(find.byType(TextField), findsNothing);
+    expect(find.byType(EditableText), findsNothing);
 
     secondController.addText();
     await tester.pumpAndSettle();
-    expect(find.byType(TextField), findsOneWidget);
+    expect(find.byType(EditableText), findsOneWidget);
 
     firstController.transformationController.value = Matrix4.translationValues(
       20,

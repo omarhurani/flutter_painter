@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+import 'dart:ui';
+
+import 'package:flutter/widgets.dart' show immutable;
 
 import '../drawables/path/free_style_drawable.dart';
 import '../drawables/path/path_drawable.dart';
@@ -32,7 +34,7 @@ class FreeStyleSettings {
   /// and [strokeWidth], [mode], and [factory] values.
   const FreeStyleSettings({
     this.mode = FreeStyleMode.none,
-    this.color = Colors.black,
+    this.color = const Color(0xFF000000),
     this.strokeWidth = 1,
     this.factory,
     this.fillTolerance = 8,

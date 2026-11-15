@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
 import 'events/selected_object_drawable_removed_event.dart';
 import 'helpers/flood_fill.dart';

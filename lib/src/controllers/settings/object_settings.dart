@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' show Color;
 
 import 'package:flutter/foundation.dart';
 
@@ -43,11 +44,17 @@ class ObjectSettings {
   final ObjectShowScaleRotationControlsResolver
   showScaleRotationControlsResolver;
 
+  /// The color used for an object's control handle while it is active (being dragged).
+  ///
+  /// Defaults to Material 3's baseline light `ColorScheme.secondary`.
+  final Color activeControlColor;
+
   /// Creates a [TextSettings] with the given [layoutAssist].
   const ObjectSettings({
     this.layoutAssist = const ObjectLayoutAssistSettings(),
     this.enlargeControlsResolver = _enlargeControls,
     this.showScaleRotationControlsResolver = _showScaleRotationControls,
+    this.activeControlColor = const Color(0xFF625B71),
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
@@ -55,6 +62,7 @@ class ObjectSettings {
     ObjectLayoutAssistSettings? layoutAssist,
     ObjectEnlargeControlsResolver? enlargeControlsResolver,
     ObjectShowScaleRotationControlsResolver? showScaleRotationControlsResolver,
+    Color? activeControlColor,
   }) {
     return ObjectSettings(
       layoutAssist: layoutAssist ?? this.layoutAssist,
@@ -63,6 +71,7 @@ class ObjectSettings {
       showScaleRotationControlsResolver:
           showScaleRotationControlsResolver ??
           this.showScaleRotationControlsResolver,
+      activeControlColor: activeControlColor ?? this.activeControlColor,
     );
   }
 

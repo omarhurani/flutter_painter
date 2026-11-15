@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'drawable.dart';
 
@@ -9,12 +9,12 @@ abstract class ObjectDrawable extends Drawable {
   /// Default paint used for horizontal and vertical assist lines.
   static final Paint defaultAssistPaint = Paint()
     ..strokeWidth = 1.5
-    ..color = Colors.blue;
+    ..color = const Color(0xFF2196F3);
 
   /// Default paint used for rotational assist lines.
   static final defaultRotationAssistPaint = Paint()
     ..strokeWidth = 1.5
-    ..color = Colors.pink;
+    ..color = const Color(0xFFE91E63);
 
   /// The smallest value for the scale of an object drawable.
   static const double minScale = 0.001;

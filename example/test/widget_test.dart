@@ -1,9 +1,9 @@
+import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:example/main.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   testWidgets('example renders the painter', (tester) async {
@@ -55,8 +55,10 @@ void main() {
     await tester.tap(find.text('Start aligned'));
     await tester.pumpAndSettle();
 
-    final textField = tester.widget<TextField>(find.byType(TextField));
-    expect(textField.textAlign, TextAlign.start);
+    final editableText = tester.widget<EditableText>(
+      find.byType(EditableText),
+    );
+    expect(editableText.textAlign, TextAlign.start);
   });
 
   testWidgets('selected text can be reopened from the toolbar', (tester) async {
@@ -70,20 +72,22 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Start aligned'));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField), 'Edit me again');
+    await tester.enterText(find.byType(EditableText), 'Edit me again');
 
     FocusManager.instance.primaryFocus?.unfocus();
     await tester.pumpAndSettle();
-    expect(find.byType(TextField), findsNothing);
+    expect(find.byType(EditableText), findsNothing);
 
     await tester.tapAt(tester.getCenter(find.byType(FlutterPainter)));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Edit selected text'));
     await tester.pumpAndSettle();
 
-    final textField = tester.widget<TextField>(find.byType(TextField));
-    expect(textField.controller?.text, 'Edit me again');
-    expect(textField.focusNode?.hasFocus, isTrue);
+    final editableText = tester.widget<EditableText>(
+      find.byType(EditableText),
+    );
+    expect(editableText.controller.text, 'Edit me again');
+    expect(editableText.focusNode.hasFocus, isTrue);
   });
 
   testWidgets('free style hue slider stays at its right boundary', (
@@ -379,9 +383,11 @@ void main() {
       await tester.pump();
 
       final updatedValue = tester.widget<Slider>(fontSizeSlider).value;
-      final textField = tester.widget<TextField>(find.byType(TextField));
+      final editableText = tester.widget<EditableText>(
+        find.byType(EditableText),
+      );
       expect(updatedValue, greaterThan(initialValue));
-      expect(textField.style?.fontSize, updatedValue);
+      expect(editableText.style.fontSize, updatedValue);
       expect(tester.testTextInput.isVisible, isTrue);
       expect(tester.takeException(), isNull);
     } finally {

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Represents settings used to create and draw text.
 @immutable
@@ -19,7 +19,7 @@ class TextSettings {
   /// Creates a [TextSettings] with the given [textStyle], [textAlign] and
   /// [focusNode].
   const TextSettings({
-    this.textStyle = const TextStyle(fontSize: 14, color: Colors.black),
+    this.textStyle = const TextStyle(fontSize: 14, color: Color(0xFF000000)),
     this.textAlign = TextAlign.center,
     this.focusNode,
   });

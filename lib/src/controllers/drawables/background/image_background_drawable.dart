@@ -1,13 +1,13 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
-import 'package:flutter/material.dart' as mt;
+import 'package:flutter/widgets.dart' as w;
 import 'package:flutter/painting.dart' show Alignment, BoxFit, applyBoxFit;
 
 import 'background_drawable.dart';
 
 /// Drawable to use an image as a background.
-@mt.immutable
+@w.immutable
 class ImageBackgroundDrawable extends BackgroundDrawable {
   /// The image to be used as a background.
   final Image image;
